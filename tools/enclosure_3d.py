@@ -179,6 +179,78 @@ Y_END = CY0 + 97.0
 RZ0 = top + HDR + 1.6 + 1.2
 cuboid(ax0 + 8, ay0 + 24.5, RZ0, 6, Y_END - (ay0 + 24.5), 0.4, (232, 160, 48))
 
+# ---------------------------------------------------------------- cables: small flat ribbons, 1.5 mm per wire (4 wires = 6 mm), 1.3 mm thick
+WIRE = 1.5
+TH = 1.3
+RED, YEL, BLU = (205, 35, 35), (235, 200, 40), (60, 110, 210)
+CABLES = []     # (number, label, connector, wires, color, end point)
+
+
+def cable(label, conn, wires, color, end):
+    CABLES.append((len(CABLES) + 1, label, conn, wires, color, end))
+
+
+def run_x(xc, y0, y1, zc, wires, color):
+    """Ribbon running along +y, width along x (horizontal housings)."""
+    w = wires * WIRE
+    cuboid(xc - w / 2, y0, zc - TH / 2, w, y1 - y0, TH, color)
+
+
+def run_z(xc, y0, y1, zc, wires, color):
+    """Ribbon running along +y, width along z (vertical 2-pin housings): seen edge-on."""
+    w = wires * WIRE
+    cuboid(xc - TH / 2, y0, zc - w / 2, TH, y1 - y0, w, color)
+
+
+def riser_y(xc, yc, z0, z1, wires, color):
+    """Short vertical piece leaving a plug whose pins run along y (J8, J9): width along y."""
+    w = wires * WIRE
+    cuboid(xc - TH / 2, yc - w / 2, z0, TH, w, z1 - z0, color)
+
+
+def riser_x(xc, yc, z0, z1, wires, color):
+    """Same, for a plug whose pins run along x (JST XH): width along x."""
+    w = wires * WIRE
+    cuboid(xc - w / 2, yc - TH / 2, z0, w, TH, z1 - z0, color)
+
+
+Y0 = CY0 + 73.8
+# J2: four 2-pin housings -> 5 V supply and the three SSRs (2 wires each)
+for k, (lab, col) in enumerate([("5 V supply", RED), ("pump SSR", (150, 90, 40)), ("boiler SSR", (232, 130, 30)), ("valve SSR", YEL)]):
+    xk = CX0 + 12.2 + k * 2.54
+    zk = top + 0.4 + 2.55
+    run_z(xk, Y0, Y_END, zk, 2, col)
+    cable(lab, "J2", 2, col, (xk, Y_END, zk))
+# J7: button (2 wires), encoder (4 wires, lower row), spare I/O (4 wires)
+xb, xe, xs = CX0 + 22.4 + 1.27, CX0 + 22.4 + 3.81, CX0 + 22.4 + 8.89
+run_x(xb, Y0, Y_END, top + 4.15, 2, (240, 240, 240)); cable("button", "J7", 2, (240, 240, 240), (xb, Y_END, top + 4.15))
+run_x(xe, Y0, Y_END, top + 1.55, 4, (40, 150, 70)); cable("encoder", "J7", 4, (40, 150, 70), (xe, Y_END, top + 1.55))
+run_x(xs, Y0, Y_END, top + 4.15, 4, (150, 90, 200)); cable("spare I/O", "J7", 4, (150, 90, 200), (xs, Y_END, top + 4.15))
+# J8 (4 wires) and J9 (3 wires): up from the plugs, then forward; J9 passes under J8 and over C1
+c8, c9 = (30, 170, 200), BLU
+riser_y(CX0 + 27.2, CY0 + 34.8, top + 10.5, top + 17.0, 4, c8)
+cuboid(CX0 + 26.2 - 3.0, CY0 + 34.8 - 3.0, top + 17.0, 6.0, Y_END - (CY0 + 34.8 - 3.0), TH, c8)
+cable("pump dimmer (I2C)", "J8", 4, c8, (CX0 + 26.2, Y_END, top + 17.0))
+riser_y(CX0 + 27.2, CY0 + 44.5, top + 10.5, top + 14.2, 3, c9)
+cuboid(CX0 + 29.0 - 2.25, CY0 + 44.5 - 2.25, top + 14.2, 4.5, Y_END - (CY0 + 44.5 - 2.25), TH, c9)
+cable("pressure sensor", "J9", 3, c9, (CX0 + 29.0, Y_END, top + 14.2))
+# JST XH: flow sensors (3 wires each), up from the plugs then forward
+c3, c4 = (20, 150, 150), (90, 80, 190)
+riser_x(CX0 + 40.5, CY0 + 65.0, top + 11.8, top + 14.0, 3, c3)
+cuboid(CX0 + 40.5 - 2.25, CY0 + 65.0 - 0.65, top + 14.0, 4.5, Y_END - (CY0 + 65.0 - 0.65), TH, c3)
+cable("flow sensor In", "J3", 3, c3, (CX0 + 40.5, Y_END, top + 14.0))
+riser_x(CX0 + 52.5, CY0 + 65.0, top + 11.8, top + 14.0, 3, c4)
+cuboid(CX0 + 52.5 - 2.25, CY0 + 65.0 - 0.65, top + 14.0, 4.5, Y_END - (CY0 + 65.0 - 0.65), TH, c4)
+cable("flow sensor Out", "J4", 3, c4, (CX0 + 52.5, Y_END, top + 14.0))
+# PT100 (3 wires): leaves the MAX31865 terminal block, rises in front of it and passes over J3
+cp = (230, 110, 160)
+xp = CX0 + 43.5
+cuboid(xp - 2.25, my + 27.9, top + 8.8 - TH / 2, 4.5, (CY0 + 57.0) - (my + 27.9), TH, cp)
+riser_x(xp, CY0 + 57.0, top + 8.8 - TH / 2, top + 17.0 + TH, 3, cp)
+cuboid(xp - 2.25, CY0 + 57.0 - 0.65, top + 17.0, 4.5, Y_END - (CY0 + 57.0 - 0.65), TH, cp)
+cable("PT100 probe", "MAX31865", 3, cp, (xp, Y_END, top + 17.0))
+RIBBON_NUMBER = len(CABLES) + 1
+
 # ---------------------------------------------------------------- outlines (edges between different faces)
 edge = np.zeros((HS, WS), bool)
 edge[:, 1:] |= FID[:, 1:] != FID[:, :-1]
@@ -187,72 +259,6 @@ e2 = edge.copy()
 e2[:, :-1] |= edge[:, 1:]
 e2[:-1, :] |= edge[1:, :]
 COL[e2] = (22, 22, 26)
-
-# ---------------------------------------------------------------- cables: round tubes with a depth test against the scene
-DCUR = DEPTH.copy()
-
-
-def tube(pts, color, r_mm):
-    R = r_mm * s * SS
-    Ri = int(math.ceil(R))
-    oy, ox = np.mgrid[-Ri:Ri + 1, -Ri:Ri + 1]
-    dist = np.sqrt(ox ** 2 + oy ** 2)
-    disc = dist <= R
-    oy, ox, dist = oy[disc], ox[disc], dist[disc]
-    q = dist / R
-    bump = np.sqrt(np.maximum(0.0, 1 - q ** 2)) * r_mm * 1.7
-    # light from the upper left: shade with the offset to the light
-    lit = np.clip(0.62 + 0.5 * (-(ox * 0.5 + oy * 0.8) / R + 0.4), 0.45, 1.25) * (1 - 0.35 * (q > 0.82))
-    base = np.array(color, np.float32)
-    # densify the polyline
-    samples = []
-    step = max(0.2, r_mm * 0.2)
-    for a, b in zip(pts[:-1], pts[1:]):
-        n = max(1, int(math.dist(a, b) / step))
-        for k in range(n + 1):
-            t = k / n
-            samples.append(tuple(a[i] + (b[i] - a[i]) * t for i in range(3)))
-    samples.sort(key=lambda p: p[0] + p[1] + p[2])
-    for p in samples:
-        u, v, d = proj(*p)
-        iu, iv = int(round(u)), int(round(v))
-        xs, ys = iu + ox, iv + oy
-        ok = (xs >= 0) & (xs < WS) & (ys >= 0) & (ys < HS)
-        xs, ys = xs[ok], ys[ok]
-        dd = (d + bump[ok]).astype(np.float32)
-        m = dd > DCUR[ys, xs]
-        if not m.any():
-            continue
-        xs, ys, dd = xs[m], ys[m], dd[m]
-        DCUR[ys, xs] = dd
-        COL[ys, xs] = np.clip(base[None, :] * lit[ok][m][:, None], 0, 255).astype(np.uint8)
-
-
-RED, BLK, YEL, BLU = (205, 35, 35), (30, 30, 34), (235, 200, 40), (60, 110, 210)
-CABLES = []     # (number, label, connector, color, radius, points)
-def cable(label, conn, color, r, pts, end_x=None):
-    CABLES.append((len(CABLES) + 1, label, conn, color, r, pts))
-
-# J2: four 2-pin housings -> 5 V supply and the three SSRs
-for k, (lab, col) in enumerate([("5 V supply", RED), ("pump SSR", (150, 90, 40)), ("boiler SSR", (232, 130, 30)), ("valve SSR", YEL)]):
-    xk = CX0 + 12.2 + k * 2.54
-    zk = top + 0.4 + 2.55
-    cable(lab, "J2", col, 1.0, [(xk, CY0 + 73.8, zk), (xk, Y_END, zk)])
-# J7: button (2-pin), encoder (4-pin, lower row), spare I/O (4-pin)
-cable("button", "J7", (240, 240, 240), 0.9, [(CX0 + 22.4 + 1.27, CY0 + 73.8, top + 4.15), (CX0 + 22.4 + 1.27, Y_END, top + 4.15)])
-cable("encoder", "J7", (40, 150, 70), 1.4, [(CX0 + 22.4 + 3.81, CY0 + 73.8, top + 1.55), (CX0 + 22.4 + 3.81, Y_END, top + 1.55)])
-cable("spare I/O", "J7", (150, 90, 200), 1.4, [(CX0 + 22.4 + 8.89, CY0 + 73.8, top + 4.15), (CX0 + 22.4 + 8.89, Y_END, top + 4.15)])
-# J8 / J9: the cables rise from the plugs, pass over C1 and leave above everything
-cable("pump dimmer (I2C)", "J8", (30, 170, 200), 1.1, [(CX0 + 27.2, CY0 + 34.8, top + 10.5), (CX0 + 26.2, CY0 + 34.8, top + 14.2), (CX0 + 26.2, Y_END, top + 14.2)])
-cable("pressure sensor", "J9", BLU, 1.1, [(CX0 + 27.2, CY0 + 44.5, top + 10.5), (CX0 + 29.0, CY0 + 44.5, top + 17.0), (CX0 + 29.0, Y_END, top + 17.0)])
-# JST XH: flow sensors
-cable("flow sensor In", "J3", (20, 150, 150), 1.2, [(CX0 + 42.0, CY0 + 65.0, top + 11.8), (CX0 + 39.0, CY0 + 65.0, top + 14.0), (CX0 + 39.0, Y_END, top + 14.0)])
-cable("flow sensor Out", "J4", (90, 80, 190), 1.2, [(CX0 + 52.5, CY0 + 65.0, top + 11.8), (CX0 + 53.0, CY0 + 65.0, top + 14.0), (CX0 + 53.0, Y_END, top + 14.0)])
-# PT100: leaves the MAX31865 terminal block towards the front and passes over J3
-cable("PT100 probe", "MAX31865", (230, 110, 160), 1.2, [(mx + 12.5, my + 27.9, top + 8.8), (CX0 + 45.5, CY0 + 58.0, top + 17.0), (CX0 + 45.5, Y_END, top + 17.0)])
-for (n, lab, conn, col, r, pts) in CABLES:
-    tube(pts, col, r)
-RIBBON_NUMBER = len(CABLES) + 1
 
 # ---------------------------------------------------------------- compose: image, overlays
 im = Image.fromarray(COL)
@@ -296,8 +302,8 @@ pl(CX0 + 27.2, CY0 + 40, top + 11, 330, 740, "J8 dimmer and J9 pressure (corrido
 
 # numbered tags at the cable ends, staggered so that they do not overlap
 ends = []
-for (n, lab, conn, col, r, pts) in CABLES:
-    ends.append((n, pts[-1], col))
+for (n, lab, conn, wires, col, end) in CABLES:
+    ends.append((n, end, col))
 ends.append((RIBBON_NUMBER, (ax0 + 11, Y_END, RZ0), (232, 160, 48)))
 order = sorted(ends, key=lambda e: e[1][0])
 for rank, (n, p, col) in enumerate(order):
@@ -312,11 +318,11 @@ for rank, (n, p, col) in enumerate(order):
     d.text((cx, cy), str(n), font=F(15, True), fill=(20, 20, 24) if sum(col) > 400 else (255, 255, 255), anchor='mm')
 
 # cable legend
-text(560, 955, "Cables (all leave through the front slot)", 20, (30, 30, 36), True)
-entries = [(n, "%s  %s" % (conn, lab), col) for (n, lab, conn, col, r, pts) in CABLES] + [(RIBBON_NUMBER, "J5  display FPC ribbon", (232, 160, 48))]
+text(560, 955, "Cables: small flat ribbons, 1.5 mm per wire (all leave through the front slot)", 20, (30, 30, 36), True)
+entries = [(n, "%s  %s  (%d wires, %.1f mm)" % (conn, lab, wires, wires * WIRE), col) for (n, lab, conn, wires, col, end) in CABLES] + [(RIBBON_NUMBER, "J5  display FPC ribbon (6 mm)", (232, 160, 48))]
 per_col = 7
 for i, (n, lab, col) in enumerate(entries):
-    cx = 580 + (i // per_col) * 520
+    cx = 580 + (i // per_col) * 560
     cy = 995 + (i % per_col) * 31
     d.ellipse([(cx - 11) * SS, (cy - 11) * SS, (cx + 11) * SS, (cy + 11) * SS], fill=col, outline=(30, 30, 34), width=2 * SS)
     d.text((cx * SS, cy * SS), str(n), font=F(14, True), fill=(20, 20, 24) if sum(col) > 400 else (255, 255, 255), anchor='mm')
