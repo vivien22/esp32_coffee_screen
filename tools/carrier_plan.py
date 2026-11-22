@@ -46,10 +46,18 @@ text(d, X(12), by0 - 1.5 * K, "USB-C opening", 12, (230, 230, 235), True)
 for (cx, cy) in [(bx0 + 3.6 * K, by0 + 3.6 * K), (bx1 - 3.6 * K, by0 + 3.6 * K), (bx0 + 3.6 * K, by1 - 3.6 * K), (bx1 - 3.6 * K, by1 - 3.6 * K)]:
     circ(d, cx, cy, 4.0 * K, fill=(30, 30, 34, 255), outline=(120, 120, 128, 255), width=3)
     circ(d, cx, cy, 1.1 * K, fill=(70, 70, 78, 255))
-# the free area 60 x 70 between the posts
-fx0, fy0 = X(-1), Y(-1)
-for (xa, ya, xb, yb) in [(fx0, fy0, fx0 + 60 * K, fy0), (fx0, fy0 + 70 * K, fx0 + 60 * K, fy0 + 70 * K), (fx0, fy0, fx0, fy0 + 70 * K), (fx0 + 60 * K, fy0, fx0 + 60 * K, fy0 + 70 * K)]:
+# the free area 58 x 68 between the posts, and the optional central extension (40 wide, up to 80 long in total)
+fx0, fy0 = X(0), Y(0)
+for (xa, ya, xb, yb) in [(fx0, fy0, fx0 + 58 * K, fy0), (fx0, fy0 + 68 * K, fx0 + 58 * K, fy0 + 68 * K), (fx0, fy0, fx0, fy0 + 68 * K), (fx0 + 58 * K, fy0, fx0 + 58 * K, fy0 + 68 * K)]:
     line(d, [(xa, ya), (xb, yb)], (200, 200, 205), 1.5)
+for (ya, yb, lab) in [(-6.0, 0.0, "back"), (68.0, 74.0, "front")]:
+    for t in range(0, 40, 4):
+        line(d, [(X(9 + t), Y(ya)), (X(9 + t + 2), Y(ya))], (150, 200, 150), 1.5)
+        line(d, [(X(9 + t), Y(yb)), (X(9 + t + 2), Y(yb))], (150, 200, 150), 1.5)
+    line(d, [(X(9), Y(ya)), (X(9), Y(yb))], (150, 200, 150), 1.5)
+    line(d, [(X(49), Y(ya)), (X(49), Y(yb))], (150, 200, 150), 1.5)
+text(d, X(29), Y(-3.0), "optional extension: 40 wide, 80 mm total length", 10, (150, 220, 150), True)
+text(d, X(29), Y(71.0), "optional extension: 40 wide, 80 mm total length", 10, (150, 220, 150), True)
 
 # ---------------------------------------------------------------- the board 58 x 68
 PW, PL = 58.0, 68.0
@@ -114,8 +122,11 @@ for i, name in enumerate(["R5", "R6", "R7", "R8"]):          # base pull-downs 1
     axial(11.5, 31.5 + i * 3.0, label=name)
 axial(11.5, 43.5, label="R9")                                  # encoder pull-up A
 axial(11.5, 46.2, label="R10")                                 # encoder pull-up B
-axial(11.5, 7.6, label="R17")                                  # IO38 input: series 4.7 k
-axial(11.5, 10.4, label="R18")                                 # IO38 input: 10 k to GND
+to92(11.5, 9.0, "Q5")                                           # spare output stage (2N2222A)
+# spare I/O conditioning, flat resistors under the MAX31865 (3 mm clearance): R17 4.7 k + R18 10 k (input divider), R19 1 k base, R20 4.7 k pull-up to 5 V, R21 10 k base to GND
+for i, name in enumerate(["R17", "R18", "R19", "R20", "R21"]):
+    axial(41.7, 35.5 + i * 2.7, pitch=10.16, label=None)
+    text(d, X(47.6), Y(35.5 + i * 2.7), name, 8, SILK, True, 'lm')
 
 # keep-out under the antenna
 for k in range(0, 14):
@@ -129,23 +140,23 @@ for i in range(8):
 rect(d, X(32.8) - 1.27 * K, Y(31.6) - 1.27 * K, X(32.8 + 7 * 2.54) + 1.27 * K, Y(31.6) + 1.27 * K, outline=(20, 20, 24, 255), width=2)
 silk(41.7, 29.9, "U2  MAX31865 (1x8, pin 1 VIN on the right)", 10)
 
-# ---------------------------------------------------------------- J5: socket 2 x 4 for the FPC adapter (board at the top right, connector towards the back wall)
+# ---------------------------------------------------------------- J5: socket 2 x 4 for the FPC adapter (board at the top right, rotated 180: connector towards the front)
 for r_ in range(2):
     for c_ in range(4):
-        tpad(35.5 + c_ * 2.54, 20.0 + r_ * 2.54, square=(r_ == 1 and c_ == 3), ring=1.7, drill=1.0)
-rect(d, X(35.5) - 1.5 * K, Y(20.0) - 1.5 * K, X(35.5 + 3 * 2.54) + 1.5 * K, Y(22.54) + 1.5 * K, outline=SILK + (255,), width=2)
-silk(41.0, 18.3, "J5  FPC board (2 x 4)", 10)
+        tpad(35.5 + c_ * 2.54, 7.6 + r_ * 2.54, square=(r_ == 0 and c_ == 0), ring=1.7, drill=1.0)
+rect(d, X(35.5) - 1.5 * K, Y(7.6) - 1.5 * K, X(35.5 + 3 * 2.54) + 1.5 * K, Y(10.14) + 1.5 * K, outline=SILK + (255,), width=2)
+silk(41.0, 5.6, "J5  FPC board (2 x 4)", 10)
 # two M2 holes for the standoffs of the FPC adapter (positions to be taken from your board)
-for (cx, cy) in [(31.0, 25.4), (49.0, 25.4)]:
+for (cx, cy) in [(31.0, 5.1), (49.0, 5.1)]:
     hole(cx, cy, 2.2, 4.2)
-silk(40, 25.9, "2 x M2 (to measure)", 9)
+silk(40, 3.6, "2 x M2 (to measure)", 9)
 
 # flow input conditioning under the adapter: R11..R16 (two columns of three, pitch 7.62) + C3, C4
 for i, name in enumerate(["R11", "R12", "R13", "R14", "R15", "R16"]):
     cx_ = 34.3 if i < 3 else 44.9
-    cy_ = 11.6 + (i % 3) * 2.6
+    cy_ = 13.8 + (i % 3) * 2.6
     axial(cx_, cy_, pitch=7.62, label=None)
-    text(d, X(cx_ + 4.6), Y(cy_), name, 8, SILK, True, 'lm') if False else text(d, X(cx_), Y(cy_) - 1.6 * K, name, 8, SILK, True)
+    text(d, X(cx_), Y(cy_) - 1.6 * K, name, 8, SILK, True)
 for i, name in enumerate(["C3", "C4"]):
     tpad(52.4, 15.0 + i * 3.0, ring=1.6, drill=0.8); tpad(54.4, 15.0 + i * 3.0, ring=1.6, drill=0.8)
     text(d, X(56.0), Y(15.0 + i * 3.0), name, 8, SILK, True, 'lm')
@@ -155,25 +166,25 @@ for i, name in enumerate(["C3", "C4"]):
 # J2: 2 x 4 right-angle header, SSR + power (housing keep-out x 11.7 .. 21.9)
 for r_ in range(2):
     for c_ in range(4):
-        tpad(13.0 + c_ * 2.54, 59.0 + r_ * 2.54, square=(r_ == 0 and c_ == 0), ring=1.7, drill=1.0)
-rect(d, X(13.0) - 1.4 * K, Y(59.0) - 1.4 * K, X(13.0 + 3 * 2.54) + 1.4 * K, Y(61.54) + 1.4 * K, outline=SILK + (255,), width=2)
-silk(16.0, 56.4, "J2  SSRs + 5 V", 9)
+        tpad(12.2 + c_ * 2.54, 59.0 + r_ * 2.54, square=(r_ == 0 and c_ == 0), ring=1.7, drill=1.0)
+rect(d, X(12.2) - 1.4 * K, Y(59.0) - 1.4 * K, X(12.2 + 3 * 2.54) + 1.4 * K, Y(61.54) + 1.4 * K, outline=SILK + (255,), width=2)
+silk(15.4, 56.4, "J2  SSRs + 5 V", 9)
 for c_, lab in enumerate(["+5V", "P+", "B+", "V+"]):
-    text(d, X(13.0 + c_ * 2.54), Y(59.0) - 1.9 * K, lab, 8, SILK, True)
+    text(d, X(12.2 + c_ * 2.54), Y(59.0) - 1.9 * K, lab, 8, SILK, True)
 for c_, lab in enumerate(["GND", "P−", "B−", "V−"]):
-    text(d, X(13.0 + c_ * 2.54), Y(61.54) + 1.9 * K, lab, 8, SILK, True)
-# J7: 2 x 5 right-angle header (two stacked rows of housings): button, encoder, and 3 spare pins (+5 V, GPIO 38, GND)
-# row A (top): BT, GND | +5 V, IO38, GND      row B (bottom): +5 V, GND, A, B
-for c_ in range(5):
-    tpad(24.0 + c_ * 2.54, 59.0, square=(c_ == 0), ring=1.7, drill=1.0)
+    text(d, X(12.2 + c_ * 2.54), Y(61.54) + 1.9 * K, lab, 8, SILK, True)
+# J7: 2 x 6 right-angle header (two stacked rows of housings): button, encoder, and 4 spare pins (+5 V, IN, OUT, GND)
+# row A (top): BT, GND | +5 V, IN38, OUT39, GND      row B (bottom): +5 V, GND, A, B
+for c_ in range(6):
+    tpad(22.4 + c_ * 2.54, 59.0, square=(c_ == 0), ring=1.7, drill=1.0)
 for c_ in range(4):
-    tpad(24.0 + c_ * 2.54, 61.54, ring=1.7, drill=1.0)
-rect(d, X(24.0) - 1.4 * K, Y(59.0) - 1.4 * K, X(24.0 + 4 * 2.54) + 1.4 * K, Y(61.54) + 1.4 * K, outline=SILK + (255,), width=2)
-silk(31.5, 56.4, "J7  button / encoder / spare", 9)
-for c_, lab in enumerate(["BT", "GND", "5V", "IO38", "GND"]):
-    text(d, X(24.0 + c_ * 2.54), Y(59.0) - 1.9 * K, lab, 7, SILK, True)
+    tpad(22.4 + c_ * 2.54, 61.54, ring=1.7, drill=1.0)
+rect(d, X(22.4) - 1.4 * K, Y(59.0) - 1.4 * K, X(22.4 + 5 * 2.54) + 1.4 * K, Y(61.54) + 1.4 * K, outline=SILK + (255,), width=2)
+silk(31.0, 56.4, "J7  button / encoder / spare I/O", 9)
+for c_, lab in enumerate(["BT", "GND", "5V", "IN", "OUT", "GND"]):
+    text(d, X(22.4 + c_ * 2.54), Y(59.0) - 1.9 * K, lab, 7, SILK, True)
 for c_, lab in enumerate(["5V", "GND", "A", "B"]):
-    text(d, X(24.0 + c_ * 2.54), Y(61.54) + 1.9 * K, lab, 7, SILK, True)
+    text(d, X(22.4 + c_ * 2.54), Y(61.54) + 1.9 * K, lab, 7, SILK, True)
 # J8: 1 x 4 vertical header, dimmer (UART / I2C) in the corridor between ESP32 and FPC board; J9: 1 x 3, pressure sensor
 for i, lab in enumerate(["3V3", "GND", "SDA", "SCL"]):
     tpad(25.5, 33.0 + i * 2.54, square=(i == 0), ring=1.7, drill=1.0)
@@ -195,7 +206,7 @@ circ(d, X(25.7), Y(54.3), 3.15 * K, fill=None, outline=SILK + (255,), width=2)
 tpad(24.45, 54.3, ring=1.8, drill=0.8); tpad(26.95, 54.3, ring=1.8, drill=0.8); silk(25.7, 54.3, "C1", 9)
 tpad(24.5, 50.4, ring=1.6, drill=0.8); tpad(27.0, 50.4, ring=1.6, drill=0.8); silk(25.7, 49.2, "C2", 8) if False else text(d, X(28.4), Y(50.4), "C2", 8, SILK, True, 'lm')
 # JST XH x2: vertical headers, rotated (pins along y), the plugs come out upwards: no keep-out towards the front
-for k, (x0, name) in enumerate([(39.2, "J3 flow In"), (45.2, "J4 flow Out")]):
+for k, (x0, name) in enumerate([(39.6, "J3 flow In"), (45.6, "J4 flow Out")]):
     for i in range(3):
         tpad(x0, 59.5 + i * 2.5, square=(i == 0), ring=1.8, drill=1.0)
     rect(d, X(x0) - 2.9 * K, Y(59.5) - 2.1 * K, X(x0) + 2.9 * K, Y(64.5) + 2.1 * K, outline=SILK + (255,), width=2)
@@ -214,14 +225,13 @@ text(o, X(11.5), Y(4.5), "USB-C", 10, (60, 60, 70), True)
 # MAX31865 module 25.4 x 27.9 at x 29..54.4, y 28.8..56.7, rotated 180 degrees (terminal block at the front)
 rrect(o, px(X(29.0)) / SS, px(Y(28.8)) / SS, px(X(54.4)) / SS, px(Y(56.7)) / SS, 6, fill=(20, 80, 170, 150), outline=(150, 190, 250, 255), width=3)
 rect(o, px(X(33.3)) / SS, px(Y(49.2)) / SS, px(X(50.5)) / SS, px(Y(56.3)) / SS, fill=(46, 104, 180, 220), outline=(180, 210, 250, 255), width=2)
-text(o, X(41.7), Y(40.0), "MAX31865", 15, (235, 240, 255), True)
-text(o, X(41.7), Y(42.6), "25.4 x 27.9, height 15", 11, (220, 232, 255))
+text(o, X(41.7), Y(34.0), "MAX31865   25.4 x 27.9, height 15", 11, (235, 240, 255), True)
 text(o, X(41.9), Y(52.7), "PT100 terminal (wires exit to the front)", 10, (235, 240, 255), True)
-# FPC adapter board ~22 x 26.5 at x 29..51, y 2..28.5 (connector towards the back wall)
+# FPC adapter board ~22 x 26.5 at x 29..51, y 2..28.5 (rotated 180: connector towards the front, ribbon goes over the MAX31865)
 rrect(o, px(X(29.0)) / SS, px(Y(2.0)) / SS, px(X(51.0)) / SS, px(Y(28.5)) / SS, 6, fill=(22, 150, 80, 130), outline=(150, 240, 190, 255), width=3)
-rect(o, px(X(35.0)) / SS, px(Y(2.4)) / SS, px(X(45.0)) / SS, px(Y(7.9)) / SS, fill=(236, 236, 228, 230), outline=(120, 120, 110, 255), width=2)
-text(o, X(40.0), Y(5.2), "FPC connector (ribbon to the back)", 9, (50, 50, 44), True)
-text(o, X(40.0), Y(8.6), "FPC board ~22 x 26 (at 8.5 mm)", 10, (230, 255, 240), True)
+rect(o, px(X(35.0)) / SS, px(Y(22.9)) / SS, px(X(45.0)) / SS, px(Y(28.4)) / SS, fill=(236, 236, 228, 230), outline=(120, 120, 110, 255), width=2)
+text(o, X(40.0), Y(25.6), "FPC connector (ribbon to the front)", 9, (50, 50, 44), True)
+text(o, X(40.0), Y(20.6), "FPC board ~22 x 26 (at 8.5 mm)", 10, (230, 255, 240), True)
 base = Image.alpha_composite(base, ov)
 d = ImageDraw.Draw(base)
 
@@ -262,10 +272,11 @@ comp = [
     "J2  right-angle 2 x 4 header: SSRs and 5 V supply",
     "J3, J4  JST XH 3-pin: flow sensors In and Out",
     "J5  2 x 4 socket: FPC adapter board",
-    "J7  right-angle 2 x 5 header: button, encoder (5 V), 3 spare pins",
+    "J7  right-angle 2 x 6 header: button, encoder (5 V), 4 spare I/O pins",
     "J8  1 x 4: pump dimmer (I2C)  ·  J9  1 x 3: pressure sensor",
     "Q1 to Q3  SSR drive ; Q4  backlight (2N2222A)",
     "R1 to R4  1 kΩ  ·  R5 to R8  10 kΩ  ·  R9, R10, R17, R18  5 V input dividers",
+    "Q5, R19 to R21  spare output stage (3.3 V to 5 V)",
     "R11 to R16  flow sensor inputs  ·  C3, C4  1 nF",
     "F1  1.1 A resettable fuse  ·  D1  1N5819",
     "C1  470 µF  ·  C2  100 nF",
@@ -287,7 +298,7 @@ for i, t in enumerate(hs):
 
 text(d, lx, 1060, "Points to check on your board:", 18, (190, 40, 40), True, 'lm')
 chk = [
-    "the FPC ribbon leaves through the back wall (slot to cut), next to the USB-C opening;",
+    "the FPC ribbon goes over the MAX31865 (about 23.5 mm, 1 mm under the 25 mm limit);",
     "PT100 wires leave at the front above J7 / J3 / J4, at about 14 mm;",
     "Dupont housings need about 9 mm in front of J2 / J7 (cable slot in the front wall);",
     "M2 holes and pin-1 orientation of the FPC board; pin order of J5, J6 and J7.",

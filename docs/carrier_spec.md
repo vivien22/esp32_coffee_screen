@@ -3,13 +3,14 @@
 All **through-hole** parts (no SMD soldering). Related files: `images/carrier_plan.png` (to-scale placement), `images/box_iso3.png` (3D view), `images/carrier_schema.png` (connection schematic).
 
 ## Dimensions and mounting
-- Board: **58 x 68 mm**, two layers, ground plane. Free area in the enclosure: 60 x 70 mm between the large posts.
+- Board: **58 x 68 mm**, two layers, ground plane. Free area in the enclosure: **58 x 68 mm** between the large posts (the board fills it exactly). In the middle of the enclosure the free length can reach **80 mm over a 40 mm width**, avoiding the posts: optional extension tabs of about 6 mm at the front and at the back (dashed in the placement plan), not used for now.
 - 4 mounting holes on the **3 mm** small posts, **45 x 50 mm** spacing.
 - Usable depth **25 mm**: posts 3 + board 1.6 = 4.6 mm; ESP32 on 8.5 mm sockets (USB-C at 17.9 mm); FPC adapter board on 8.5 mm sockets (17.7 mm); MAX31865 on low 3 mm sockets (22.6 mm, 2.4 mm margin).
 - **Front connector row:** right-angle headers with their Dupont housings need about **9 mm in front of the pads** (keep-out, nothing else there); J2, J7 and the vertical JST XH J3 / J4 are side by side on the front edge. F1 and D1 sit in the front-left corner (in front of the mounting hole), C1 and C2 in the corridor between the ESP32 and the MAX31865. A cable slot is needed in the front wall (housings end about 6 mm from it).
 - **Cable sides:** all cables leave through the **front** (J2, J7, J3, J4, and the PT100 wires). The USB-C and the display ribbon are at the **back**.
-- **MAX31865 rotated 180 degrees and swapped with the FPC board:** the MAX31865 is at the bottom right (header on its rear edge, pin 1 VIN on the right; PT100 terminal block facing the front, wires at about 14 mm above J7 / J3 / J4). The FPC adapter board is at the top right, its FPC connector towards the back wall, with the flow-input resistors R11 to R16 and C3, C4 under it. Only the MAX terminal block needs the front: if it stayed at the top (even rotated), its wires would have to cross the FPC board, which is at 13.1 to 17.7 mm.
-- The display ribbon (flat, at about 15.5 mm) goes out through the **back wall**: a slot has to be cut in the wall (or the lid), next to the USB-C opening. If the display must also be reached from the front, the ribbon has to be routed around the enclosure.
+- **MAX31865 rotated 180 degrees and swapped with the FPC board:** the MAX31865 is at the bottom right (header on its rear edge, pin 1 VIN on the right; PT100 terminal block facing the front, wires at about 14 mm above J7 / J3 / J4). The FPC adapter board is at the top right, **rotated 180 degrees so that its FPC connector faces the front**, with the flow-input resistors R11 to R16 and C3, C4 under it.
+- **Display ribbon:** it leaves the connector at about 15.5 mm, climbs and runs **over the MAX31865** (top at 22.6 mm) at about 23.5 mm, then leaves with the other cables through the front slot. That leaves only about 1 mm above the MAX and about 1 mm under the 25 mm limit: use a thin flat ribbon, keep it from being squeezed by the lid, or move the MAX to the top and the FPC board to the front on low (about 4 mm) sockets if this is too tight.
+- The spare-I/O resistors R17 to R21 are flat resistors under the MAX31865 (3 mm clearance, enough for axial 1/4 W parts); Q5 sits under the ESP32 next to the other transistors.
 - No copper and no component under the ESP32 antenna (the end of the ESP32 board opposite the USB-C).
 
 ## Connectors
@@ -19,7 +20,7 @@ All **through-hole** parts (no SMD soldering). Related files: `images/carrier_pl
 | J3, J4 | JST XH 3-pin, vertical, rotated (real pitch 2.5 mm) | flow sensors In and Out |
 | J5 | 2 x 4 female socket | FPC adapter board (8 pins, ribbon to the remote display) |
 | J6 | 1 x 8 female socket (low, 3 mm) | MAX31865 module |
-| J7 | 2 x 5 right-angle male header | button + encoder (encoder powered from 5 V) + 3 spare pins (5 V, GPIO 38, GND) |
+| J7 | 2 x 6 right-angle male header | button + encoder (encoder powered from 5 V) + 4 spare I/O pins (+5 V, level-adapted input, level-adapted output, GND) |
 | J8 | 1 x 4 header | RobotDyn 4 A pump dimmer, **I2C** (powered from 3.3 V) |
 | J9 | 1 x 3 header | pressure sensor 0.5 to 4.5 V, 0 to 12 bar (powered from 5 V) |
 | ESP | 2 x 1 x 20 female sockets | ESP32-S3 board (row spacing to be measured) |
@@ -32,13 +33,19 @@ All **through-hole** parts (no SMD soldering). Related files: `images/carrier_pl
 
 Four 2-pin Dupont housings (one per column). Warning: a 2 x 4 header is not keyed and a 2-pin housing can be plugged the wrong way round; mark the wires (red on row A) or add a key / use a keyed housing.
 
-### J7 (2 x 5, right-angle: two stacked rows of Dupont housings)
-| | 1 | 2 | 3 | 4 | 5 |
-|---|---|---|---|---|---|
-| Row A (upper) | button (GPIO 6) | GND | **+5 V** | **GPIO 38** | **GND** |
-| Row B (lower) | +5 V | GND | enc. A (GPIO 4) | enc. B (GPIO 5) | not used |
+### J7 (2 x 6, right-angle: two stacked rows of Dupont housings)
+| | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|
+| Row A (upper) | button (GPIO 6) | GND | **+5 V** | **IN (GPIO 38)** | **OUT (GPIO 39)** | **GND** |
+| Row B (lower) | +5 V | GND | enc. A (GPIO 4) | enc. B (GPIO 5) | not used | not used |
 
-Housings: row A = 2-pin (button) + 3-pin (**spare: +5 V, free GPIO 38, GND**); row B = 4-pin (encoder: +5 V, GND, A, B). The wire order must follow **your** encoder module (to be checked). Stacking the spare pins above the encoder (rather than extending the row to the right) keeps J7 only 15 mm wide, so it does not run into J3 / J4. GPIO 38 is a plain 3.3 V GPIO (not on the strapping / PSRAM / USB list) and is **not 5 V tolerant**, so it has the same level adaptation as the encoder inputs: 4.7 kΩ in series (R17) to the GPIO, 10 kΩ from the GPIO to GND (R18), which turns a 5 V signal into 3.4 V. It is an **input only**. For a 3.3 V logic source, replace R17 by a 0 Ω link and leave R18 out (the divider would drop 3.3 V to 2.2 V, below the input high threshold of about 2.5 V). For a 5 V **output**, use a 2N2222A as an inverting open-collector stage with a pull-up to 5 V instead (not fitted).
+Housings: row A = 2-pin (button) + 4-pin (**spare I/O: +5 V, IN, OUT, GND**); row B = 4-pin (encoder: +5 V, GND, A, B). The wire order must follow **your** encoder module (to be checked). Stacking the spare pins above the encoder, rather than extending the row to the right, keeps J7 only about 17 mm wide, so it does not run into J3 / J4.
+
+**Spare IN (GPIO 38), 5 V to 3.3 V:** 4.7 kΩ in series (R17) to the GPIO and 10 kΩ from the GPIO to GND (R18): a 5 V signal becomes 3.4 V. Input only. For a 3.3 V source, replace R17 by a 0 Ω link and leave R18 out (the divider would give only 2.2 V, below the input-high threshold of about 2.5 V).
+
+**Spare OUT (GPIO 39), 3.3 V to 5 V, inverting:** GPIO 39 → 1 kΩ (R19) → base of a 2N2222A (Q5); 10 kΩ from the base to GND (R21, keeps the output idle at boot); the collector is the OUT pin, pulled up to +5 V by 4.7 kΩ (R20); emitter to GND. GPIO high gives OUT low, GPIO low gives OUT at 5 V: invert the logic in the firmware. It can sink up to about 100 mA, but sources only about 1 mA (the pull-up): for a load, drive a relay or transistor from it. A non-inverting alternative is a 2N7000 / BS170 level shifter (gate on 3.3 V, 10 kΩ pull-ups on both sides), not fitted.
+
+The two GPIO numbers (38 and 39) are provisional free GPIOs of the ESP32-S3 chip (neither strapping, PSRAM, flash nor USB); check them against the real pin table of your board, which does not necessarily expose every GPIO of the chip.
 
 ### 5 V inputs protection (encoder)
 The ESP32-S3 only accepts 3.3 V. Since the encoder module is powered from 5 V, its outputs (A, B, button) can reach 5 V if the module has pull-ups to 5 V. Each signal (A, B, button and the spare GPIO 38) therefore goes through a divider: 4.7 kΩ in series to the GPIO, then 10 kΩ from the GPIO to GND (5 V becomes 3.4 V). The 10 kΩ pull-ups to 3.3 V (R9, R10) are then removed. **To check:** if your module is a bare encoder without pull-up resistors, 10 kΩ pull-ups to 5 V are needed (provide optional footprints).
@@ -98,9 +105,9 @@ VIN (3.3 V), 3Vo (unused), GND, CLK (GPIO 12), SDO (GPIO 13), SDI (GPIO 11), CS 
 | 2 | 1 x 20 female sockets, 8.5 mm | 1 € |
 | 1 | MAX31865 module (owned) + low 1 x 8 socket | 0.3 € |
 | 1 | 8-pin FPC board (owned) + 2 x 4 male header + 2 x 4 female socket | 0.5 € |
-| 1 | right-angle 2 x 4 + right-angle 2 x 5 male headers, 1 x 4 and 1 x 3 male headers | 0.8 € |
+| 1 | right-angle 2 x 4 + right-angle 2 x 6 male headers, 1 x 4 and 1 x 3 male headers | 0.8 € |
 | 2 | JST XH 3-pin headers | 0.5 € |
-| 4 | 2N2222A transistors (3 SSRs + backlight) | 0.6 € |
+| 5 | 2N2222A transistors (3 SSRs + backlight + spare output) | 0.7 € |
 | ~20 | axial resistors (1 kΩ, 10 kΩ, 4.7 kΩ, 20 kΩ; to be recounted at routing) | 1 € |
 | 1 | 1.1 A resettable fuse (radial) | 0.5 € |
 | 1 | 1N5819 diode | 0.2 € |
@@ -118,4 +125,4 @@ VIN (3.3 V), 3Vo (unused), GND, CLK (GPIO 12), SDO (GPIO 13), SDI (GPIO 11), CS 
 6. MAX31865 module (Adafruit, measured from the manufacturer's drawing): 25.4 x 27.9 mm, mounting holes 0.9" apart and 0.1" from the terminal-block edge, 1 x 8 header at 0.1" pitch on the short edge.
 7. Pump dimmer: one-time switch from UART to I2C (see J8); behaviour with the vibration pump to test; I2C pull-ups (4.7 kΩ) fitted on the board.
 8. Pressure sensor: confirm 3 wires (+5 V, GND, signal) and the G1/4 fitting on the hydraulic circuit.
-9. Slot for the display ribbon in the back wall or lid; orientation of pin 1 on your FPC adapter board (the board is mounted rotated 180 degrees compared to the previous layout).
+9. Display ribbon over the MAX31865: ribbon length and thickness, clearance to the lid; orientation of pin 1 on your FPC adapter board (mounted rotated 180 degrees).

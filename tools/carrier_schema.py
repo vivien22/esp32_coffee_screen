@@ -44,13 +44,16 @@ T(x0 + 370, 214, "pins in the same housing share one", F(14), GRY, 'lm')
 T(x0 + 370, 236, "SSR; a 2 x 4 header is not keyed:", F(14), GRY, 'lm')
 T(x0 + 370, 258, "mark the wires (red on row A)", F(14), GRY, 'lm')
 
-# ---- J7 : 1 x 6
-head(60, 350, "J7: right-angle 1 x 6 male header: button + encoder (powered from 5 V)")
-j7 = [("button", (90, 90, 96)), ("GND", DK), ("+5 V", RED), ("GND", DK), ("enc. A", GRN), ("enc. B", GRN)]
-for i, (lab, col) in enumerate(j7):
-    pin(60 + i * 88, 390, lab, col, 14)
-T(60 + 88, 450, "2-pin housing", F(13, True), (90, 90, 96))
-T(60 + 4 * 88 - 44 + 44, 450, "4-pin housing (+5 V, GND, A, B): follow your module", F(13, True), GRN, 'mm')
+# ---- J7 : 2 x 6 (two stacked rows of housings)
+head(60, 350, "J7: right-angle 2 x 6 male header: button, encoder (5 V) and 4 spare I/O pins")
+j7a = [("button", (90, 90, 96)), ("GND", DK), ("+5 V", RED), ("IN 38", VIO), ("OUT 39", VIO), ("GND", DK)]
+j7b = [("+5 V", RED), ("GND", DK), ("enc. A", GRN), ("enc. B", GRN)]
+for i, (lab, col) in enumerate(j7a):
+    pin(60 + i * 88, 382, lab, col, 14)
+for i, (lab, col) in enumerate(j7b):
+    pin(60 + i * 88, 430, lab, col, 14)
+T(620, 404, "row A: 2-pin button + 4-pin spare (5 V, IN, OUT, GND)", F(14), GRY, 'lm')
+T(620, 452, "row B: 4-pin encoder: follow your module", F(14), GRY, 'lm')
 
 # ---- J8 / J9
 head(60, 490, "J8: pump dimmer (I2C)", "RobotDyn 4 A, DimmerLink")
@@ -92,13 +95,13 @@ rows = [("5V", "+5 V (after diode and fuse)", RED), ("3V3", "powers MAX31865, di
         ("GPIO 4 / 5", "encoder A / B", GRN), ("GPIO 6", "start button", (90, 90, 96)),
         ("GPIO 47 / 48", "dimmer I2C: SDA / SCL", VIO),
         ("GPIO 11 / 12 / 13", "SPI: MOSI / SCK / MISO", VIO), ("GPIO 10", "display CS", VIO), ("GPIO 9 / 8", "display DC / RST", VIO),
-        ("GPIO 14", "display backlight (transistor)", VIO), ("GPIO 7", "MAX31865 CS", VIO), ("GPIO 38", "spare input on J7 (5 V divider)", (150, 150, 156))]
+        ("GPIO 14", "display backlight (transistor)", VIO), ("GPIO 7", "MAX31865 CS", VIO), ("GPIO 38", "spare input on J7 (5 V divider)", (150, 150, 156)), ("GPIO 39", "spare output on J7 (to 5 V, inverting)", (150, 150, 156))]
 for i, (a, b, col) in enumerate(rows):
     y = 150 + i * 34
     RR(gx, y, gx + 180, y + 28, 5, fill=col, outline=(20, 20, 24), width=1)
     T(gx + 90, y + 14, a, F(14, True), (255, 255, 255))
     T(gx + 192, y + 14, b, F(15), INK, 'lm')
-T(gx, 750, "Avoided: 0, 3, 45, 46 (strapping), 19 and 20 (USB), 35 to 37 (PSRAM).", F(15), GRY, 'lm')
+T(gx, 786, "Avoided: 0, 3, 45, 46 (strapping), 19 and 20 (USB), 35 to 37 (PSRAM).", F(15), GRY, 'lm')
 
 # ================================================================ 2b. input circuits (chains)
 def box(x, y, w, h, label, fill=(250, 250, 240), col=INK, size=12):
@@ -119,7 +122,7 @@ def chain(x, y, title, src, res, end, shunts, col):
         L([(x + sx, y), (x + sx, y)], col, 2)
         shunt(x + sx, y, lab)
 cy = 850
-chain(gx, cy, "Encoder A, B, button, spare IO38 (x4): 5 V to 3.3 V", "module out", "4.7 k", "GPIO", [(270, "10 k")], GRN)
+chain(gx, cy, "Encoder A, B, button, spare IN 38 (x4): 5 V to 3.3 V", "module out", "4.7 k", "GPIO", [(270, "10 k")], GRN)
 chain(gx, cy + 120, "Pressure input: 4.5 V to 3.0 V", "sensor", "10 k", "GPIO 1", [(250, "20 k"), (320, "100 nF")], BLU)
 T(gx, cy + 262, "Dimmer I2C pull-ups: 4.7 k from SDA (GPIO 47) and from SCL (GPIO 48) to 3V3", F(14, True), VIO, 'lm')
 T(gx, cy + 286, "(100 kHz, cable under 30 cm; the module is shipped in UART mode: switch it to I2C once)", F(13), GRY, 'lm')
@@ -176,6 +179,22 @@ L([(cx0 + 225, 830), (cx0 + 225, 860)], BLU, 2); L([(cx0 + 215, 860), (cx0 + 235
 L([(cx0 + 225, 868), (cx0 + 225, 890)], INK, 2); T(cx0 + 225, 904, "1 nF", F(11, True))
 T(cx0 + 20, 960, "Works with a 5 V output sensor (the divider gives 3.4 V)", F(13), GRY, 'lm')
 T(cx0 + 20, 982, "or open collector (the 10 k resistor pulls up to 5 V).", F(13), GRY, 'lm')
+
+# spare output stage (GPIO 39 -> 5 V, inverting), under the flow circuit
+T(cx0, 1040, "Spare output OUT (GPIO 39): 3.3 V to 5 V, inverting", F(16, True), VIO, 'lm')
+L([(cx0 + 20, 1085), (cx0 + 250, 1085)], RED, 3); T(cx0 + 262, 1085, "+5 V", F(13, True), RED, 'lm')
+L([(cx0 + 155, 1085), (cx0 + 155, 1105)], RED, 2)
+RR(cx0 + 143, 1105, cx0 + 167, 1140, 3, fill=(250, 250, 240), outline=INK, width=2); T(cx0 + 155, 1122, "4.7k", F(11, True))
+L([(cx0 + 155, 1140), (cx0 + 155, 1175)], VIO, 3)
+L([(cx0 + 155, 1158), (cx0 + 240, 1158)], VIO, 3); T(cx0 + 252, 1158, "OUT (J7)", F(13, True), VIO, 'lm')
+RR(cx0 + 125, 1175, cx0 + 185, 1235, 8, fill=(250, 250, 240), outline=INK, width=3); T(cx0 + 155, 1205, "Q5", F(14, True))
+L([(cx0 + 155, 1235), (cx0 + 155, 1262)], INK, 3); T(cx0 + 155, 1275, "GND", F(12, True))
+L([(cx0 + 60, 1205), (cx0 + 125, 1205)], VIO, 3)
+RR(cx0 + 20, 1193, cx0 + 60, 1217, 3, fill=(250, 250, 240), outline=INK, width=2); T(cx0 + 40, 1205, "1 k", F(12, True))
+L([(cx0 - 20, 1205), (cx0 + 20, 1205)], VIO, 3); T(cx0 - 28, 1205, "GPIO 39", F(12, True), VIO, 'rm')
+L([(cx0 + 90, 1205), (cx0 + 90, 1240)], INK, 2)
+RR(cx0 + 78, 1240, cx0 + 102, 1275, 3, fill=(250, 250, 240), outline=INK, width=2); T(cx0 + 90, 1257, "10k", F(11, True))
+T(cx0 + 20, 1310, "GPIO high -> OUT low; GPIO low -> OUT 5 V (invert in firmware).", F(13), GRY, 'lm')
 
 # ================================================================ 4. notes
 T(60, 1140, "Design notes", F(22, True), INK, 'lm')
