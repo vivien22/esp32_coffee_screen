@@ -1,59 +1,94 @@
-import os
 # -*- coding: utf-8 -*-
+"""3D view of the carrier board in the enclosure.
+
+Software renderer with a per-pixel depth buffer (numpy + Pillow): no painter's-algorithm artefacts.
+Axes (mm): x to the right-down, y to the left-down (towards the front), z up. The camera looks along (-1, -1, -1),
+so the depth of a point is x + y + z (larger = closer to the camera).
+"""
 import math
+import os
+import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
 SS = 2
-W, H = 2000, 1150
-im = Image.new('RGB', (W * SS, H * SS), (244, 244, 240))
-d = ImageDraw.Draw(im)
-s = 7.6                      # px per mm
-OX, OY = 1000, 240            # screen position of the origin (back corner of the tray at floor level)
+W, H = 2000, 1250
+WS, HS = W * SS, H * SS
+s = 7.6                       # px per mm
+OX, OY = 1000, 250            # screen position of the origin (back corner of the tray at floor level)
 C30, S30 = math.cos(math.radians(30)), math.sin(math.radians(30))
+BG = (244, 244, 240)
 
-def F(sz, b=False):
-    return ImageFont.truetype('C:/Windows/Fonts/%s.ttf' % ('arialbd' if b else 'arial'), sz * SS)
+COL = np.empty((HS, WS, 3), np.uint8)
+COL[:] = BG
+DEPTH = np.full((HS, WS), -1e9, np.float32)
+FID = np.zeros((HS, WS), np.int32)
+_fid = [0]
 
-def P(x, y, z):
-    """x to the right-down, y to the left-down, z up (mm) -> pixels (supersampled)."""
-    return ((OX + (x - y) * C30 * s) * SS, (OY + (x + y) * S30 * s - z * s) * SS)
 
-def poly(pts, fill, outline=None, w=1):
-    d.polygon([P(*p) for p in pts], fill=fill, outline=outline)
-    if outline:
-        d.line([P(*p) for p in pts] + [P(*pts[0])], fill=outline, width=w * SS)
+def proj(x, y, z):
+    """-> (u, v, depth) in supersampled pixels."""
+    return ((OX + (x - y) * C30 * s) * SS, (OY + (x + y) * S30 * s - z * s) * SS, x + y + z)
+
 
 def shade(c, f):
     return tuple(max(0, min(255, int(v * f))) for v in c)
 
-def cuboid(x, y, z, w, dp, h, color, outline=(20, 20, 24)):
-    """Three visible faces: top, +x face, +y face."""
-    poly([(x, y, z + h), (x + w, y, z + h), (x + w, y + dp, z + h), (x, y + dp, z + h)], shade(color, 1.12), outline)
-    poly([(x + w, y, z), (x + w, y + dp, z), (x + w, y + dp, z + h), (x + w, y, z + h)], shade(color, 0.85), outline)
-    poly([(x, y + dp, z), (x + w, y + dp, z), (x + w, y + dp, z + h), (x, y + dp, z + h)], shade(color, 0.68), outline)
 
-def cyl(cx, cy, r, z, h, color, outline=(20, 20, 24), n=28):
-    """Vertical cylinder: side quads painted back to front, then the top disc."""
-    angs = [2 * math.pi * k / n for k in range(n)]
-    quads = []
+def tri(a, b, c, col, fid):
+    umin = int(max(0, math.floor(min(a[0], b[0], c[0]))))
+    umax = int(min(WS - 1, math.ceil(max(a[0], b[0], c[0]))))
+    vmin = int(max(0, math.floor(min(a[1], b[1], c[1]))))
+    vmax = int(min(HS - 1, math.ceil(max(a[1], b[1], c[1]))))
+    if umax < umin or vmax < vmin:
+        return
+    den = (b[1] - c[1]) * (a[0] - c[0]) + (c[0] - b[0]) * (a[1] - c[1])
+    if abs(den) < 1e-9:
+        return
+    ys, xs = np.mgrid[vmin:vmax + 1, umin:umax + 1]
+    xs = xs.astype(np.float32) + 0.5
+    ys = ys.astype(np.float32) + 0.5
+    w0 = ((b[1] - c[1]) * (xs - c[0]) + (c[0] - b[0]) * (ys - c[1])) / den
+    w1 = ((c[1] - a[1]) * (xs - c[0]) + (a[0] - c[0]) * (ys - c[1])) / den
+    w2 = 1.0 - w0 - w1
+    inside = (w0 >= -1e-4) & (w1 >= -1e-4) & (w2 >= -1e-4)
+    depth = (w0 * a[2] + w1 * b[2] + w2 * c[2]).astype(np.float32)
+    sub = DEPTH[vmin:vmax + 1, umin:umax + 1]
+    m = inside & (depth > sub)
+    sub[m] = depth[m]
+    COL[vmin:vmax + 1, umin:umax + 1][m] = col
+    FID[vmin:vmax + 1, umin:umax + 1][m] = fid
+
+
+def quad(p0, p1, p2, p3, col, bias=0.0):
+    _fid[0] += 1
+    f = _fid[0]
+    q = [proj(*p) for p in (p0, p1, p2, p3)]
+    q = [(u, v, d + bias) for (u, v, d) in q]
+    tri(q[0], q[1], q[2], col, f)
+    tri(q[0], q[2], q[3], col, f)
+
+
+def cuboid(x, y, z, w, dp, h, color):
+    """The three faces turned towards the camera: top, +x, +y."""
+    quad((x, y, z + h), (x + w, y, z + h), (x + w, y + dp, z + h), (x, y + dp, z + h), shade(color, 1.12))
+    quad((x + w, y, z), (x + w, y + dp, z), (x + w, y + dp, z + h), (x + w, y, z + h), shade(color, 0.85))
+    quad((x, y + dp, z), (x + w, y + dp, z), (x + w, y + dp, z + h), (x, y + dp, z + h), shade(color, 0.68))
+
+
+def cyl(cx, cy, r, z, h, color, n=32):
     for k in range(n):
-        a0, a1 = angs[k], angs[(k + 1) % n]
+        a0, a1 = 2 * math.pi * k / n, 2 * math.pi * (k + 1) / n
         mid = (a0 + a1) / 2
-        quads.append((cx + r * math.cos(mid) + cy + r * math.sin(mid), k, a0, a1))
-    for _, k, a0, a1 in sorted(quads):
-        p = [(cx + r * math.cos(a0), cy + r * math.sin(a0), z), (cx + r * math.cos(a1), cy + r * math.sin(a1), z),
-             (cx + r * math.cos(a1), cy + r * math.sin(a1), z + h), (cx + r * math.cos(a0), cy + r * math.sin(a0), z + h)]
-        poly(p, shade(color, 0.62 + 0.5 * (math.cos((a0 + a1) / 2) + math.sin((a0 + a1) / 2) + 1.4) / 2.4))
-    poly([(cx + r * math.cos(a), cy + r * math.sin(a), z + h) for a in angs], shade(color, 1.25), outline)
+        f = 0.55 + 0.5 * max(0.0, math.cos(mid) * 0.55 + math.sin(mid) * 0.83)
+        quad((cx + r * math.cos(a0), cy + r * math.sin(a0), z), (cx + r * math.cos(a1), cy + r * math.sin(a1), z),
+             (cx + r * math.cos(a1), cy + r * math.sin(a1), z + h), (cx + r * math.cos(a0), cy + r * math.sin(a0), z + h), shade(color, f))
+    _fid[0] += 1
+    f = _fid[0]
+    c0 = proj(cx, cy, z + h)
+    for k in range(n):
+        a0, a1 = 2 * math.pi * k / n, 2 * math.pi * (k + 1) / n
+        tri(c0, proj(cx + r * math.cos(a0), cy + r * math.sin(a0), z + h), proj(cx + r * math.cos(a1), cy + r * math.sin(a1), z + h), shade(color, 1.25), f)
 
-def text(x, y, t, size=18, color=(30, 30, 36), bold=False, anchor='lm'):
-    d.text((x * SS, y * SS), t, font=F(size, bold), fill=color, anchor=anchor)
-
-def label(px, py, tx, ty, t, color=(30, 30, 36), size=17):
-    """Text at (tx, ty) with a leader to the screen point (px, py) given as a P() result."""
-    d.line([(px, py), (tx * SS, ty * SS)], fill=color, width=2 * SS)
-    d.ellipse([px - 4 * SS, py - 4 * SS, px + 4 * SS, py + 4 * SS], fill=color)
-    text(tx + (8 if tx > 0 else 0), ty, t, size, color, True, 'lm' if tx >= px / SS else 'rm')
 
 # ---------------------------------------------------------------- dimensions (mm)
 WALL = 3.0
@@ -61,37 +96,31 @@ INT_X, INT_Y = 60.0, 85.0           # interior: x across, y along (the long side
 BX, BY = INT_X + 2 * WALL, INT_Y + 2 * WALL
 BASE_H = 16.0                        # height of the base half (the walls)
 FLOOR = 2.0
-
+FW = 5.0                             # the front and right walls are cut low, to see inside
 PLASTIC = (58, 58, 66)
-text(W / 2, 40, "Enclosure view: the carrier board with its connectors (the display is remote)", 30, bold=True, anchor='mm')
-text(W / 2, 80, "Enclosure base, lid removed. Scaled concept drawing following the placement plan: not a board layout.", 20, (110, 110, 116), anchor='mm')
 
 # ---------------------------------------------------------------- the base (open tray)
-# floor
-poly([(0, 0, FLOOR), (BX, 0, FLOOR), (BX, BY, FLOOR), (0, BY, FLOOR)], shade(PLASTIC, 0.95), (20, 20, 24))
-# inner faces of the two back walls (visible from inside)
-poly([(WALL, WALL, FLOOR), (BX - WALL, WALL, FLOOR), (BX - WALL, WALL, BASE_H), (WALL, WALL, BASE_H)], shade(PLASTIC, 0.78), (20, 20, 24))
-poly([(WALL, WALL, FLOOR), (WALL, BY - WALL, FLOOR), (WALL, BY - WALL, BASE_H), (WALL, WALL, BASE_H)], shade(PLASTIC, 0.9), (20, 20, 24))
-# the opening for the USB-C cable in the back wall y = 0 (seen on its inner face)
+cuboid(WALL, WALL, 0, BX - 2 * WALL, BY - 2 * WALL, FLOOR, shade(PLASTIC, 0.95))   # floor (inside the walls: no coplanar faces)
+cuboid(0, 0, 0, WALL, BY, BASE_H, PLASTIC)                              # left wall (USB-C side)
+cuboid(WALL, 0, 0, BX - WALL, WALL, BASE_H, PLASTIC)                    # back wall
+cuboid(WALL, BY - WALL, 0, BX - WALL, WALL, FW, PLASTIC)                 # front wall (cut low)
+cuboid(BX - WALL, 0, 0, WALL, BY - WALL, FW, PLASTIC)                    # right wall (cut low)
 uy0 = WALL + 8.5 + 9.0
-poly([(WALL, uy0, 7), (WALL, uy0 + 10, 7), (WALL, uy0 + 10, 15), (WALL, uy0, 15)], (14, 14, 18), (230, 230, 235), 2)
-# top of the back walls
-poly([(0, 0, BASE_H), (BX, 0, BASE_H), (BX - WALL, WALL, BASE_H), (WALL, WALL, BASE_H)], shade(PLASTIC, 1.25), (20, 20, 24))
-poly([(0, 0, BASE_H), (0, BY, BASE_H), (WALL, BY - WALL, BASE_H), (WALL, WALL, BASE_H)], shade(PLASTIC, 1.2), (20, 20, 24))
-# the big posts (plus-shaped usable area: each corner blocked over 13 x 6 mm); the back ones here, the front ones after the board
-for (px, py) in [(WALL, WALL), (BX - WALL - 8, WALL)]:
-    cyl(px + 4, py + 4, 4, FLOOR, BASE_H - FLOOR, (46, 46, 54))
+USB_OPENING = [(WALL, uy0, 12.5), (WALL, uy0 + 10, 12.5), (WALL, uy0 + 10, BASE_H), (WALL, uy0, BASE_H)]   # notch at the base / lid joint
+quad(*USB_OPENING, (14, 14, 18), bias=0.05)                              # opening for the USB-C cable in the left wall
+for (px, py) in [(WALL, WALL), (BX - WALL - 8, WALL), (WALL, BY - WALL - 8), (BX - WALL - 8, BY - WALL - 8)]:
+    cyl(px + 4, py + 4, 4, FLOOR, BASE_H - FLOOR, (46, 46, 54))          # the four big posts, 8 mm round
 
 # ---------------------------------------------------------------- the carrier and what it holds
 CX0, CY0 = WALL + 1.0, WALL + 8.5     # origin of the carrier (58 x 68)
 PCB_Z = FLOOR + 3.0                   # on the four small standoffs of 3 mm
 PCBT = 1.6
 top = PCB_Z + PCBT
-items = []
-def add(x, y, z, w, dp, h, color, bias=0.0):
-    items.append(((x + w) + (y + dp) + (z + h) + bias, lambda x=x, y=y, z=z, w=w, dp=dp, h=h, color=color: cuboid(x, y, z, w, dp, h, color)))
+GOLD = (214, 178, 70)
+BLACK = (24, 24, 28)
+WHITE = (238, 236, 226)
+CREAM = (225, 215, 190)
 
-# the standoffs (3 mm), 45 x 50 apart, then the carrier slab itself: they are under it, it is under everything else
 sx0 = CX0 + (58 - 45) / 2
 sy0 = CY0 + (68 - 50) / 2
 for (ax, ay) in [(sx0, sy0), (sx0 + 45, sy0), (sx0, sy0 + 50), (sx0 + 45, sy0 + 50)]:
@@ -99,131 +128,207 @@ for (ax, ay) in [(sx0, sy0), (sx0 + 45, sy0), (sx0, sy0 + 50), (sx0 + 45, sy0 + 
 cuboid(CX0, CY0, PCB_Z, 58, 68, PCBT, (22, 110, 66))
 cuboid(CX0 + 8, CY0 + 68, PCB_Z, 42, 7, PCBT, (22, 110, 66))          # front tab (cable side)
 
-GOLD = (214, 178, 70)
-BLACK = (24, 24, 28)
-WHITE = (238, 236, 226)
-
 # ESP32-S3 (~22 x 54) rotated 90 degrees on sockets of 8.5 mm: USB-C towards the left wall
 ex, ey = CX0 + 2.5, CY0 + 3
-add(CX0 + 3.1, CY0 + 5.11 - 1.2, top, 50.8, 2.4, 8.5, BLACK); add(CX0 + 3.1, CY0 + 22.89 - 1.2, top, 50.8, 2.4, 8.5, BLACK)
-add(ex, ey, top + 8.5, 54, 22, 1.6, (236, 236, 242))
-add(CX0 + 1.0, CY0 + 9.9, top + 8.5 + 1.6, 7.5, 8.2, 3.2, (190, 194, 200), bias=6)        # USB-C
-add(CX0 + 22, CY0 + 9.5, top + 8.5 + 1.6, 9, 9, 1.0, BLACK, bias=6)                        # the module (shield)
-add(CX0 + 48.5, CY0 + 6, top + 8.5 + 1.6, 7.5, 16, 0.8, (236, 226, 196), bias=6)           # antenna
+cuboid(CX0 + 3.1, CY0 + 5.11 - 1.2, top, 50.8, 2.4, 8.5, BLACK)
+cuboid(CX0 + 3.1, CY0 + 22.89 - 1.2, top, 50.8, 2.4, 8.5, BLACK)
+cuboid(ex, ey, top + 8.5, 54, 22, 1.6, (236, 236, 242))
+cuboid(CX0 + 1.0, CY0 + 9.9, top + 8.5 + 1.6, 7.5, 8.2, 3.2, (190, 194, 200))        # USB-C
+cuboid(CX0 + 22, CY0 + 9.5, top + 8.5 + 1.6, 9, 9, 1.0, BLACK)                        # the module (shield)
+cuboid(CX0 + 48.5, CY0 + 6, top + 8.5 + 1.6, 7.5, 16, 0.8, (236, 226, 196))           # antenna
 # MAX31865 (25.4 x 27.9, 15 high) on low sockets of 3 mm, rotated 180 degrees: header at the rear, PT100 terminal at the front
 mx, my = CX0 + 31, CY0 + 27.5
-add(mx + 3.8, my + 1.4, top, 19.0, 2.5, 3.0, BLACK)
-add(mx, my, top + 3.0, 25.4, 27.9, 1.6, (130, 30, 40))                      # Adafruit board is red-purple
-add(mx + 4.2, my + 20.5, top + 3.0 + 1.6, 17.0, 7.0, 10.4, (46, 120, 190), bias=6)  # PT100 terminal block (blue)
-add(mx + 9.4, my + 9.9, top + 3.0 + 1.6, 7, 7, 1.6, BLACK, bias=6)                  # the MAX31865 chip
+cuboid(mx + 3.8, my + 1.4, top, 19.0, 2.5, 3.0, BLACK)
+cuboid(mx, my, top + 3.0, 25.4, 27.9, 1.6, (130, 30, 40))
+cuboid(mx + 4.2, my + 20.5, top + 3.0 + 1.6, 17.0, 7.0, 10.4, (46, 120, 190))          # PT100 terminal block
+cuboid(mx + 9.4, my + 9.9, top + 3.0 + 1.6, 7, 7, 1.6, BLACK)                          # the chip
 # the FPC adapter board (~22 x 26.5) on a 2 x 4 header, at the left, FPC connector towards the front
 ax0, ay0 = CX0 + 1.5, CY0 + 27.5
 HDR = 8.5
-add(ax0 + 6.5, ay0 + 5.6, top, 10.2, 5.1, HDR, BLACK)                       # 2 x 4 header + socket
-add(ax0, ay0, top + HDR, 22, 26.5, 1.6, (22, 130, 70))
-add(ax0 + 6, ay0 + 19.0, top + HDR + 1.6, 10, 5.5, 2.6, WHITE, bias=6)              # its FPC connector (front side)
-add(ax0 + 1.0, ay0 + 3.1, top, 3.5, 3.5, HDR, (110, 110, 118))              # standoffs under the mounting holes
-add(ax0 + 17.5, ay0 + 3.1, top, 3.5, 3.5, HDR, (110, 110, 118))
-
+cuboid(ax0 + 6.5, ay0 + 5.6, top, 10.2, 5.1, HDR, BLACK)
+cuboid(ax0, ay0, top + HDR, 22, 26.5, 1.6, (22, 130, 70))
+cuboid(ax0 + 6, ay0 + 19.0, top + HDR + 1.6, 10, 5.5, 2.6, WHITE)                      # its FPC connector
+cuboid(ax0 + 1.0, ay0 + 3.1, top, 3.5, 3.5, HDR, (110, 110, 118))
+cuboid(ax0 + 17.5, ay0 + 3.1, top, 3.5, 3.5, HDR, (110, 110, 118))
 # J8 (dimmer, 1 x 4) and J9 (pressure, 1 x 3): straight headers in the corridor, plugs seated on top
 J8X, J8Y = CX0 + 27.2 - 1.27, CY0 + 31.0 - 1.27
 J9X, J9Y = CX0 + 27.2 - 1.27, CY0 + 42.0 - 1.27
-add(J8X, J8Y, top, 2.54, 10.16, 2.5, BLACK); add(J8X + 0.2, J8Y + 0.2, top + 2.5, 2.14, 9.76, 8.0, WHITE)
-add(J9X, J9Y, top, 2.54, 7.62, 2.5, BLACK); add(J9X + 0.2, J9Y + 0.2, top + 2.5, 2.14, 7.22, 8.0, WHITE)
+cuboid(J8X, J8Y, top, 2.54, 10.16, 2.5, BLACK); cuboid(J8X + 0.2, J8Y + 0.2, top + 2.5, 2.14, 9.76, 8.0, WHITE)
+cuboid(J9X, J9Y, top, 2.54, 7.62, 2.5, BLACK); cuboid(J9X + 0.2, J9Y + 0.2, top + 2.5, 2.14, 7.22, 8.0, WHITE)
 # J2 (2 x 4 right-angle, rows stacked vertically) and four 2-pin housings plugged in from the front
-add(CX0 + 12.2 - 1.27, CY0 + 60.2, top, 10.16, 5.0, 5.9, BLACK)
+cuboid(CX0 + 12.2 - 1.27, CY0 + 60.2, top, 10.16, 5.0, 5.9, BLACK)
 for k in range(4):
-    add(CX0 + 12.2 - 1.27 + k * 2.54 + 0.15, CY0 + 65.2, top + 0.4, 2.24, 8.6, 5.1, WHITE)
-# J7 (2 x 5 right-angle): lower row = 4-pin encoder housing, upper row = 2-pin button + 3-pin spare housings
-add(CX0 + 22.4 - 1.27, CY0 + 60.2, top, 15.24, 5.0, 5.9, BLACK)
-add(CX0 + 22.4 - 1.27 + 0.15, CY0 + 65.2, top + 0.4, 10.0, 8.6, 2.3, WHITE)
-add(CX0 + 22.4 - 1.27 + 0.15, CY0 + 65.2, top + 3.0, 4.9, 8.6, 2.3, WHITE)
-add(CX0 + 22.4 - 1.27 + 5.23, CY0 + 65.2, top + 3.0, 9.9, 8.6, 2.3, (225, 222, 205))
+    cuboid(CX0 + 12.2 - 1.27 + k * 2.54 + 0.15, CY0 + 65.2, top + 0.4, 2.24, 8.6, 5.1, WHITE)
+# J7 (2 x 6 right-angle): lower row = 4-pin encoder housing, upper row = 2-pin button + 4-pin spare housings
+cuboid(CX0 + 22.4 - 1.27, CY0 + 60.2, top, 15.24, 5.0, 5.9, BLACK)
+cuboid(CX0 + 22.4 - 1.27 + 0.15, CY0 + 65.2, top + 0.4, 10.0, 8.6, 2.3, WHITE)
+cuboid(CX0 + 22.4 - 1.27 + 0.15, CY0 + 65.2, top + 3.0, 4.9, 8.6, 2.3, WHITE)
+cuboid(CX0 + 22.4 - 1.27 + 5.23, CY0 + 65.2, top + 3.0, 9.9, 8.6, 2.3, (225, 222, 205))
 # polyfuse, standing diode, electrolytic, 100 nF, and the two JST XH (vertical headers with their plugs)
-add(CX0 + 1.9, CY0 + 64.4, top, 7.2, 3.2, 11.0, (232, 200, 60))                # polyfuse
-add(CX0 + 1.2, CY0 + 61.2, top, 2.7, 2.7, 5.2, BLACK)                          # 1N5819 standing
-add(CX0 + 24.05, CY0 + 50.85, top, 6.3, 6.3, 12.0, (30, 40, 90))               # 470 uF electrolytic
-add(CX0 + 25.5, CY0 + 48.2, top, 4.0, 1.6, 4.2, (200, 120, 40))                # 100 nF
+cuboid(CX0 + 1.9, CY0 + 64.4, top, 7.2, 3.2, 11.0, (232, 200, 60))
+cuboid(CX0 + 1.2, CY0 + 61.2, top, 2.7, 2.7, 5.2, BLACK)
+cyl(CX0 + 27.2, CY0 + 54.0, 3.15, top, 12.0, (30, 40, 90))                                # 470 uF electrolytic
+cuboid(CX0 + 25.5, CY0 + 48.2, top, 4.0, 1.6, 4.2, (200, 120, 40))                        # 100 nF
 for k in range(2):
     xb = CX0 + 42.0 + k * 10.5 - 4.95
-    add(xb, CY0 + 62.1, top, 9.9, 5.8, 5.8, WHITE)                             # JST XH header (pins along x)
-    add(xb + 0.3, CY0 + 62.4, top + 5.8, 9.3, 5.2, 6.0, (225, 215, 190))      # its plug
+    cuboid(xb, CY0 + 62.1, top, 9.9, 5.8, 5.8, WHITE)                                     # JST XH header
+    cuboid(xb + 0.3, CY0 + 62.4, top + 5.8, 9.3, 5.2, 6.0, CREAM)                         # its plug
 
-items.sort(key=lambda t: t[0])
-for _, fn in items:
-    fn()
-for (px, py) in [(WALL, BY - WALL - 8), (BX - WALL - 8, BY - WALL - 8)]:
-    cyl(px + 4, py + 4, 4, FLOOR, BASE_H - FLOOR, (46, 46, 54))
-
-# ---------------------------------------------------------------- the front walls of the base (cut low, to see inside)
-FW = 5.0
-poly([(0, BY, 0), (BX, BY, 0), (BX, BY, FW), (0, BY, FW)], shade(PLASTIC, 0.62), (20, 20, 24))
-poly([(BX, 0, 0), (BX, BY, 0), (BX, BY, FW), (BX, 0, FW)], shade(PLASTIC, 0.8), (20, 20, 24))
-poly([(0, BY, FW), (BX, BY, FW), (BX, BY - WALL, FW), (0, BY - WALL, FW)], shade(PLASTIC, 1.2), (20, 20, 24))
-poly([(BX, 0, FW), (BX, BY, FW), (BX - WALL, BY - WALL, FW), (BX - WALL, WALL, FW)], shade(PLASTIC, 1.15), (20, 20, 24))
-
-# ---------------------------------------------------------------- the cables, leaving through the front
-j2cols = [((200, 30, 30), (20, 20, 24)), ((150, 90, 40), (235, 235, 235)), ((230, 130, 30), (235, 235, 235)), ((235, 200, 40), (235, 235, 235))]
-for k, (c1, c2) in enumerate(j2cols):
-    xk = CX0 + 12.2 + k * 2.54
-    d.line([P(xk, CY0 + 73.8, top + 4.1), P(xk, CY0 + 84, top + 3.0)], fill=c1, width=3 * SS)
-    d.line([P(xk, CY0 + 73.8, top + 1.6), P(xk, CY0 + 84, top + 0.6)], fill=c2, width=3 * SS)
-# J7 upper row: button (2) + spare (3); lower row: encoder (4)
-upper = [(240, 240, 240), (20, 20, 24), (200, 30, 30), (235, 200, 40), (150, 90, 200), (20, 20, 24)]
-lower = [(200, 30, 30), (20, 20, 24), (40, 150, 70), (60, 110, 210)]
-for k, col in enumerate(upper):
-    xk = CX0 + 22.4 + k * 2.54
-    d.line([P(xk, CY0 + 73.8, top + 4.2), P(xk, CY0 + 84, top + 3.2)], fill=col, width=3 * SS)
-for k, col in enumerate(lower):
-    xk = CX0 + 22.4 + k * 2.54
-    d.line([P(xk, CY0 + 73.8, top + 1.5), P(xk, CY0 + 84, top + 0.5)], fill=col, width=3 * SS)
-# J8 / J9: wires rise above the plugs then leave towards the front, above everything
-for k, col in enumerate([(200, 30, 30), (20, 20, 24), (235, 200, 40), (60, 110, 210)]):
-    y = CY0 + 31.0 + k * 2.54
-    d.line([P(CX0 + 27.2, y, top + 10.5), P(CX0 + 27.2, y, top + 14 + k), P(CX0 + 27.2, CY0 + 84, top + 10 + k)], fill=col, width=3 * SS)
-for k, col in enumerate([(200, 30, 30), (20, 20, 24), (40, 150, 70)]):
-    y = CY0 + 42.0 + k * 2.54
-    d.line([P(CX0 + 27.2, y, top + 10.5), P(CX0 + 27.2, y, top + 19 + k), P(CX0 + 27.2, CY0 + 84, top + 15 + k)], fill=col, width=3 * SS)
-# JST XH flow sensors: the cables come out of the top of the plugs and go forward
-for kx in range(2):
-    for k, col in enumerate([(200, 30, 30), (235, 200, 40), (20, 20, 24)]):
-        xk = CX0 + 42.0 + kx * 10.5 + (k - 1) * 2.5
-        yk = CY0 + 65.0
-        d.line([P(xk, yk, top + 11.8), P(xk, yk, top + 15), P(xk, CY0 + 84, top + 5 + kx)], fill=col, width=3 * SS)
-# PT100 wires leave the terminal block towards the front, above J7 / XH
-for k, col in enumerate([(200, 30, 30), (200, 30, 30), (235, 235, 235)]):
-    xk = mx + 7.0 + k * 3.6
-    d.line([P(xk, my + 27.9, top + 8.8), P(xk, CY0 + 84, top + 7.5 - k * 0.5)], fill=col, width=3 * SS)
-# FPC ribbon: leaves the connector towards the front and runs straight out with the cables (nothing in the way)
+# FPC ribbon: leaves the connector towards the front and runs straight out
+Y_END = CY0 + 97.0
 RZ0 = top + HDR + 1.6 + 1.2
-cuboid(ax0 + 8, ay0 + 24.5, RZ0, 6, CY0 + 84 - (ay0 + 24.5), 0.4, (232, 160, 48))
+cuboid(ax0 + 8, ay0 + 24.5, RZ0, 6, Y_END - (ay0 + 24.5), 0.4, (232, 160, 48))
 
-# ---------------------------------------------------------------- the labels
+# ---------------------------------------------------------------- outlines (edges between different faces)
+edge = np.zeros((HS, WS), bool)
+edge[:, 1:] |= FID[:, 1:] != FID[:, :-1]
+edge[1:, :] |= FID[1:, :] != FID[:-1, :]
+e2 = edge.copy()
+e2[:, :-1] |= edge[:, 1:]
+e2[:-1, :] |= edge[1:, :]
+COL[e2] = (22, 22, 26)
+
+# ---------------------------------------------------------------- cables: round tubes with a depth test against the scene
+DCUR = DEPTH.copy()
+
+
+def tube(pts, color, r_mm):
+    R = r_mm * s * SS
+    Ri = int(math.ceil(R))
+    oy, ox = np.mgrid[-Ri:Ri + 1, -Ri:Ri + 1]
+    dist = np.sqrt(ox ** 2 + oy ** 2)
+    disc = dist <= R
+    oy, ox, dist = oy[disc], ox[disc], dist[disc]
+    q = dist / R
+    bump = np.sqrt(np.maximum(0.0, 1 - q ** 2)) * r_mm * 1.7
+    # light from the upper left: shade with the offset to the light
+    lit = np.clip(0.62 + 0.5 * (-(ox * 0.5 + oy * 0.8) / R + 0.4), 0.45, 1.25) * (1 - 0.35 * (q > 0.82))
+    base = np.array(color, np.float32)
+    # densify the polyline
+    samples = []
+    step = max(0.2, r_mm * 0.2)
+    for a, b in zip(pts[:-1], pts[1:]):
+        n = max(1, int(math.dist(a, b) / step))
+        for k in range(n + 1):
+            t = k / n
+            samples.append(tuple(a[i] + (b[i] - a[i]) * t for i in range(3)))
+    samples.sort(key=lambda p: p[0] + p[1] + p[2])
+    for p in samples:
+        u, v, d = proj(*p)
+        iu, iv = int(round(u)), int(round(v))
+        xs, ys = iu + ox, iv + oy
+        ok = (xs >= 0) & (xs < WS) & (ys >= 0) & (ys < HS)
+        xs, ys = xs[ok], ys[ok]
+        dd = (d + bump[ok]).astype(np.float32)
+        m = dd > DCUR[ys, xs]
+        if not m.any():
+            continue
+        xs, ys, dd = xs[m], ys[m], dd[m]
+        DCUR[ys, xs] = dd
+        COL[ys, xs] = np.clip(base[None, :] * lit[ok][m][:, None], 0, 255).astype(np.uint8)
+
+
+RED, BLK, YEL, BLU = (205, 35, 35), (30, 30, 34), (235, 200, 40), (60, 110, 210)
+CABLES = []     # (number, label, connector, color, radius, points)
+def cable(label, conn, color, r, pts, end_x=None):
+    CABLES.append((len(CABLES) + 1, label, conn, color, r, pts))
+
+# J2: four 2-pin housings -> 5 V supply and the three SSRs
+for k, (lab, col) in enumerate([("5 V supply", RED), ("pump SSR", (150, 90, 40)), ("boiler SSR", (232, 130, 30)), ("valve SSR", YEL)]):
+    xk = CX0 + 12.2 + k * 2.54
+    zk = top + 0.4 + 2.55
+    cable(lab, "J2", col, 1.0, [(xk, CY0 + 73.8, zk), (xk, Y_END, zk)])
+# J7: button (2-pin), encoder (4-pin, lower row), spare I/O (4-pin)
+cable("button", "J7", (240, 240, 240), 0.9, [(CX0 + 22.4 + 1.27, CY0 + 73.8, top + 4.15), (CX0 + 22.4 + 1.27, Y_END, top + 4.15)])
+cable("encoder", "J7", (40, 150, 70), 1.4, [(CX0 + 22.4 + 3.81, CY0 + 73.8, top + 1.55), (CX0 + 22.4 + 3.81, Y_END, top + 1.55)])
+cable("spare I/O", "J7", (150, 90, 200), 1.4, [(CX0 + 22.4 + 8.89, CY0 + 73.8, top + 4.15), (CX0 + 22.4 + 8.89, Y_END, top + 4.15)])
+# J8 / J9: the cables rise from the plugs, pass over C1 and leave above everything
+cable("pump dimmer (I2C)", "J8", (30, 170, 200), 1.1, [(CX0 + 27.2, CY0 + 34.8, top + 10.5), (CX0 + 26.2, CY0 + 34.8, top + 14.2), (CX0 + 26.2, Y_END, top + 14.2)])
+cable("pressure sensor", "J9", BLU, 1.1, [(CX0 + 27.2, CY0 + 44.5, top + 10.5), (CX0 + 29.0, CY0 + 44.5, top + 17.0), (CX0 + 29.0, Y_END, top + 17.0)])
+# JST XH: flow sensors
+cable("flow sensor In", "J3", (20, 150, 150), 1.2, [(CX0 + 42.0, CY0 + 65.0, top + 11.8), (CX0 + 39.0, CY0 + 65.0, top + 14.0), (CX0 + 39.0, Y_END, top + 14.0)])
+cable("flow sensor Out", "J4", (90, 80, 190), 1.2, [(CX0 + 52.5, CY0 + 65.0, top + 11.8), (CX0 + 53.0, CY0 + 65.0, top + 14.0), (CX0 + 53.0, Y_END, top + 14.0)])
+# PT100: leaves the MAX31865 terminal block towards the front and passes over J3
+cable("PT100 probe", "MAX31865", (230, 110, 160), 1.2, [(mx + 12.5, my + 27.9, top + 8.8), (CX0 + 45.5, CY0 + 58.0, top + 17.0), (CX0 + 45.5, Y_END, top + 17.0)])
+for (n, lab, conn, col, r, pts) in CABLES:
+    tube(pts, col, r)
+RIBBON_NUMBER = len(CABLES) + 1
+
+# ---------------------------------------------------------------- compose: image, overlays
+im = Image.fromarray(COL)
+d = ImageDraw.Draw(im)
+
+
+def F(sz, b=False):
+    return ImageFont.truetype('C:/Windows/Fonts/%s.ttf' % ('arialbd' if b else 'arial'), int(sz * SS))
+
+
+def P2(x, y, z):
+    u, v, _ = proj(x, y, z)
+    return u, v
+
+
+def text(x, y, t, size=18, color=(30, 30, 36), bold=False, anchor='lm'):
+    d.text((x * SS, y * SS), t, font=F(size, bold), fill=color, anchor=anchor)
+
+
+d.line([P2(*p) for p in USB_OPENING] + [P2(*USB_OPENING[0])], fill=(230, 230, 235), width=2 * SS)
+text(W / 2, 40, "Enclosure view: the carrier board with its connectors (the display is remote)", 30, bold=True, anchor='mm')
+text(W / 2, 80, "Enclosure base, lid removed. Scaled concept drawing following the placement plan: not a board layout.", 20, (110, 110, 116), anchor='mm')
+
+
 def pl(x, y, z, tx, ty, t, color=(20, 20, 26)):
-    px, py = P(x, y, z)
+    px, py = P2(x, y, z)
     d.line([(px, py), (tx * SS, ty * SS)], fill=color, width=2 * SS)
     d.ellipse([px - 4 * SS, py - 4 * SS, px + 4 * SS, py + 4 * SS], fill=color)
     text(tx + (10 if tx >= px / SS else -10), ty, t, 17, color, True, 'lm' if tx >= px / SS else 'rm')
 
-pl(ex + 30, ey + 11, top + 10.2, 300, 470, "ESP32-S3, rotated 90 deg")
-pl(CX0 + 3, CY0 + 14, top + 12, 300, 400, "USB-C: opening in the left wall")
-pl(mx + 12, my + 8, top + 15, 1560, 240, "MAX31865 (rotated 180 deg, PT100 to the front)")
-pl(ax0 + 11, ay0 + 10, top + HDR + 1.6, 1560, 300, "your FPC adapter board (on sockets)")
-pl(ax0 + 11, ay0 + 22, top + HDR + 4.2, 1560, 420, "FPC connector pre-soldered")
-pl(ax0 + 11, ay0 + 40, RZ0, 300, 900, "FPC ribbon straight to the front")
-pl(CX0 + 27.2, CY0 + 38, top + 10.5, 300, 560, "J8 dimmer (I2C), J9 pressure")
-pl(CX0 + 16, CY0 + 66, top + 3.5, 300, 650, "J2: 5 V + 3 SSRs")
-pl(CX0 + 28, CY0 + 66, top + 4.0, 300, 735, "J7: button, encoder, 4 spare I/O")
-pl(CX0 + 47, CY0 + 65, top + 12, 1560, 640, "JST XH 3 (vertical plugs): flow sensors In and Out")
-pl(sx0, sy0 + 50, FLOOR + 3, 300, 820, "3 mm small posts (45 x 50)")
 
-# ---------------------------------------------------------------- the stack of heights
-text(1560, 800, "Usable height: 25 mm", 22, (30, 30, 36), True)
-text(1560, 836, "posts 3 + board 1.6 = 4.6 mm", 18, (60, 60, 66))
-text(1560, 862, "ESP32 (8.5 sockets): USB-C at 17.9 mm", 18, (60, 60, 66))
-text(1560, 888, "FPC board on 8.5 sockets: 17.7 mm", 18, (60, 60, 66))
-text(1560, 914, "MAX31865 (3 sockets): 22.6 mm, margin 2.4 mm", 18, (20, 110, 60), True)
-text(1560, 950, "Electrolytic C1 and polyfuse F1: about 15 mm", 18, (60, 60, 66))
+pl(ex + 30, ey + 11, top + 10.2, 330, 330, "ESP32-S3, rotated 90 deg")
+pl(CX0 + 3, CY0 + 14, top + 12, 330, 250, "USB-C: left wall opening")
+pl(mx + 12, my + 8, top + 15, 1560, 330, "MAX31865 (PT100 to the front)")
+pl(ax0 + 11, ay0 + 10, top + HDR + 1.6, 330, 430, "your FPC adapter board (on sockets)")
+pl(ax0 + 11, ay0 + 22, top + HDR + 4.2, 330, 520, "FPC connector pre-soldered")
+pl(sx0, sy0 + 50, FLOOR + 3, 330, 640, "3 mm small posts (45 x 50)")
+pl(BX - WALL - 4, BY - WALL - 4, BASE_H, 1560, 520, "8 mm round corner posts")
+pl(CX0 + 30, BY, FW, 1560, 640, "slot to cut in the front wall (cables)")
+pl(CX0 + 27.2, CY0 + 40, top + 11, 330, 740, "J8 dimmer and J9 pressure (corridor)")
+
+# numbered tags at the cable ends, staggered so that they do not overlap
+ends = []
+for (n, lab, conn, col, r, pts) in CABLES:
+    ends.append((n, pts[-1], col))
+ends.append((RIBBON_NUMBER, (ax0 + 11, Y_END, RZ0), (232, 160, 48)))
+order = sorted(ends, key=lambda e: e[1][0])
+for rank, (n, p, col) in enumerate(order):
+    u, v = P2(*p)
+    off = (rank % 4) * 30
+    tx, ty = u - 0.866 * off * 0 + (-0.866) * (14 + off) * 1.0 * 0, v
+    # direction of the cables on screen (towards +y): (-C30, +S30)
+    ux, uy = -C30, S30
+    cx, cy = u + ux * (30 + off * SS), v + uy * (30 + off * SS)
+    d.line([(u, v), (cx, cy)], fill=(40, 40, 46), width=2 * SS)
+    d.ellipse([cx - 11 * SS, cy - 11 * SS, cx + 11 * SS, cy + 11 * SS], fill=col, outline=(30, 30, 34), width=2 * SS)
+    d.text((cx, cy), str(n), font=F(15, True), fill=(20, 20, 24) if sum(col) > 400 else (255, 255, 255), anchor='mm')
+
+# cable legend
+text(560, 955, "Cables (all leave through the front slot)", 20, (30, 30, 36), True)
+entries = [(n, "%s  %s" % (conn, lab), col) for (n, lab, conn, col, r, pts) in CABLES] + [(RIBBON_NUMBER, "J5  display FPC ribbon", (232, 160, 48))]
+per_col = 7
+for i, (n, lab, col) in enumerate(entries):
+    cx = 580 + (i // per_col) * 520
+    cy = 995 + (i % per_col) * 31
+    d.ellipse([(cx - 11) * SS, (cy - 11) * SS, (cx + 11) * SS, (cy + 11) * SS], fill=col, outline=(30, 30, 34), width=2 * SS)
+    d.text((cx * SS, cy * SS), str(n), font=F(14, True), fill=(20, 20, 24) if sum(col) > 400 else (255, 255, 255), anchor='mm')
+    text(cx + 22, cy, lab, 18, (30, 30, 36))
+
+# the stack of heights
+text(1560, 760, "Usable height: 25 mm", 22, (30, 30, 36), True)
+text(1560, 796, "posts 3 + board 1.6 = 4.6 mm", 18, (60, 60, 66))
+text(1560, 822, "ESP32 (8.5 sockets): USB-C at 17.9 mm", 18, (60, 60, 66))
+text(1560, 848, "FPC board on 8.5 sockets: 17.7 mm", 18, (60, 60, 66))
+text(1560, 874, "MAX31865 (3 sockets): 22.6 mm, margin 2.4 mm", 18, (20, 110, 60), True)
+text(1560, 910, "Electrolytic C1 and polyfuse F1: about 15 mm", 18, (60, 60, 66))
 
 im = im.resize((W, H), Image.LANCZOS)
 im.save(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'images', 'enclosure_3d.png'))
