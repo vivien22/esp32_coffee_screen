@@ -238,13 +238,18 @@ cable("flow sensor In", "J3", 3, c3, (CX0 + 40.5, Y_END, top + 14.0))
 riser_x(CX0 + 52.5, CY0 + 65.0, top + 11.8, top + 14.0, 3, c4)
 cuboid(CX0 + 52.5 - 2.25, CY0 + 65.0 - 0.65, top + 14.0, 4.5, Y_END - (CY0 + 65.0 - 0.65), TH, c4)
 cable("flow sensor Out", "J4", 3, c4, (CX0 + 52.5, Y_END, top + 14.0))
-# PT100 (3 wires): leaves the MAX31865 terminal block, rises in front of it and passes over J3
-cp = (230, 110, 160)
-xp = CX0 + 43.5
-cuboid(xp - 2.25, my + 27.9, top + 8.8 - TH / 2, 4.5, (CY0 + 57.0) - (my + 27.9), TH, cp)
-riser_x(xp, CY0 + 57.0, top + 8.8 - TH / 2, top + 17.0 + TH, 3, cp)
-cuboid(xp - 2.25, CY0 + 57.0 - 0.65, top + 17.0, 4.5, Y_END - (CY0 + 57.0 - 0.65), TH, cp)
-cable("PT100 probe", "MAX31865", 3, cp, (xp, Y_END, top + 17.0))
+# PT100 probe: two very thin wires (0.8 mm) screwed on the two middle terminals of the MAX31865 block (RTD+ and RTD-, 3.5 mm apart),
+# straight out of the block, up in front of it, then forward over J3 and out through the slot
+DW = 0.8
+zA, zB = top + 8.8, top + 17.0
+yR = CY0 + 57.0
+PT_WIRES = [(mx + 12.7 - 1.75, (205, 35, 35)), (mx + 12.7 + 1.75, (235, 235, 235))]
+for (xw, colw) in PT_WIRES:
+    cuboid(xw - DW / 2, my + 26.5, zA - DW / 2, DW, yR - (my + 26.5), DW, colw)
+    cuboid(xw - DW / 2, yR - DW / 2, zA - DW / 2, DW, DW, zB - zA + DW, colw)
+    cuboid(xw - DW / 2, yR - DW / 2, zB - DW / 2, DW, Y_END - (yR - DW / 2), DW, colw)
+cable("PT100 probe", "MAX31865", 2, (235, 235, 235), (mx + 12.7, Y_END, zB))
+SIZE_LABEL = {len(CABLES): "2 very thin wires, 0.8 mm"}
 RIBBON_NUMBER = len(CABLES) + 1
 
 # ---------------------------------------------------------------- outlines (edges between different faces)
@@ -315,7 +320,7 @@ for rank, (n, p, col) in enumerate(order):
 
 # cable legend
 text(560, 955, "Cables: small flat ribbons, 1.5 mm per wire (all leave through the front slot)", 20, (30, 30, 36), True)
-entries = [(n, "%s  %s  (%d wires, %.1f mm)" % (conn, lab, wires, wires * WIRE), col) for (n, lab, conn, wires, col, end) in CABLES] + [(RIBBON_NUMBER, "J5  display FPC ribbon (6 mm)", (232, 160, 48))]
+entries = [(n, "%s  %s  (%s)" % (conn, lab, SIZE_LABEL.get(n, "%d wires, %.1f mm" % (wires, wires * WIRE))), col) for (n, lab, conn, wires, col, end) in CABLES] + [(RIBBON_NUMBER, "J5  display FPC ribbon (6 mm)", (232, 160, 48))]
 per_col = 7
 for i, (n, lab, col) in enumerate(entries):
     cx = 580 + (i // per_col) * 560
