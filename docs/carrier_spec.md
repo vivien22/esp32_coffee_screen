@@ -14,7 +14,7 @@
 | J1 | (fusionné dans J2, broches A1 / A2) | alimentation 5 V |
 | J2 | barrette mâle 2 x 4 coudée, boîtiers Dupont femelles | alimentation 5 V + 3 SSR |
 | J7 | barrette mâle 1 x 6 coudée | bouton + encodeur (alimenté en 5 V) |
-| J8 | barrette 1 x 4 | variateur de pompe RobotDyn 4 A UART / I2C (alimenté en 3,3 V) |
+| J8 | barrette 1 x 4 | variateur de pompe RobotDyn 4 A, en UART (alimenté en 3,3 V) |
 | J9 | barrette 1 x 3 | capteur de pression 0,5 à 4,5 V, 0 à 12 bar (alimenté en 5 V) |
 | J3, J4 | JST XH 3 broches (pas réel 2,5 mm) | capteurs de débit In et Out |
 | J5 | support femelle 2 x 4 | ta carte d'adaptation FPC 8 broches (nappe vers l'écran déporté) |
@@ -44,7 +44,7 @@ L'ESP32-S3 n'accepte que 3,3 V. Le module encodeur étant alimenté en 5 V, ses 
 |---|---|---|---|
 | VCC (3,3 V) | GND | TX/SDA | RX/SCL |
 
-Module RobotDyn « 4 A Dimmer, interface DimmerLink UART / I2C » (53 x 16 mm) : pas de broche de passage par zéro ni de PWM, tout passe par le bus. En UART, le TX de l'ESP32 va vers RX/SCL du module et inversement (GPIO 47 = TX, GPIO 48 = RX, **provisoire**) ; en I2C, GPIO 47 = SDA, GPIO 48 = SCL (les mêmes broches servent aux deux modes, les rappels I2C seraient à ajouter). Le module reste hors de la carte, côté secteur : seul le câble Dupont de commande y revient, la partie 230 V garde sa propre isolation et sa distance. Alimentation en 3,3 V pour que la logique soit au même niveau que l'ESP32.
+Module RobotDyn « 4 A Dimmer, interface DimmerLink UART / I2C » (53 x 16 mm) : pas de broche de passage par zéro ni de PWM, tout passe par le bus. **Mode retenu : UART.** Le TX de l'ESP32 (GPIO 47, **provisoire**) va vers RX/SCL du module et le RX de l'ESP32 (GPIO 48) vers TX/SDA ; le module est configuré en UART (voir sa fiche DimmerLink). Le module reste hors de la carte, côté secteur : seul le câble Dupont de commande y revient, la partie 230 V garde sa propre isolation et sa distance. Alimentation en 3,3 V pour que la logique soit au même niveau que l'ESP32.
 
 ### J9 (capteur de pression, 1 x 3)
 | 1 | 2 | 3 |
@@ -63,7 +63,7 @@ Affectation **provisoire** (GC9A01 8 broches typique) : 1 GND, 2 3V3, 3 SCL (GPI
 VIN (3,3 V), 3Vo (non utilisé), GND, CLK (GPIO 12), SDO (GPIO 13), SDI (GPIO 11), CS (GPIO 7), RDY (non utilisé). Ordre à vérifier sur ton module.
 
 ## Broches de l'ESP32-S3
-5V, 3V3, GND ; GPIO 17 (SSR pompe), 18 (SSR chaudière), 21 (SSR vanne) ; 15 (débit In), 16 (débit Out) ; 4 / 5 (encodeur) ; 6 (bouton) ; 11 / 12 / 13 (SPI MOSI / SCK / MISO) ; 10 (écran CS) ; 9 / 8 (écran DC / RST) ; 14 (rétroéclairage) ; 7 (MAX31865 CS) ; 47 / 48 (variateur TX / RX ou SDA / SCL) ; 1 (pression, ADC) ; 38 (réserve). Évitées : 0, 3, 45, 46, 19, 20, 35 à 37.
+5V, 3V3, GND ; GPIO 17 (SSR pompe), 18 (SSR chaudière), 21 (SSR vanne) ; 15 (débit In), 16 (débit Out) ; 4 / 5 (encodeur) ; 6 (bouton) ; 11 / 12 / 13 (SPI MOSI / SCK / MISO) ; 10 (écran CS) ; 9 / 8 (écran DC / RST) ; 14 (rétroéclairage) ; 7 (MAX31865 CS) ; 47 / 48 (variateur, UART TX / RX) ; 1 (pression, ADC) ; 38 (réserve). Évitées : 0, 3, 45, 46, 19, 20, 35 à 37.
 
 ## Circuits
 - **Alimentation :** J2 A1 (+5 V) → fusible réarmable 1,1 A → diode 1N5819 (contre l'inversion) → rail +5 V (470 µF + 100 nF) → broche 5V de l'ESP32. Le 3,3 V vient de la carte ESP32.
@@ -97,5 +97,5 @@ VIN (3,3 V), 3Vo (non utilisé), GND, CLK (GPIO 12), SDO (GPIO 13), SDI (GPIO 11
 4. Les dimensions de ta carte d'adaptation FPC (environ 22 x 28 mm estimés) et l'écartement de ses trous de fixation.
 5. Le type de sortie des capteurs de débit (5 V ou collecteur ouvert) : le circuit prévu convient aux deux.
 6. Module MAX31865 (Adafruit, relevé sur le plan du fabricant) : 25,4 x 27,9 mm, trous de fixation à 0,9" d'entraxe et 0,1" du bord côté bornier, connecteur 1 x 8 au pas de 0,1" sur le petit côté : VIN, 3Vo, GND, CLK, SDO, SDI, CS, RDY.
-7. Variateur de pompe : le protocole DimmerLink (commandes, adresse I2C, vitesse UART) est à relever sur la fiche du module. Un variateur de phase sur un moteur de pompe vibratoire (ou à aimant) est à valider : tout moteur ne supporte pas bien la coupure de phase.
+7. Variateur de pompe : le protocole DimmerLink (commandes, adresse I2C, vitesse UART) est à relever sur la fiche du module. Pompe : Olab Silent Green (vibrante, 230 V / 35 W / 0,33 A en version européenne ; vérifier l'étiquette). Le variateur de phase est une pratique courante sur ce type de pompe. Le variateur se place en série avec la pompe ; garder le SSR de pompe en série comme coupure franche (le variateur seul ne garantit pas l'arrêt complet). Aux faibles puissances la pompe peut vibrer sans pomper : prévoir une plage de réglage minimale à calibrer avec le capteur de pression.
 8. Capteur de pression : confirmer 3 fils (+5 V, GND, signal) et le raccord G1/4 côté circuit hydraulique.
