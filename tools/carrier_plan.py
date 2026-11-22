@@ -162,8 +162,19 @@ for i in range(6):
     tpad(25.0 + i * 2.54, 58.2, square=(i == 0), ring=1.7, drill=1.0)
 rect(d, X(25.0) - 1.4 * K, Y(58.2) - 1.4 * K, X(25.0 + 5 * 2.54) + 1.4 * K, Y(58.2) + 1.4 * K, outline=SILK + (255,), width=2)
 silk(31.5, 55.4, "J7  bouton + encodeur (1 x 6)", 10)
-for i, lab in enumerate(["BT", "G", "3V", "G", "A", "B"]):
+for i, lab in enumerate(["BT", "G", "5V", "G", "A", "B"]):
     text(d, X(25.0 + i * 2.54), Y(58.2) + 2.1 * K, lab, 8, SILK, True)
+# J8: 1 x 4 vertical header, dimmer (UART / I2C) in the corridor between ESP32 and FPC board; J9: 1 x 3, pressure sensor
+for i, lab in enumerate(["3V3", "GND", "TX/SDA", "RX/SCL"]):
+    tpad(25.5, 33.0 + i * 2.54, square=(i == 0), ring=1.7, drill=1.0)
+    text(d, X(27.0), Y(33.0 + i * 2.54), lab, 7, SILK, True, 'lm')
+rect(d, X(25.5) - 1.4 * K, Y(33.0) - 1.4 * K, X(25.5) + 1.4 * K, Y(33.0 + 3 * 2.54) + 1.4 * K, outline=SILK + (255,), width=2)
+silk(25.0, 31.4, "J8 variateur", 8)
+for i, lab in enumerate(["5V", "GND", "SIG"]):
+    tpad(25.5, 43.2 + i * 2.54, square=(i == 0), ring=1.7, drill=1.0)
+    text(d, X(27.0), Y(43.2 + i * 2.54), lab, 7, SILK, True, 'lm')
+rect(d, X(25.5) - 1.4 * K, Y(43.2) - 1.4 * K, X(25.5) + 1.4 * K, Y(43.2 + 2 * 2.54) + 1.4 * K, outline=SILK + (255,), width=2)
+silk(25.0, 41.5, "J9 pression", 8)
 # F1 polyfuse (radial, pitch 5), D1 1N5819 (axial 10.16), C1 470 uF (radial 5 mm dia, pitch 2.5), C2 100 nF
 tpad(3.0, 65.0, ring=1.8, drill=0.9); tpad(8.0, 65.0, ring=1.8, drill=0.9)
 rrect(d, X(1.9), Y(63.4), X(9.1), Y(66.6), 6, outline=SILK + (255,), width=2); silk(5.5, 61.9, "F1 1,1 A", 9)
@@ -239,7 +250,8 @@ comp = [
     "J2  barrette 2 x 4 coudée : SSR et alimentation 5 V",
     "J3, J4  JST XH 3 broches : capteurs de débit In et Out",
     "J5  support 2 x 4 : carte d'adaptation FPC",
-    "J7  barrette 1 x 6 coudée : bouton et encodeur",
+    "J7  barrette 1 x 6 coudée : bouton et encodeur (5 V)",
+    "J8  1 x 4 : variateur de pompe (UART / I2C)  ·  J9  1 x 3 : capteur de pression",
     "Q1 à Q3  commande des SSR ; Q4  rétroéclairage (2N2222A)",
     "R1 à R4  1 kΩ  ·  R5 à R8  10 kΩ  ·  R9, R10  10 kΩ",
     "R11 à R16  entrées des capteurs de débit  ·  C3, C4  1 nF",
