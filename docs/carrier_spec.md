@@ -45,14 +45,14 @@ The ESP32-S3 only accepts 3.3 V. Since the encoder module is powered from 5 V, i
 
 RobotDyn "4 A Dimmer, DimmerLink UART / I2C interface" module (53 x 16 mm): no zero-cross pin and no PWM, everything goes through the bus. **Selected mode: I2C**, GPIO 47 = SDA, GPIO 48 = SCL (**provisional**). Provide two 4.7 kΩ pull-ups to 3.3 V on SDA and SCL (fitted only if the module has none). The module stays off the board, on the mains side: only the control cable comes back, and the 230 V part keeps its own insulation and clearances. Powered from 3.3 V so the logic level matches the ESP32.
 
-Pump: Olab Silent Green (vibration pump, 230 V / 35 W / 0.33 A in the European version; check the label). Phase-angle dimming is a common practice on this type of pump. The dimmer goes in series with the pump; keep the pump SSR in series as a hard cut-off (the dimmer alone does not guarantee a complete stop). At low power the pump may vibrate without pumping: provide a minimum setting, to be calibrated with the pressure sensor.
+Pump: Olab Silent Green K09541 / K09541L (datasheet): self-priming vibration pump, 35 W class F coil, available in 230 V / 50 Hz or 120 V / 60 Hz (check the label of yours), water 5 to 35 °C, brass or plastic outlet. Pressure-flow curve (±15 %): about 19 bar at zero flow, 13 bar at 100 cm³/min, 3.5 bar at 300 cm³/min, 0 bar at about 420 cm³/min. Phase-angle dimming is a common practice on this type of pump. The dimmer goes in series with the pump; keep the pump SSR in series as a hard cut-off (the dimmer alone does not guarantee a complete stop). At low power the pump may vibrate without pumping: provide a minimum setting, to be calibrated with the pressure sensor. 35 W (about 0.15 A at 230 V) is far below the 4 A rating of the dimmer.
 
 ### J9 (pressure sensor, 1 x 3)
 | 1 | 2 | 3 |
 |---|---|---|
 | +5 V | GND | signal |
 
-G1/4 sensor, 0 to 12 bar, 0.5 to 4.5 V output. The signal goes through a divider, 10 kΩ (series) / 20 kΩ (to GND), which brings 4.5 V down to 3.0 V, plus 100 nF on GPIO 1 (ADC1, 11 dB attenuation). Pressure in bar = (sensor voltage − 0.5) x 3. Average the readings (the ESP32 ADC is noisy and not very linear at the ends).
+G1/4 sensor, 0 to 12 bar, 0.5 to 4.5 V output. The signal goes through a divider, 10 kΩ (series) / 20 kΩ (to GND), which brings 4.5 V down to 3.0 V, plus 100 nF on GPIO 1 (ADC1, 11 dB attenuation). Pressure in bar = (sensor voltage − 0.5) x 3. Average the readings (the ESP32 ADC is noisy and not very linear at the ends). The pump can reach about 19 bar at zero flow, above the sensor's 12 bar range: make sure the machine's pressure relief valve limits the pressure at the sensor tap (and check the sensor's overpressure rating).
 
 ### J3 / J4 (JST XH 3-pin)
 1 = +5 V, 2 = signal, 3 = GND. The exact order comes from the sensor cable (often red / yellow / black).
