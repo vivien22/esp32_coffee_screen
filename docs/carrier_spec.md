@@ -43,7 +43,20 @@ The ESP32-S3 only accepts 3.3 V. Since the encoder module is powered from 5 V, i
 |---|---|---|---|
 | VCC (3.3 V) | GND | SDA | SCL |
 
-RobotDyn "4 A Dimmer, DimmerLink UART / I2C interface" module (53 x 16 mm): no zero-cross pin and no PWM, everything goes through the bus. **Selected mode: I2C**, GPIO 47 = SDA, GPIO 48 = SCL (**provisional**). Provide two 4.7 kΩ pull-ups to 3.3 V on SDA and SCL (fitted only if the module has none). The module stays off the board, on the mains side: only the control cable comes back, and the 230 V part keeps its own insulation and clearances. Powered from 3.3 V so the logic level matches the ESP32.
+RobotDyn "4 A Dimmer, DimmerLink UART / I2C interface" module (53 x 16 mm): no zero-cross pin and no PWM, everything goes through the bus. Reference code and documentation: https://github.com/robotdyn-dimmer/DimmerLink. Powered from 3.3 V (the module accepts 1.8 / 3.3 / 5 V and its logic follows VCC, so no level converter); 100 nF decoupling near the module. **Selected mode: I2C**, GPIO 47 = SDA, GPIO 48 = SCL (**provisional**).
+
+**Important: the module ships in UART mode.** It must be switched to I2C once, by sending the UART frame `02 5B` (SWITCH_I2C) to it; the same two pins are then SDA / SCL. Plan a one-time switch (temporary UART sketch on GPIO 47 / 48, or a USB-serial adapter on J8) before using I2C. Going back to UART is done by writing `0x03` to the COMMAND register.
+
+I2C summary (from the DimmerLink documentation, version 1.0):
+- Address **0x50** (7-bit), changeable through register 0x30 (0x08 to 0x77, saved to EEPROM). Speed **100 kHz**.
+- Pull-ups: **4.7 kΩ to 3.3 V on SDA and SCL** (the ESP32 internal ones are too weak): fit them on the board (R-SDA, R-SCL). Keep the cable under 30 cm.
+- Registers: 0x00 STATUS (bit 0 ready, bit 1 error), 0x01 COMMAND (1 reset, 2 recalibrate, 3 switch to UART), 0x02 ERROR, 0x03 VERSION, **0x10 DIM0_LEVEL (0 to 100 %, read/write)**, 0x11 DIM0_CURVE (0 linear, 1 RMS, 2 log), 0x20 AC_FREQ (50 or 60), 0x21 / 0x22 AC_PERIOD (µs, half-wave), 0x23 CALIBRATION (1 = done).
+- Resolution is 1 % steps, and mains frequency is detected automatically. Use the linear curve for the pump.
+- Not stated in the documentation: power-on delay, EEPROM write time, maximum load, mains isolation. Wait a few hundred ms after power-up and poll STATUS bit 0 (ready) before the first write.
+
+**Warning (from the DimmerLink FAQ):** it lists induction / asynchronous motors, "most fans, pumps", as unsuitable (they hum and overheat); it does not mention vibration pumps. The Olab pump is a vibration pump (a solenoid coil with a piston, not an induction motor), a type commonly dimmed with this kind of module, but this is not covered by the documentation: test it carefully (monitor the pump temperature and noise) and keep the pump SSR as an independent cut-off. An RC snubber on the dimmer output is suggested by the FAQ if the mains interferes.
+
+The module stays off the board, on the mains side: only the control cable comes back, and the 230 V part keeps its own insulation and clearances.
 
 Pump: Olab Silent Green K09541 / K09541L (datasheet): self-priming vibration pump, 35 W class F coil, available in 230 V / 50 Hz or 120 V / 60 Hz (check the label of yours), water 5 to 35 °C, brass or plastic outlet. Pressure-flow curve (±15 %): about 19 bar at zero flow, 13 bar at 100 cm³/min, 3.5 bar at 300 cm³/min, 0 bar at about 420 cm³/min. Phase-angle dimming is a common practice on this type of pump. The dimmer goes in series with the pump; keep the pump SSR in series as a hard cut-off (the dimmer alone does not guarantee a complete stop). At low power the pump may vibrate without pumping: provide a minimum setting, to be calibrated with the pressure sensor. 35 W (about 0.15 A at 230 V) is far below the 4 A rating of the dimmer.
 
@@ -98,6 +111,6 @@ VIN (3.3 V), 3Vo (unused), GND, CLK (GPIO 12), SDO (GPIO 13), SDI (GPIO 11), CS 
 4. Dimensions of your FPC adapter board (about 22 x 26 mm estimated) and position of its mounting holes.
 5. Flow sensor output type (5 V or open collector): the planned circuit suits both.
 6. MAX31865 module (Adafruit, measured from the manufacturer's drawing): 25.4 x 27.9 mm, mounting holes 0.9" apart and 0.1" from the terminal-block edge, 1 x 8 header at 0.1" pitch on the short edge.
-7. Pump dimmer: I2C address, registers and timing from the DimmerLink datasheet; I2C pull-ups present or not on the module.
+7. Pump dimmer: one-time switch from UART to I2C (see J8); behaviour with the vibration pump to test; I2C pull-ups (4.7 kΩ) fitted on the board.
 8. Pressure sensor: confirm 3 wires (+5 V, GND, signal) and the G1/4 fitting on the hydraulic circuit.
 9. One mounting hole (top right) passes under the MAX31865: flat-head screw, 1.5 mm high at most, under the module's 3 mm.
