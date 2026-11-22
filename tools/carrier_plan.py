@@ -39,9 +39,9 @@ bx0, by0 = X(-1), Y(-8.5)
 bx1, by1 = bx0 + INT_W * K, by0 + INT_L * K
 rrect(d, bx0 - 3 * K, by0 - 3 * K, bx1 + 3 * K, by1 + 3 * K, 14, fill=(52, 52, 58, 255), outline=(30, 30, 34, 255), width=4)
 rect(d, bx0, by0, bx1, by1, fill=(74, 74, 82, 255))
-# the opening for the USB-C cable in the back wall (y = top)
-rect(d, X(5.5), by0 - 3 * K, X(18.5), by0, fill=(20, 20, 24, 255), outline=(230, 230, 235, 255), width=2)
-text(d, X(12), by0 - 1.5 * K, "USB-C opening", 12, (230, 230, 235), True)
+# the opening for the USB-C cable in the LEFT wall (the ESP32 is rotated 90 degrees, USB-C towards the left)
+rect(d, bx0 - 3 * K, Y(9.0), bx0, Y(19.0), fill=(20, 20, 24, 255), outline=(230, 230, 235, 255), width=2)
+text(d, bx0 - 1.5 * K, Y(14.0), "USB", 9, (230, 230, 235), True)
 # the four big posts (lid screws): round, 8 mm diameter (8 x 8 mm footprint) in the corners of the interior. They leave a plus-shaped usable area:
 # 60 wide over 69 long, and 44 wide over the full 85 length.
 for (xa, xb, ya, yb) in [(-1, 7, -8.5, -0.5), (51, 59, -8.5, -0.5), (-1, 7, 68.5, 76.5), (51, 59, 68.5, 76.5)]:
@@ -81,14 +81,14 @@ for (cx, cy) in MH:
     hole(cx, cy, 2.7, 5.6)
     circ(d, X(cx), Y(cy), 4.4 * K / 2 + 3, outline=SILK + (255,), width=2)
 
-# ---------------------------------------------------------------- U1: ESP32-S3 sockets (2 x 1x20, pitch 2.54, rows 17.78 apart)
-ROW_L, ROW_R = 2.61, 20.39
-Y0 = 4.87
-for rx in (ROW_L, ROW_R):
-    rect(d, X(rx) - 1.27 * K, Y(Y0) - 1.27 * K, X(rx) + 1.27 * K, Y(Y0 + 19 * 2.54) + 1.27 * K, fill=(28, 28, 32, 255), outline=(10, 10, 12, 255), width=1)
+# ---------------------------------------------------------------- U1: ESP32-S3 sockets (2 x 1x20, pitch 2.54, rows 17.78 apart), board rotated 90 degrees, USB-C to the left
+ROW_T, ROW_B = 5.11, 22.89
+X0 = 4.37
+for ry in (ROW_T, ROW_B):
+    rect(d, X(X0) - 1.27 * K, Y(ry) - 1.27 * K, X(X0 + 19 * 2.54) + 1.27 * K, Y(ry) + 1.27 * K, fill=(28, 28, 32, 255), outline=(10, 10, 12, 255), width=1)
     for i in range(20):
-        tpad(rx, Y0 + i * 2.54, square=(i == 0 and rx == ROW_L), ring=1.7, drill=1.0)
-silk(11.5, 1.2, "U1  ESP32-S3 (2 x 1x20)", 11)
+        tpad(X0 + i * 2.54, ry, square=(i == 0 and ry == ROW_T), ring=1.7, drill=1.0)
+silk(30.0, 1.2, "U1  ESP32-S3 (2 x 1x20), rotated 90 degrees", 11)
 # ---------------------------------------------------------------- under the ESP32 (clearance 8.5 mm): transistors and resistors
 def axial(cx, cy, pitch=10.16, label=None):
     x0, x1 = cx - pitch / 2, cx + pitch / 2
@@ -98,6 +98,15 @@ def axial(cx, cy, pitch=10.16, label=None):
         tpad(xx, cy, ring=1.8, drill=0.8)
     if label:
         text(d, X(cx), Y(cy) - 2.1 * K * 0.9, label, 9, SILK, True)
+
+def axial_v(cx, cy, pitch=10.16, label=None):
+    y0, y1 = cy - pitch / 2, cy + pitch / 2
+    line(d, [(X(cx), Y(y0)), (X(cx), Y(y1))], (190, 190, 196, 255), 2)
+    rrect(d, X(cx) - 1.2 * K, Y(cy) - 1.6 * K - 0.9 * K, X(cx) + 1.2 * K, Y(cy) + 1.6 * K + 0.9 * K, 6, fill=(214, 190, 140, 255), outline=(120, 90, 40, 255), width=1)
+    for yy in (y0, y1):
+        tpad(cx, yy, ring=1.8, drill=0.8)
+    if label:
+        text(d, X(cx), Y(cy), label, 7, INK, True)
 
 def to92(cx, cy, label):
     # three pads at 1.27 pitch, flat face down
@@ -109,53 +118,49 @@ def to92(cx, cy, label):
     line(d, [(X(a_), Y(b_)) for a_, b_ in ang], SILK + (255,), 2)
     text(d, X(cx), Y(cy + 2.4), label, 10, SILK, True)
 
-# Q1..Q4 and their resistors, in the clear zone between the two socket rows (x 4.5 .. 18.5)
+to92(6.5, 16.2, "Q5")                                           # spare output stage, left of the resistors
+# R1..R10 (vertical, between the two socket rows) then Q1..Q4 (SSR drivers, backlight, spare output)
+for i, name in enumerate(["R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9", "R10"]):
+    axial_v(10.6 + i * 2.4, 14.0, label=name)
 for i, name in enumerate(["Q1", "Q2", "Q3", "Q4"]):
-    to92(6.4 + i * 4.0, 15.0, name)
-for i, name in enumerate(["R1", "R2", "R3", "R4"]):          # base resistors 1 k
-    axial(11.5, 19.5 + i * 3.0, label=name)
-for i, name in enumerate(["R5", "R6", "R7", "R8"]):          # base pull-downs 10 k
-    axial(11.5, 31.5 + i * 3.0, label=name)
-axial(11.5, 43.5, label="R9")                                  # encoder pull-up A
-axial(11.5, 46.2, label="R10")                                 # encoder pull-up B
-to92(11.5, 9.0, "Q5")                                           # spare output stage (2N2222A)
+    to92(35.2 + i * 3.7, 14.0, name)
 # spare I/O conditioning, flat resistors under the MAX31865 (3 mm clearance): R17 4.7 k + R18 10 k (input divider), R19 1 k base, R20 4.7 k pull-up to 5 V, R21 10 k base to GND
 for i, name in enumerate(["R17", "R18", "R19", "R20", "R21"]):
-    axial(41.7, 35.5 + i * 2.7, pitch=10.16, label=None)
-    text(d, X(47.6), Y(35.5 + i * 2.7), name, 8, SILK, True, 'lm')
+    axial(43.7, 34.2 + i * 2.7, pitch=10.16, label=None)
+    text(d, X(49.6), Y(34.2 + i * 2.7), name, 8, SILK, True, 'lm')
 
-# keep-out under the antenna
-for k in range(0, 12):
-    line(d, [(X(3.6), Y(49 + k)), (X(19.4), Y(49 + k - 6))], (170, 30, 30, 160), 1)
-rect(d, X(3.6), Y(49.0), X(19.4), Y(57), outline=(210, 50, 50, 255), width=2)
+# keep-out under the antenna (right end of the ESP32 board)
+for k in range(0, 9):
+    line(d, [(X(48.5 + k), Y(3.0)), (X(48.5 + k), Y(25.0))], (170, 30, 30, 160), 1)
+rect(d, X(48.5), Y(3.0), X(56.5), Y(25.0), outline=(210, 50, 50, 255), width=2)
 
-# ---------------------------------------------------------------- U2: MAX31865 module socket (1x8), module rotated 180 degrees:
+# ---------------------------------------------------------------- U2: MAX31865 module socket (1x8), module at the right, rotated 180 degrees:
 # header on the rear edge of the module (pin 1 VIN on the right), PT100 terminal block facing the front
 for i in range(8):
-    tpad(32.8 + i * 2.54, 31.6, square=(i == 7), ring=1.7, drill=1.0)
-rect(d, X(32.8) - 1.27 * K, Y(31.6) - 1.27 * K, X(32.8 + 7 * 2.54) + 1.27 * K, Y(31.6) + 1.27 * K, outline=(20, 20, 24, 255), width=2)
-silk(41.7, 29.9, "U2  MAX31865 (1x8, pin 1 VIN on the right)", 10)
+    tpad(34.8 + i * 2.54, 30.3, square=(i == 7), ring=1.7, drill=1.0)
+rect(d, X(34.8) - 1.27 * K, Y(30.3) - 1.27 * K, X(34.8 + 7 * 2.54) + 1.27 * K, Y(30.3) + 1.27 * K, outline=(20, 20, 24, 255), width=2)
+silk(43.7, 28.5, "U2  MAX31865 (1x8, pin 1 VIN on the right)", 10)
 
-# ---------------------------------------------------------------- J5: socket 2 x 4 for the FPC adapter (board at the top right, rotated 180: connector towards the front)
+# ---------------------------------------------------------------- J5: socket 2 x 4 for the FPC adapter (board at the left, connector towards the front)
 for r_ in range(2):
     for c_ in range(4):
-        tpad(35.5 + c_ * 2.54, 7.6 + r_ * 2.54, square=(r_ == 0 and c_ == 0), ring=1.7, drill=1.0)
-rect(d, X(35.5) - 1.5 * K, Y(7.6) - 1.5 * K, X(35.5 + 3 * 2.54) + 1.5 * K, Y(10.14) + 1.5 * K, outline=SILK + (255,), width=2)
-silk(41.0, 5.6, "J5  FPC board (2 x 4)", 10)
+        tpad(8.0 + c_ * 2.54, 33.1 + r_ * 2.54, square=(r_ == 0 and c_ == 0), ring=1.7, drill=1.0)
+rect(d, X(8.0) - 1.5 * K, Y(33.1) - 1.5 * K, X(8.0 + 3 * 2.54) + 1.5 * K, Y(35.64) + 1.5 * K, outline=SILK + (255,), width=2)
+silk(13.0, 31.2, "J5  FPC board (2 x 4)", 10)
 # two M2 holes for the standoffs of the FPC adapter (positions to be taken from your board)
-for (cx, cy) in [(31.0, 5.1), (49.0, 5.1)]:
+for (cx, cy) in [(3.5, 30.6), (21.5, 30.6)]:
     hole(cx, cy, 2.2, 4.2)
-silk(40, 3.6, "2 x M2 (to measure)", 9)
+silk(12.5, 29.0, "2 x M2 (to measure)", 9)
 
 # flow input conditioning under the adapter: R11..R16 (two columns of three, pitch 7.62) + C3, C4
 for i, name in enumerate(["R11", "R12", "R13", "R14", "R15", "R16"]):
-    cx_ = 34.3 if i < 3 else 44.9
-    cy_ = 13.8 + (i % 3) * 2.6
+    cx_ = 6.8 if i < 3 else 17.4
+    cy_ = 39.3 + (i % 3) * 2.6
     axial(cx_, cy_, pitch=7.62, label=None)
     text(d, X(cx_), Y(cy_) - 1.6 * K, name, 8, SILK, True)
-for i, name in enumerate(["C3", "C4"]):
-    tpad(52.4, 15.0 + i * 3.0, ring=1.6, drill=0.8); tpad(54.4, 15.0 + i * 3.0, ring=1.6, drill=0.8)
-    text(d, X(56.0), Y(15.0 + i * 3.0), name, 8, SILK, True, 'lm')
+for i, (name, xa) in enumerate([("C3", 7.0), ("C4", 14.0)]):
+    tpad(xa, 49.5, ring=1.6, drill=0.8); tpad(xa + 2.0, 49.5, ring=1.6, drill=0.8)
+    text(d, X(xa + 1.0), Y(49.5) - 1.9 * K, name, 8, SILK, True)
 
 # ---------------------------------------------------------------- front strip: J2 (2x4), J7 (1x6), polyfuse, diode, electrolytic, XH x2
 # Front edge: every right-angle header has its Dupont housings plugged in towards the front (about 9 mm of keep-out in front of the pads).
@@ -181,53 +186,54 @@ for c_, lab in enumerate(["BT", "GND", "5V", "IN", "OUT", "GND"]):
     text(d, X(22.4 + c_ * 2.54), Y(61.0) - 1.9 * K, lab, 7, SILK, True)
 for c_, lab in enumerate(["5V", "GND", "A", "B"]):
     text(d, X(22.4 + c_ * 2.54), Y(63.54) + 1.9 * K, lab, 7, SILK, True)
-# J8: 1 x 4 vertical header, dimmer (UART / I2C) in the corridor between ESP32 and FPC board; J9: 1 x 3, pressure sensor
+# J8: 1 x 4 vertical header, dimmer (I2C), in the corridor between the FPC board and the MAX31865; J9: 1 x 3, pressure sensor
 for i, lab in enumerate(["3V3", "GND", "SDA", "SCL"]):
-    tpad(25.5, 33.0 + i * 2.54, square=(i == 0), ring=1.7, drill=1.0)
-    text(d, X(27.0), Y(33.0 + i * 2.54), lab, 7, SILK, True, 'lm')
-rect(d, X(25.5) - 1.4 * K, Y(33.0) - 1.4 * K, X(25.5) + 1.4 * K, Y(33.0 + 3 * 2.54) + 1.4 * K, outline=SILK + (255,), width=2)
-silk(25.0, 31.4, "J8 dimmer", 8)
+    tpad(27.2, 31.0 + i * 2.54, square=(i == 0), ring=1.7, drill=1.0)
+    text(d, X(28.6), Y(31.0 + i * 2.54), lab, 7, SILK, True, 'lm')
+rect(d, X(27.2) - 1.4 * K, Y(31.0) - 1.4 * K, X(27.2) + 1.4 * K, Y(31.0 + 3 * 2.54) + 1.4 * K, outline=SILK + (255,), width=2)
+silk(27.2, 29.2, "J8 dimmer", 8)
 for i, lab in enumerate(["5V", "GND", "SIG"]):
-    tpad(25.5, 43.2 + i * 2.54, square=(i == 0), ring=1.7, drill=1.0)
-    text(d, X(27.0), Y(43.2 + i * 2.54), lab, 7, SILK, True, 'lm')
-rect(d, X(25.5) - 1.4 * K, Y(43.2) - 1.4 * K, X(25.5) + 1.4 * K, Y(43.2 + 2 * 2.54) + 1.4 * K, outline=SILK + (255,), width=2)
-silk(25.0, 41.5, "J9 pressure", 8)
+    tpad(27.2, 42.0 + i * 2.54, square=(i == 0), ring=1.7, drill=1.0)
+    text(d, X(28.6), Y(42.0 + i * 2.54), lab, 7, SILK, True, 'lm')
+rect(d, X(27.2) - 1.4 * K, Y(42.0) - 1.4 * K, X(27.2) + 1.4 * K, Y(42.0 + 2 * 2.54) + 1.4 * K, outline=SILK + (255,), width=2)
+silk(27.2, 40.2, "J9 pressure", 8)
 # F1 polyfuse (radial, pitch 5) and D1 1N5819 (standing) in the front-left corner, in front of the mounting hole
 tpad(3.0, 66.0, ring=1.8, drill=0.9); tpad(8.0, 66.0, ring=1.8, drill=0.9)
 rrect(d, X(1.9), Y(64.4), X(9.1), Y(67.6), 6, outline=SILK + (255,), width=2); text(d, X(10.4), Y(66.0), "F1", 8, SILK, True, 'lm')
 tpad(2.5, 62.6, ring=1.8, drill=0.8); tpad(5.04, 62.6, ring=1.8, drill=0.8)
 text(d, X(6.6), Y(62.6), "D1", 8, SILK, True, 'lm')
-# C1 470 uF (radial 6.3 mm) and C2 100 nF, in the corridor between ESP32 and MAX31865
-circ(d, X(25.7), Y(54.3), 3.15 * K, fill=None, outline=SILK + (255,), width=2)
-tpad(24.45, 54.3, ring=1.8, drill=0.8); tpad(26.95, 54.3, ring=1.8, drill=0.8); silk(25.7, 54.3, "C1", 9)
-tpad(24.5, 50.4, ring=1.6, drill=0.8); tpad(27.0, 50.4, ring=1.6, drill=0.8); silk(25.7, 49.2, "C2", 8) if False else text(d, X(28.4), Y(50.4), "C2", 8, SILK, True, 'lm')
-# JST XH x2: vertical headers, rotated (pins along y), the plugs come out upwards: no keep-out towards the front
-for k, (x0, name) in enumerate([(39.6, "J3 flow In"), (45.6, "J4 flow Out")]):
+# C1 470 uF (radial 6.3 mm) and C2 100 nF, in the corridor
+circ(d, X(27.2), Y(54.0), 3.15 * K, fill=None, outline=SILK + (255,), width=2)
+tpad(25.95, 54.0, ring=1.8, drill=0.8); tpad(28.45, 54.0, ring=1.8, drill=0.8); silk(27.2, 54.0, "C1", 9)
+tpad(26.0, 49.0, ring=1.6, drill=0.8); tpad(28.5, 49.0, ring=1.6, drill=0.8); text(d, X(29.8), Y(49.0), "C2", 8, SILK, True, 'lm')
+# JST XH x2: vertical headers, pins along x, the plugs come out upwards: no keep-out towards the front, away from the ribbon path (x 7 to 18)
+for k, (x0, name) in enumerate([(42.0, "J3 flow In"), (52.5, "J4 flow Out")]):
     for i in range(3):
-        tpad(x0, 61.5 + i * 2.5, square=(i == 0), ring=1.8, drill=1.0)
-    rect(d, X(x0) - 2.9 * K, Y(61.5) - 2.1 * K, X(x0) + 2.9 * K, Y(66.5) + 2.1 * K, outline=SILK + (255,), width=2)
-    text(d, X(x0), Y(66.5) + 3.4 * K, name, 8, SILK, True)
-
-# silkscreen title
-silk(53.0, 66.6, "rev A", 9)
+        tpad(x0 + (i - 1) * 2.5, 65.0, square=(i == 0), ring=1.8, drill=1.0)
+    rect(d, X(x0) - 4.95 * K, Y(65.0) - 2.9 * K, X(x0) + 4.95 * K, Y(65.0) + 2.9 * K, outline=SILK + (255,), width=2)
+    text(d, X(x0), Y(62.9), name, 8, SILK, True)
 
 # ---------------------------------------------------------------- the raised boards, translucent (they hide nothing)
-# ESP32-S3 board 21 x 52 at x 1..22, y 3..55
-rrect(o, px(X(0.5)) / SS, px(Y(3.0)) / SS, px(X(22.5)) / SS, px(Y(57.0)) / SS, 6, fill=(240, 240, 248, 120), outline=(240, 240, 248, 255), width=3)
-rect(o, px(X(7.5)) / SS, px(Y(1.7)) / SS, px(X(15.5)) / SS, px(Y(7.0)) / SS, fill=(190, 194, 200, 200), outline=(120, 124, 130, 255), width=2)
-text(o, X(11.5), Y(10.2), "ESP32-S3   ~22 x 54  (at 8.5 mm)", 11, (60, 60, 70), True)
-text(o, X(11.5), Y(53.5), "antenna zone: nothing underneath", 10, (150, 30, 30), True)
-text(o, X(11.5), Y(4.5), "USB-C", 10, (60, 60, 70), True)
-# MAX31865 module 25.4 x 27.9 at x 29..54.4, y 28.8..56.7, rotated 180 degrees (terminal block at the front)
-rrect(o, px(X(29.0)) / SS, px(Y(28.8)) / SS, px(X(54.4)) / SS, px(Y(56.7)) / SS, 6, fill=(20, 80, 170, 150), outline=(150, 190, 250, 255), width=3)
-rect(o, px(X(33.3)) / SS, px(Y(49.2)) / SS, px(X(50.5)) / SS, px(Y(56.3)) / SS, fill=(46, 104, 180, 220), outline=(180, 210, 250, 255), width=2)
-text(o, X(41.7), Y(34.0), "MAX31865   25.4 x 27.9, height 15", 11, (235, 240, 255), True)
-text(o, X(41.9), Y(52.7), "PT100 terminal (wires exit to the front)", 10, (235, 240, 255), True)
-# FPC adapter board ~22 x 26.5 at x 29..51, y 2..28.5 (rotated 180: connector towards the front, ribbon goes over the MAX31865)
-rrect(o, px(X(29.0)) / SS, px(Y(2.0)) / SS, px(X(51.0)) / SS, px(Y(28.5)) / SS, 6, fill=(22, 150, 80, 130), outline=(150, 240, 190, 255), width=3)
-rect(o, px(X(35.0)) / SS, px(Y(22.9)) / SS, px(X(45.0)) / SS, px(Y(28.4)) / SS, fill=(236, 236, 228, 230), outline=(120, 120, 110, 255), width=2)
-text(o, X(40.0), Y(25.6), "FPC connector (ribbon to the front)", 9, (50, 50, 44), True)
-text(o, X(40.0), Y(20.6), "FPC board ~22 x 26 (at 8.5 mm)", 10, (230, 255, 240), True)
+# ESP32-S3 board ~22 x 54 at x 2.5..56.5, y 3..25 (rotated 90 degrees, USB-C to the left)
+rrect(o, px(X(2.5)) / SS, px(Y(3.0)) / SS, px(X(56.5)) / SS, px(Y(25.0)) / SS, 6, fill=(240, 240, 248, 120), outline=(240, 240, 248, 255), width=3)
+rect(o, px(X(1.0)) / SS, px(Y(9.9)) / SS, px(X(8.5)) / SS, px(Y(18.1)) / SS, fill=(190, 194, 200, 200), outline=(120, 124, 130, 255), width=2)
+text(o, X(30.0), Y(7.8), "ESP32-S3   ~22 x 54  (at 8.5 mm)", 11, (60, 60, 70), True)
+text(o, X(52.5), Y(13.0), "antenna zone:", 10, (150, 30, 30), True)
+text(o, X(52.5), Y(15.0), "nothing below", 10, (150, 30, 30), True)
+text(o, X(4.8), Y(14.0), "USB-C", 9, (60, 60, 70), True)
+# MAX31865 module 25.4 x 27.9 at x 31..56.4, y 27.5..55.4, rotated 180 degrees (terminal block at the front)
+rrect(o, px(X(31.0)) / SS, px(Y(27.5)) / SS, px(X(56.4)) / SS, px(Y(55.4)) / SS, 6, fill=(20, 80, 170, 150), outline=(150, 190, 250, 255), width=3)
+rect(o, px(X(35.3)) / SS, px(Y(47.9)) / SS, px(X(52.5)) / SS, px(Y(55.0)) / SS, fill=(46, 104, 180, 220), outline=(180, 210, 250, 255), width=2)
+text(o, X(43.7), Y(32.9), "MAX31865   25.4 x 27.9, height 15", 11, (235, 240, 255), True)
+text(o, X(43.9), Y(51.5), "PT100 terminal (wires exit to the front)", 10, (235, 240, 255), True)
+# FPC adapter board ~22 x 26.5 at x 1.5..23.5, y 27.5..54 (connector towards the front: the ribbon goes straight to the front)
+rrect(o, px(X(1.5)) / SS, px(Y(27.5)) / SS, px(X(23.5)) / SS, px(Y(54.0)) / SS, 6, fill=(22, 150, 80, 130), outline=(150, 240, 190, 255), width=3)
+rect(o, px(X(7.5)) / SS, px(Y(48.4)) / SS, px(X(17.5)) / SS, px(Y(53.9)) / SS, fill=(236, 236, 228, 230), outline=(120, 120, 110, 255), width=2)
+text(o, X(12.5), Y(51.1), "FPC connector", 10, (50, 50, 44), True)
+text(o, X(12.5), Y(46.0), "FPC board ~22 x 26 (at 8.5 mm)", 10, (230, 255, 240), True)
+# the ribbon, straight to the front (about 6 mm wide)
+rect(o, px(X(9.5)) / SS, px(Y(54.0)) / SS, px(X(15.5)) / SS, px(Y(75.0)) / SS, fill=(232, 160, 48, 150), outline=(232, 160, 48, 255), width=2)
+text(o, X(12.5), Y(60.0), "ribbon", 9, (120, 70, 10), True)
 base = Image.alpha_composite(base, ov)
 d = ImageDraw.Draw(base)
 
@@ -294,7 +300,8 @@ for i, t in enumerate(hs):
 
 text(d, lx, 1060, "Points to check on your board:", 18, (190, 40, 40), True, 'lm')
 chk = [
-    "the FPC ribbon goes over the MAX31865 (about 23.5 mm, 1 mm under the 25 mm limit);",
+    "the FPC ribbon runs straight to the front (about 15.5 mm), over J2 and F1; keep tall parts out of x 7 to 18;",
+    "USB-C opening in the left wall (y 9 to 19 mm); mounting holes under the antenna: no copper ring;",
     "PT100 wires leave at the front above J7 / J3 / J4, at about 14 mm;",
     "Dupont housings end at the front wall (the board has a 42 x 7 tab there); cable slot in the wall;",
     "M2 holes and pin-1 orientation of the FPC board; pin order of J5, J6 and J7.",

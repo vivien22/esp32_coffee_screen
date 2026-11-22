@@ -73,8 +73,8 @@ poly([(0, 0, FLOOR), (BX, 0, FLOOR), (BX, BY, FLOOR), (0, BY, FLOOR)], shade(PLA
 poly([(WALL, WALL, FLOOR), (BX - WALL, WALL, FLOOR), (BX - WALL, WALL, BASE_H), (WALL, WALL, BASE_H)], shade(PLASTIC, 0.78), (20, 20, 24))
 poly([(WALL, WALL, FLOOR), (WALL, BY - WALL, FLOOR), (WALL, BY - WALL, BASE_H), (WALL, WALL, BASE_H)], shade(PLASTIC, 0.9), (20, 20, 24))
 # the opening for the USB-C cable in the back wall y = 0 (seen on its inner face)
-ux0 = WALL + 8.0
-poly([(ux0, WALL, 7), (ux0 + 12, WALL, 7), (ux0 + 12, WALL, 15), (ux0, WALL, 15)], (14, 14, 18), (230, 230, 235), 2)
+uy0 = WALL + 8.5 + 9.0
+poly([(WALL, uy0, 7), (WALL, uy0 + 10, 7), (WALL, uy0 + 10, 15), (WALL, uy0, 15)], (14, 14, 18), (230, 230, 235), 2)
 # top of the back walls
 poly([(0, 0, BASE_H), (BX, 0, BASE_H), (BX - WALL, WALL, BASE_H), (WALL, WALL, BASE_H)], shade(PLASTIC, 1.25), (20, 20, 24))
 poly([(0, 0, BASE_H), (0, BY, BASE_H), (WALL, BY - WALL, BASE_H), (WALL, WALL, BASE_H)], shade(PLASTIC, 1.2), (20, 20, 24))
@@ -103,21 +103,21 @@ GOLD = (214, 178, 70)
 BLACK = (24, 24, 28)
 WHITE = (238, 236, 226)
 
-# ESP32-S3 (21 x 52) on sockets of 8.5 mm, at the left; USB-C towards the back wall
-ex, ey = CX0 + 1, CY0 + 3
-add(ex, ey + 1, top, 2.4, 50, 8.5, BLACK); add(ex + 21 - 2.4, ey + 1, top, 2.4, 50, 8.5, BLACK)
-add(ex - 0.5, ey, top + 8.5, 22, 54, 1.6, (236, 236, 242))
-add(ex + 5.5, ey - 1.3, top + 8.5 + 1.6, 10, 7.5, 3.2, (190, 194, 200))     # USB-C
-add(ex + 6, ey + 14, top + 8.5 + 1.6, 9, 9, 1.0, BLACK)                     # the module (shield)
-add(ex + 3, ey + 43, top + 8.5 + 1.6, 15, 8, 0.8, (236, 226, 196))          # antenna
+# ESP32-S3 (~22 x 54) rotated 90 degrees on sockets of 8.5 mm: USB-C towards the left wall
+ex, ey = CX0 + 2.5, CY0 + 3
+add(CX0 + 3.1, CY0 + 5.11 - 1.2, top, 50.8, 2.4, 8.5, BLACK); add(CX0 + 3.1, CY0 + 22.89 - 1.2, top, 50.8, 2.4, 8.5, BLACK)
+add(ex, ey, top + 8.5, 54, 22, 1.6, (236, 236, 242))
+add(CX0 + 1.0, CY0 + 9.9, top + 8.5 + 1.6, 7.5, 8.2, 3.2, (190, 194, 200))        # USB-C
+add(CX0 + 22, CY0 + 9.5, top + 8.5 + 1.6, 9, 9, 1.0, BLACK)                        # the module (shield)
+add(CX0 + 48.5, CY0 + 6, top + 8.5 + 1.6, 7.5, 16, 0.8, (236, 226, 196))           # antenna
 # MAX31865 (25.4 x 27.9, 15 high) on low sockets of 3 mm, rotated 180 degrees: header at the rear, PT100 terminal at the front
-mx, my = CX0 + 29, CY0 + 28.8
+mx, my = CX0 + 31, CY0 + 27.5
 add(mx + 3.8, my + 1.4, top, 19.0, 2.5, 3.0, BLACK)
 add(mx, my, top + 3.0, 25.4, 27.9, 1.6, (130, 30, 40))                      # Adafruit board is red-purple
 add(mx + 4.2, my + 20.5, top + 3.0 + 1.6, 17.0, 7.0, 10.4, (46, 120, 190))  # PT100 terminal block (blue)
 add(mx + 9.4, my + 9.9, top + 3.0 + 1.6, 7, 7, 1.6, BLACK)                  # the MAX31865 chip
-# the FPC adapter board (~22 x 26.5) on a 2 x 4 header, at the top right, rotated 180: FPC connector towards the front
-ax0, ay0 = CX0 + 29, CY0 + 2
+# the FPC adapter board (~22 x 26.5) on a 2 x 4 header, at the left, FPC connector towards the front
+ax0, ay0 = CX0 + 1.5, CY0 + 27.5
 HDR = 8.5
 add(ax0 + 6.5, ay0 + 5.6, top, 10.2, 5.1, HDR, BLACK)                       # 2 x 4 header + socket
 add(ax0, ay0, top + HDR, 22, 26.5, 1.6, (22, 130, 70))
@@ -126,8 +126,8 @@ add(ax0 + 1.0, ay0 + 3.1, top, 3.5, 3.5, HDR, (110, 110, 118))              # st
 add(ax0 + 17.5, ay0 + 3.1, top, 3.5, 3.5, HDR, (110, 110, 118))
 
 # J8 (dimmer, 1 x 4) and J9 (pressure, 1 x 3): straight headers in the corridor, plugs seated on top
-J8X, J8Y = CX0 + 25.5 - 1.27, CY0 + 33.0 - 1.27
-J9X, J9Y = CX0 + 25.5 - 1.27, CY0 + 43.2 - 1.27
+J8X, J8Y = CX0 + 27.2 - 1.27, CY0 + 31.0 - 1.27
+J9X, J9Y = CX0 + 27.2 - 1.27, CY0 + 42.0 - 1.27
 add(J8X, J8Y, top, 2.54, 10.16, 2.5, BLACK); add(J8X + 0.2, J8Y + 0.2, top + 2.5, 2.14, 9.76, 8.0, WHITE)
 add(J9X, J9Y, top, 2.54, 7.62, 2.5, BLACK); add(J9X + 0.2, J9Y + 0.2, top + 2.5, 2.14, 7.22, 8.0, WHITE)
 # J2 (2 x 4 right-angle, rows stacked vertically) and four 2-pin housings plugged in from the front
@@ -142,12 +142,12 @@ add(CX0 + 22.4 - 1.27 + 5.23, CY0 + 65.2, top + 3.0, 9.9, 8.6, 2.3, (225, 222, 2
 # polyfuse, standing diode, electrolytic, 100 nF, and the two JST XH (vertical headers with their plugs)
 add(CX0 + 1.9, CY0 + 64.4, top, 7.2, 3.2, 11.0, (232, 200, 60))                # polyfuse
 add(CX0 + 1.2, CY0 + 61.2, top, 2.7, 2.7, 5.2, BLACK)                          # 1N5819 standing
-add(CX0 + 22.55, CY0 + 51.15, top, 6.3, 6.3, 12.0, (30, 40, 90))               # 470 uF electrolytic
-add(CX0 + 24.0, CY0 + 49.9, top, 4.0, 1.6, 4.2, (200, 120, 40))                # 100 nF
+add(CX0 + 24.05, CY0 + 50.85, top, 6.3, 6.3, 12.0, (30, 40, 90))               # 470 uF electrolytic
+add(CX0 + 25.5, CY0 + 48.2, top, 4.0, 1.6, 4.2, (200, 120, 40))                # 100 nF
 for k in range(2):
-    xb = CX0 + 39.6 + k * 6.0 - 2.9
-    add(xb, CY0 + 60.1, top, 5.8, 9.9, 5.8, WHITE)                             # JST XH header
-    add(xb + 0.3, CY0 + 60.4, top + 5.8, 5.2, 9.3, 6.0, (225, 215, 190))      # its plug
+    xb = CX0 + 42.0 + k * 10.5 - 4.95
+    add(xb, CY0 + 62.1, top, 9.9, 5.8, 5.8, WHITE)                             # JST XH header (pins along x)
+    add(xb + 0.3, CY0 + 62.4, top + 5.8, 9.3, 5.2, 6.0, (225, 215, 190))      # its plug
 
 items.sort(key=lambda t: t[0])
 for _, fn in items:
@@ -179,27 +179,24 @@ for k, col in enumerate(lower):
     d.line([P(xk, CY0 + 73.8, top + 1.5), P(xk, CY0 + 84, top + 0.5)], fill=col, width=3 * SS)
 # J8 / J9: wires rise above the plugs then leave towards the front, above everything
 for k, col in enumerate([(200, 30, 30), (20, 20, 24), (235, 200, 40), (60, 110, 210)]):
-    y = CY0 + 33.0 + k * 2.54
-    d.line([P(CX0 + 25.5, y, top + 10.5), P(CX0 + 25.5, y, top + 14 + k), P(CX0 + 25.5, CY0 + 84, top + 10 + k)], fill=col, width=3 * SS)
+    y = CY0 + 31.0 + k * 2.54
+    d.line([P(CX0 + 27.2, y, top + 10.5), P(CX0 + 27.2, y, top + 14 + k), P(CX0 + 27.2, CY0 + 84, top + 10 + k)], fill=col, width=3 * SS)
 for k, col in enumerate([(200, 30, 30), (20, 20, 24), (40, 150, 70)]):
-    y = CY0 + 43.2 + k * 2.54
-    d.line([P(CX0 + 25.5, y, top + 10.5), P(CX0 + 25.5, y, top + 19 + k), P(CX0 + 25.5, CY0 + 84, top + 15 + k)], fill=col, width=3 * SS)
+    y = CY0 + 42.0 + k * 2.54
+    d.line([P(CX0 + 27.2, y, top + 10.5), P(CX0 + 27.2, y, top + 19 + k), P(CX0 + 27.2, CY0 + 84, top + 15 + k)], fill=col, width=3 * SS)
 # JST XH flow sensors: the cables come out of the top of the plugs and go forward
 for kx in range(2):
     for k, col in enumerate([(200, 30, 30), (235, 200, 40), (20, 20, 24)]):
-        yk = CY0 + 61.5 + k * 2.5
-        xk = CX0 + 39.6 + kx * 6.0
+        xk = CX0 + 42.0 + kx * 10.5 + (k - 1) * 2.5
+        yk = CY0 + 65.0
         d.line([P(xk, yk, top + 11.8), P(xk, yk, top + 15), P(xk, CY0 + 84, top + 5 + kx)], fill=col, width=3 * SS)
 # PT100 wires leave the terminal block towards the front, above J7 / XH
 for k, col in enumerate([(200, 30, 30), (200, 30, 30), (235, 235, 235)]):
     xk = mx + 7.0 + k * 3.6
     d.line([P(xk, my + 27.9, top + 8.8), P(xk, CY0 + 84, top + 7.5 - k * 0.5)], fill=col, width=3 * SS)
-# FPC ribbon: leaves the connector towards the front, climbs, runs over the MAX31865 (about 23.5 mm) and leaves with the cables
-RZ0 = top + HDR + 1.6 + 1.2          # ribbon height at the connector
-RZ1 = FLOOR + 23.6                   # ribbon height over the MAX (module top at 22.6 above the floor posts)
-cuboid(ax0 + 8, ay0 + 24.5, RZ0, 6, 3.0, 0.4, (232, 160, 48))
-cuboid(ax0 + 8, ay0 + 27.5, RZ0, 6, 0.4, RZ1 - RZ0 + 0.4, (232, 160, 48))
-cuboid(ax0 + 8, ay0 + 27.5, RZ1, 6, CY0 + 84 - (ay0 + 27.5), 0.4, (232, 160, 48))
+# FPC ribbon: leaves the connector towards the front and runs straight out with the cables (nothing in the way)
+RZ0 = top + HDR + 1.6 + 1.2
+cuboid(ax0 + 8, ay0 + 24.5, RZ0, 6, CY0 + 84 - (ay0 + 24.5), 0.4, (232, 160, 48))
 
 # ---------------------------------------------------------------- the labels
 def pl(x, y, z, tx, ty, t, color=(20, 20, 26)):
@@ -208,16 +205,16 @@ def pl(x, y, z, tx, ty, t, color=(20, 20, 26)):
     d.ellipse([px - 4 * SS, py - 4 * SS, px + 4 * SS, py + 4 * SS], fill=color)
     text(tx + (10 if tx >= px / SS else -10), ty, t, 17, color, True, 'lm' if tx >= px / SS else 'rm')
 
-pl(ex + 10, ey + 26, top + 10.2, 300, 470, "ESP32-S3, above the board")
-pl(ex + 10, ey - 0.5, top + 11, 300, 400, "USB-C: opening in the wall")
+pl(ex + 30, ey + 11, top + 10.2, 300, 470, "ESP32-S3, rotated 90 deg")
+pl(CX0 + 3, CY0 + 14, top + 12, 300, 400, "USB-C: opening in the left wall")
 pl(mx + 12, my + 8, top + 15, 1560, 240, "MAX31865 (rotated 180 deg, PT100 to the front)")
 pl(ax0 + 11, ay0 + 10, top + HDR + 1.6, 1560, 300, "your FPC adapter board (on sockets)")
 pl(ax0 + 11, ay0 + 22, top + HDR + 4.2, 1560, 420, "FPC connector pre-soldered")
-pl(ax0 + 11, ay0 + 50, RZ1, 1560, 510, "ribbon over the MAX, to the remote display")
-pl(CX0 + 25.5, CY0 + 38, top + 10.5, 300, 560, "J8 dimmer (I2C), J9 pressure")
+pl(ax0 + 11, ay0 + 40, RZ0, 300, 900, "FPC ribbon straight to the front")
+pl(CX0 + 27.2, CY0 + 38, top + 10.5, 300, 560, "J8 dimmer (I2C), J9 pressure")
 pl(CX0 + 16, CY0 + 66, top + 3.5, 300, 650, "J2: 5 V + 3 SSRs")
 pl(CX0 + 28, CY0 + 66, top + 4.0, 300, 735, "J7: button, encoder, 4 spare I/O")
-pl(CX0 + 42, CY0 + 63, top + 12, 1560, 640, "JST XH 3 (vertical plugs): flow sensors In and Out")
+pl(CX0 + 47, CY0 + 65, top + 12, 1560, 640, "JST XH 3 (vertical plugs): flow sensors In and Out")
 pl(sx0, sy0 + 50, FLOOR + 3, 300, 820, "3 mm small posts (45 x 50)")
 
 # ---------------------------------------------------------------- the stack of heights

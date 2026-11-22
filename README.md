@@ -22,7 +22,7 @@ Status: **working design, nothing has been manufactured.** Placement is to scale
 ## Principles
 - 58 x 68 mm board with a 42 x 7 mm tab on the cable side, in the plus-shaped free area of the 60 x 85 mm enclosure (8 x 8 mm corner posts), on four 3 mm standoffs (45 x 50 mm spacing), 25 mm usable depth.
 - Through-hole parts only (no SMD soldering).
-- ESP32-S3 and MAX31865 module on sockets; FPC adapter board (remote display) on a 2 x 4 socket.
+- ESP32-S3 (rotated 90 degrees, USB-C to the left) and MAX31865 module on sockets; FPC adapter board (remote display) on a 2 x 4 socket, its ribbon going straight to the front.
 - SSRs are kept, driven by 2N2222A transistors from the external 5 V supply.
 - Connectors: J2 2 x 4 (5 V + 3 SSRs), J7 1 x 6 (button + encoder, 5 V), J8 1 x 4 (pump dimmer, I2C), J9 1 x 3 (pressure sensor), 2 x JST XH 3-pin (flow sensors).
 
