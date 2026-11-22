@@ -42,9 +42,9 @@ All **through-hole** parts (no SMD soldering). Related files: `images/board_plac
 | | 1 | 2 | 3 | 4 | 5 | 6 |
 |---|---|---|---|---|---|---|
 | Row A (upper) | button (GPIO 6) | GND | **+5 V** | **IN (GPIO 38)** | **OUT (GPIO 39)** | **GND** |
-| Row B (lower) | +5 V | GND | enc. A (GPIO 4) | enc. B (GPIO 5) | not used | not used |
+| Row B (lower) | GA (GPIO 4) | GB (GPIO 5) | +5 V | GND | not used | not used |
 
-Housings: row A = 2-pin (button) + 4-pin (**spare I/O: +5 V, IN, OUT, GND**); row B = 4-pin (encoder: +5 V, GND, A, B). The wire order must follow **your** encoder module (to be checked). Stacking the spare pins above the encoder, rather than extending the row to the right, keeps J7 only about 17 mm wide, so it does not run into J3 / J4.
+Housings: row A = 2-pin (button) + 4-pin (**spare I/O: +5 V, IN, OUT, GND**); row B = 4-pin (CJMCU-111 encoder, in the module's own order: GA, GB, VCC = +5 V, GND). The CJMCU-111 module has only these four pins (photo): GA, GB, VCC, GND; its push button is carried by the GA line, so there is no separate push wire (the firmware's encoder library recognises the push from the GA edges, with the 0 Ω hack on the module's push resistor). Stacking the spare pins above the encoder, rather than extending the row to the right, keeps J7 only about 17 mm wide, so it does not run into J3 / J4.
 
 **Spare IN (GPIO 38), 5 V to 3.3 V:** 4.7 kΩ in series (R17) to the GPIO and 10 kΩ from the GPIO to GND (R18): a 5 V signal becomes 3.4 V. Input only. For a 3.3 V source, replace R17 by a 0 Ω link and leave R18 out (the divider would give only 2.2 V, below the input-high threshold of about 2.5 V).
 
@@ -53,7 +53,7 @@ Housings: row A = 2-pin (button) + 4-pin (**spare I/O: +5 V, IN, OUT, GND**); ro
 The two GPIO numbers (38 and 39) are provisional free GPIOs of the ESP32-S3 chip (neither strapping, PSRAM, flash nor USB); check them against the real pin table of your board, which does not necessarily expose every GPIO of the chip.
 
 ### 5 V inputs protection (encoder)
-The ESP32-S3 only accepts 3.3 V. Since the encoder module is powered from 5 V, its outputs (A, B, button) can reach 5 V if the module has pull-ups to 5 V. Each signal (A, B, button and the spare GPIO 38) therefore goes through a divider: 4.7 kΩ in series to the GPIO, then 10 kΩ from the GPIO to GND (5 V becomes 3.4 V). The 10 kΩ pull-ups to 3.3 V (R9, R10) are then removed. **To check:** if your module is a bare encoder without pull-up resistors, 10 kΩ pull-ups to 5 V are needed (provide optional footprints).
+The ESP32-S3 only accepts 3.3 V. Since the encoder module is powered from 5 V, its outputs (A, B, button) can reach 5 V if the module has pull-ups to 5 V. GA, GB and the spare GPIO 38 therefore each go through a divider: 4.7 kΩ in series to the GPIO, then 10 kΩ from the GPIO to GND (5 V becomes 3.4 V). The start button (J7 row A, "button") is a dry contact to GND: it needs no divider, only the ESP32 internal pull-up and 100 nF against bounce. **To check:** if your module is a bare encoder without pull-up resistors, 10 kΩ pull-ups to 5 V are needed (provide optional footprints).
 
 ### J8 (pump dimmer, 1 x 4, in the module's order)
 | 1 | 2 | 3 | 4 |
@@ -147,4 +147,4 @@ Silkscreen read on the photo, left column from the USB-C end: GND, 5V, G48, BOOT
 9. USB-C opening in the left wall (y 9 to 19 mm) and the USB cable bend outside the box.
 10. Display ribbon: length, thickness and pin-1 orientation of your FPC adapter board; the column x 7 to 18 mm in front of it must stay free of tall parts.
 10. MAX31865 at 5 V: high level of SDO (3.3 V or 5 V).
-11. Rotary knob (CJMCU-111): a library note says the push button can share the **Ga line through a 3 kΩ resistor** (pressing pulls Ga low through that resistor, which can be told apart from a rotation by an analog read of Ga). Confirm whether your module has a separate push pin (design assumption: yes, GPIO 6). If the push is on Ga, read Ga as an analog level: GPIO 4 is ADC-capable and the 4.7 kΩ / 10 kΩ divider keeps the information.
+11. Rotary knob (CJMCU-111, photo: pins GA, GB, VCC, GND): the push is on the GA line through a 3 kΩ resistor; the firmware's encoder library handles it from the GA / GB edges (as on the Nano). Check the module's pull-ups on GA and GB (value, to VCC). Optional alternative from the library note: bridge the 3 kΩ with 330 Ω and read GA as an analog level (GPIO 4 is ADC-capable and the 4.7 kΩ / 10 kΩ divider keeps the information).

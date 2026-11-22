@@ -50,13 +50,13 @@ T(x0 + 370, 258, "2 x 4 header, or mark the housing", F(14), GRY, 'lm')
 # ---- J7 : 2 x 6 (two stacked rows of housings)
 head(60, 350, "J7: right-angle 2 x 6 male header: button, encoder (5 V) and 4 spare I/O pins")
 j7a = [("button", (90, 90, 96)), ("GND", DK), ("+5 V", RED), ("IN 38", VIO), ("OUT 39", VIO), ("GND", DK)]
-j7b = [("+5 V", RED), ("GND", DK), ("enc. A", GRN), ("enc. B", GRN)]
+j7b = [("GA", GRN), ("GB", GRN), ("+5 V", RED), ("GND", DK)]
 for i, (lab, col) in enumerate(j7a):
     pin(60 + i * 88, 382, lab, col, 14)
 for i, (lab, col) in enumerate(j7b):
     pin(60 + i * 88, 430, lab, col, 14)
 T(620, 404, "row A: 2-pin + 4-pin spare", F(14), GRY, 'lm')
-T(620, 452, "row B: 4-pin encoder", F(14), GRY, 'lm')
+T(620, 452, "row B: 4-pin encoder (module order)", F(14), GRY, 'lm')
 
 # ---- J8 / J9
 head(60, 490, "J8: pump dimmer (I2C)", "RobotDyn 4 A, DimmerLink")
@@ -125,7 +125,7 @@ def chain(x, y, title, src, res, end, shunts, col):
         L([(x + sx, y), (x + sx, y)], col, 2)
         shunt(x + sx, y, lab)
 cy = 850
-chain(gx, cy, "Encoder A, B, button, spare IN 38 (x4): 5 V to 3.3 V", "module out", "4.7 k", "GPIO", [(270, "10 k")], GRN)
+chain(gx, cy, "Encoder GA, GB, spare IN 38 (x3): 5 V to 3.3 V", "module out", "4.7 k", "GPIO", [(270, "10 k")], GRN)
 chain(gx, cy + 120, "Pressure input: 4.5 V to 3.0 V", "sensor", "10 k", "GPIO 1", [(250, "20 k"), (320, "100 nF")], BLU)
 T(gx, cy + 262, "Dimmer I2C (5 V module): 2 x 2N7000 level shifter, 10 k pull-ups to 3V3 and to +5 V", F(14, True), VIO, 'lm')
 T(gx, cy + 286, "(SDA = GPIO 47, SCL = GPIO 48, 100 kHz; the module ships in UART mode: switch it to I2C once)", F(13), GRY, 'lm')
