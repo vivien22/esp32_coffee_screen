@@ -1,6 +1,6 @@
 # ESP32-S3 carrier board: specification (working version)
 
-All **through-hole** parts (no SMD soldering). Related files: `images/placement_plan.png` (to-scale placement), `images/enclosure_view.png` (3D view), `images/connection_schematic.png` (connection schematic).
+All **through-hole** parts (no SMD soldering). Related files: `images/board_placement.png` (to-scale placement), `images/enclosure_overview.png` (3D view), `images/board_schematic.png` (connection schematic).
 
 ## Dimensions and mounting
 - Enclosure interior (measured): **60 mm wide x 85 mm long**. The four big posts are round, **8 mm in diameter** (8 x 8 mm footprint), in the corners. The small posts (3 mm high) are at **45 x 50 mm**, centred.

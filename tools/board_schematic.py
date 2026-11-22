@@ -214,5 +214,5 @@ for i, t in enumerate(notes):
     T(60, 1176 + i * 30, "• " + t, F(16), INK, 'lm')
 
 im = im.resize((W, H), Image.LANCZOS)
-im.save(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'images', 'connection_schematic.png'))
+im.save(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'images', 'board_schematic.png'))
 print('ok')
