@@ -1,6 +1,6 @@
 # ESP32-S3 carrier board: specification (working version)
 
-All **through-hole** parts (no SMD soldering). Related files: `images/carrier_plan.png` (to-scale placement), `images/box_iso3.png` (3D view, outdated), `images/carrier_schema.png` (connection schematic, outdated: to be regenerated for J2 / J7 / J8 / J9).
+All **through-hole** parts (no SMD soldering). Related files: `images/carrier_plan.png` (to-scale placement), `images/box_iso3.png` (3D view), `images/carrier_schema.png` (connection schematic).
 
 ## Dimensions and mounting
 - Board: **58 x 68 mm**, two layers, ground plane. Free area in the enclosure: 60 x 70 mm between the large posts.

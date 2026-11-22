@@ -4,11 +4,11 @@ import math
 from PIL import Image, ImageDraw, ImageFont
 
 SS = 2
-W, H = 1700, 1200
+W, H = 2000, 1150
 im = Image.new('RGB', (W * SS, H * SS), (244, 244, 240))
 d = ImageDraw.Draw(im)
-s = 6.2                      # px per mm
-OX, OY = 800, 440            # screen position of the origin (back corner of the tray at floor level)
+s = 7.6                      # px per mm
+OX, OY = 1000, 240            # screen position of the origin (back corner of the tray at floor level)
 C30, S30 = math.cos(math.radians(30)), math.sin(math.radians(30))
 
 def F(sz, b=False):
@@ -50,7 +50,7 @@ FLOOR = 2.0
 
 PLASTIC = (58, 58, 66)
 text(W / 2, 40, "Enclosure view: the carrier board with its connectors (the display is remote)", 30, bold=True, anchor='mm')
-text(W / 2, 80, "Enclosure base, lid removed. Scaled concept drawing: not a board layout. (Outdated: still shows the old 2 x 8 Dupont block.)", 20, (110, 110, 116), anchor='mm')
+text(W / 2, 80, "Enclosure base, lid removed. Scaled concept drawing following the placement plan: not a board layout.", 20, (110, 110, 116), anchor='mm')
 
 # ---------------------------------------------------------------- the base (open tray)
 # floor
@@ -84,35 +84,51 @@ for (ax, ay) in [(sx0, sy0), (sx0 + 45, sy0), (sx0, sy0 + 50), (sx0 + 45, sy0 + 
     cuboid(ax - 2.4, ay - 2.4, FLOOR, 4.8, 4.8, 3.0, (36, 36, 42))
 cuboid(CX0, CY0, PCB_Z, 58, 68, PCBT, (22, 110, 66))
 
+GOLD = (214, 178, 70)
+BLACK = (24, 24, 28)
+WHITE = (238, 236, 226)
+
 # ESP32-S3 (21 x 52) on sockets of 8.5 mm, at the left; USB-C towards the back wall
-ex, ey = CX0 + 3, CY0 + 3
-add(ex, ey + 1, top, 2.4, 50, 8.5, (30, 30, 34)); add(ex + 21 - 2.4, ey + 1, top, 2.4, 50, 8.5, (30, 30, 34))
+ex, ey = CX0 + 1, CY0 + 3
+add(ex, ey + 1, top, 2.4, 50, 8.5, BLACK); add(ex + 21 - 2.4, ey + 1, top, 2.4, 50, 8.5, BLACK)
 add(ex, ey, top + 8.5, 21, 52, 1.6, (236, 236, 242))
-add(ex + 5.5, ey - 1.3, top + 8.5 + 1.6, 10, 7.5, 3.2, (190, 194, 200))
-add(ex + 6, ey + 14, top + 8.5 + 1.6, 9, 9, 1.0, (28, 28, 34))
-add(ex + 3, ey + 43, top + 8.5 + 1.6, 15, 8, 0.8, (236, 226, 196))
-# MAX31865 (25 x 28, 15 high) on low sockets of 3 mm
-mx, my = CX0 + 28, CY0 + 2
-add(mx, my + 1, top, 2.0, 26, 3.0, (30, 30, 34)); add(mx + 23, my + 1, top, 2.0, 26, 3.0, (30, 30, 34))
-add(mx, my, top + 3.0, 25, 28, 1.6, (22, 70, 160))
-add(mx + 6, my + 17, top + 3.0 + 1.6, 13, 9, 15 - 1.6, (46, 104, 180))
-add(mx + 4, my + 5, top + 3.0 + 1.6, 7, 7, 2.0, (24, 24, 28))
-# the FPC adapter board (22 x 28), with its connector already soldered: it stands on a 2 x 4 header, at the right, under the exit
-ax0, ay0 = CX0 + 29, CY0 + 32
+add(ex + 5.5, ey - 1.3, top + 8.5 + 1.6, 10, 7.5, 3.2, (190, 194, 200))     # USB-C
+add(ex + 6, ey + 14, top + 8.5 + 1.6, 9, 9, 1.0, BLACK)                     # the module (shield)
+add(ex + 3, ey + 43, top + 8.5 + 1.6, 15, 8, 0.8, (236, 226, 196))          # antenna
+# MAX31865 (25.4 x 27.9, 15 high) on low sockets of 3 mm; header on the short edge at the front
+mx, my = CX0 + 29, CY0 + 2
+add(mx + 3.8, my + 24.0, top, 19.0, 2.5, 3.0, BLACK)
+add(mx, my, top + 3.0, 25.4, 27.9, 1.6, (130, 30, 40))                      # Adafruit board is red-purple
+add(mx + 4.2, my + 0.4, top + 3.0 + 1.6, 17.0, 7.0, 10.4, (46, 120, 190))   # PT100 terminal block (blue)
+add(mx + 9, my + 11, top + 3.0 + 1.6, 7, 7, 1.6, BLACK)                     # the MAX31865 chip
+# the FPC adapter board (~22 x 26.5) on a 2 x 4 header, with its FPC connector
+ax0, ay0 = CX0 + 29, CY0 + 30.4
 HDR = 8.5
-add(ax0 + 6, ay0 + 3, top, 10.2, 5.1, HDR, (24, 24, 28))                  # 2 x 4 header + socket
-add(ax0, ay0, top + HDR, 22, 28, 1.6, (22, 130, 70))                      # the adapter board
-add(ax0 + 6, ay0 + 22, top + HDR + 1.6, 10, 5, 2.6, (236, 236, 228))       # its FPC connector, towards the front wall
-add(ax0 + 1.5, ay0 + 24, top, 3.5, 3.5, HDR, (110, 110, 118))              # a standoff under each mounting hole
-add(ax0 + 17, ay0 + 24, top, 3.5, 3.5, HDR, (110, 110, 118))
-# the Dupont block under the ESP: a right-angle 2 x 8 header (two rows of housings), cables to the front
-add(CX0 + 3, CY0 + 57, top, 20.3, 5.1, 2.8, (24, 24, 28))
-# three transistors, in the row below
-for i in range(3):
-    add(CX0 + 5 + i * 7, CY0 + 63.5, top, 4.5, 3.5, 1.6, (24, 24, 28))
-# JST XH 3 pins x2 (flow sensors), at the front edge, right
+add(ax0 + 6.5, ay0 + 5.6, top, 10.2, 5.1, HDR, BLACK)                       # 2 x 4 header + socket
+add(ax0, ay0, top + HDR, 22, 26.5, 1.6, (22, 130, 70))
+add(ax0 + 6, ay0 + 19, top + HDR + 1.6, 10, 5.5, 2.6, WHITE)                # its FPC connector
+add(ax0 + 1.0, ay0 + 3.1, top, 3.5, 3.5, HDR, (110, 110, 118))              # standoffs under the mounting holes
+add(ax0 + 17.5, ay0 + 3.1, top, 3.5, 3.5, HDR, (110, 110, 118))
+
+# J8 (dimmer, 1 x 4) and J9 (pressure, 1 x 3): straight headers in the corridor, plugs seated on top
+J8X, J8Y = CX0 + 25.5 - 1.27, CY0 + 33.0 - 1.27
+J9X, J9Y = CX0 + 25.5 - 1.27, CY0 + 43.2 - 1.27
+add(J8X, J8Y, top, 2.54, 10.16, 2.5, BLACK); add(J8X + 0.2, J8Y + 0.2, top + 2.5, 2.14, 9.76, 8.0, WHITE)
+add(J9X, J9Y, top, 2.54, 7.62, 2.5, BLACK); add(J9X + 0.2, J9Y + 0.2, top + 2.5, 2.14, 7.22, 8.0, WHITE)
+# J2 (2 x 4 right-angle, rows stacked vertically) and four 2-pin housings plugged in from the front
+add(CX0 + 13 - 1.27, CY0 + 56.0, top, 10.16, 5.6, 5.9, BLACK)
+for k in range(4):
+    add(CX0 + 13 - 1.27 + k * 2.54 + 0.15, CY0 + 61.6, top + 0.4, 2.24, 8.6, 5.1, WHITE)
+# J7 (1 x 6 right-angle): a 2-pin housing (button) and a 4-pin housing (encoder)
+add(CX0 + 25 - 1.27, CY0 + 56.8, top, 15.24, 3.0, 2.5, BLACK)
+add(CX0 + 25 - 1.27 + 0.15, CY0 + 59.8, top + 0.2, 4.78, 8.6, 2.1, WHITE)
+add(CX0 + 25 - 1.27 + 5.08 + 0.15, CY0 + 59.8, top + 0.2, 9.86, 8.6, 2.1, WHITE)
+# two transistors' worth of small parts at the front: polyfuse, diode, electrolytic, JST XH x2
+add(CX0 + 1.9, CY0 + 63.4, top, 7.2, 3.2, 8.5, (232, 200, 60))                # polyfuse
+add(CX0 + 13.5, CY0 + 63.2, top, 9.0, 2.0, 2.0, BLACK)                         # 1N5819 diode
+add(CX0 + 23.8, CY0 + 61.0, top, 6.3, 6.3, 12.0, (30, 40, 90))                # 470 uF electrolytic
 for k in range(2):
-    add(CX0 + 28 + k * 11, CY0 + 61.5, top, 7.5, 5.75, 6.0, (240, 240, 232))
+    add(CX0 + 31.2 + k * 9.5, CY0 + 61.6, top, 7.5, 5.75, 6.0, WHITE)          # JST XH 3 (plug on the board header)
 
 items.sort(key=lambda t: t[0])
 for _, fn in items:
@@ -126,18 +142,32 @@ poly([(0, BY, FW), (BX, BY, FW), (BX, BY - WALL, FW), (0, BY - WALL, FW)], shade
 poly([(BX, 0, FW), (BX, BY, FW), (BX - WALL, BY - WALL, FW), (BX - WALL, WALL, FW)], shade(PLASTIC, 1.15), (20, 20, 24))
 
 # ---------------------------------------------------------------- the cables, leaving through the front
-rowA = [(200, 30, 30), (20, 20, 24), (150, 90, 40), (235, 235, 235), (230, 130, 30), (235, 235, 235), (235, 200, 40), (235, 235, 235)]
-rowB = [(240, 240, 240), (20, 20, 24), (40, 150, 70), (60, 110, 210), (20, 20, 24), (200, 30, 30)]
-for k, col in enumerate(rowA):
-    xk = CX0 + 3 + (k + 0.5) * 2.54
-    d.line([P(xk, CY0 + 62.1, top + 2.0), P(xk, CY0 + 62.1 + 24, top + 1.0)], fill=col, width=3 * SS)
-for k, col in enumerate(rowB):
-    xk = CX0 + 3 + (k + 0.5) * 2.54
-    d.line([P(xk, CY0 + 62.1, top + 0.8), P(xk, CY0 + 62.1 + 24, top - 0.2)], fill=col, width=3 * SS)
+def wire(x, y, z, pts_z_end, col, w=3):
+    pass
+
+# J2: 4 housings, two wires each (stacked rows): +5 V / GND, pump, boiler, valve
+j2cols = [((200, 30, 30), (20, 20, 24)), ((150, 90, 40), (235, 235, 235)), ((230, 130, 30), (235, 235, 235)), ((235, 200, 40), (235, 235, 235))]
+for k, (c1, c2) in enumerate(j2cols):
+    xk = CX0 + 13 + k * 2.54
+    d.line([P(xk, CY0 + 70.2, top + 4.1), P(xk, CY0 + 84, top + 3.0)], fill=c1, width=3 * SS)
+    d.line([P(xk, CY0 + 70.2, top + 1.6), P(xk, CY0 + 84, top + 0.6)], fill=c2, width=3 * SS)
+# J7: button (2 wires) and encoder (4 wires)
+j7cols = [(240, 240, 240), (20, 20, 24), (200, 30, 30), (20, 20, 24), (40, 150, 70), (60, 110, 210)]
+for k, col in enumerate(j7cols):
+    xk = CX0 + 25 + k * 2.54
+    d.line([P(xk, CY0 + 68.4, top + 1.2), P(xk, CY0 + 82, top - 0.3)], fill=col, width=3 * SS)
+# J8 / J9: wires rise above the plugs then leave towards the front, above everything
+for k, col in enumerate([(200, 30, 30), (20, 20, 24), (235, 200, 40), (60, 110, 210)]):
+    y = CY0 + 33.0 + k * 2.54
+    d.line([P(CX0 + 25.5, y, top + 10.5), P(CX0 + 25.5, y, top + 14 + k), P(CX0 + 25.5, CY0 + 84, top + 10 + k)], fill=col, width=3 * SS)
+for k, col in enumerate([(200, 30, 30), (20, 20, 24), (40, 150, 70)]):
+    y = CY0 + 43.2 + k * 2.54
+    d.line([P(CX0 + 25.5, y, top + 10.5), P(CX0 + 25.5, y, top + 19 + k), P(CX0 + 25.5, CY0 + 84, top + 15 + k)], fill=col, width=3 * SS)
+# JST XH flow sensors
 for kx in range(2):
-    for k, col in enumerate([(200, 30, 30), (20, 20, 24), (235, 200, 40)]):
-        xk = CX0 + 28 + kx * 11 + (k + 0.5) * 2.5
-        d.line([P(xk, CY0 + 67.5, top + 3), P(xk, CY0 + 67.5 + 24, top + 2)], fill=col, width=3 * SS)
+    for k, col in enumerate([(200, 30, 30), (235, 200, 40), (20, 20, 24)]):
+        xk = CX0 + 32 + kx * 9.5 + k * 2.5
+        d.line([P(xk, CY0 + 67.3, top + 5), P(xk, CY0 + 82, top + 3)], fill=col, width=3 * SS)
 # FPC ribbon from the adapter connector to the remote display
 cuboid(ax0 + 8, ay0 + 27, top + HDR + 1.6 + 0.8, 6, 36, 0.4, (232, 160, 48))
 
@@ -148,23 +178,25 @@ def pl(x, y, z, tx, ty, t, color=(20, 20, 26)):
     d.ellipse([px - 4 * SS, py - 4 * SS, px + 4 * SS, py + 4 * SS], fill=color)
     text(tx + (10 if tx >= px / SS else -10), ty, t, 17, color, True, 'lm' if tx >= px / SS else 'rm')
 
-pl(ex + 10, ey + 26, top + 10.2, 330, 470, "ESP32-S3, above the board")
-pl(ex + 10, ey - 0.5, top + 11, 330, 400, "USB-C: opening in the wall")
-pl(mx + 12, my + 22, top + 4.6, 1230, 240, "MAX31865 (25 x 28, height 15)")
-pl(ax0 + 11, ay0 + 10, top + HDR + 1.6, 1230, 330, "your FPC adapter board (on sockets)")
-pl(ax0 + 11, ay0 + 24, top + HDR + 4.2, 1230, 420, "FPC connector already soldered: no SMD to solder")
-pl(ax0 + 11, ay0 + 40, top + HDR + 2, 1230, 510, "ribbon to the remote display")
-pl(CX0 + 13, CY0 + 59.5, top + 2.8, 330, 600, "Dupont 2 x 8: 5 V, SSRs, button, enc. (old layout)")
-pl(CX0 + 9, CY0 + 65, top + 1.6, 330, 690, "3 SSR transistors")
-pl(CX0 + 31, CY0 + 64, top + 6, 1230, 640, "JST XH 3: flow sensors In and Out")
-pl(sx0, sy0 + 50, FLOOR + 3, 330, 780, "3 mm small posts (45 x 50)")
+pl(ex + 10, ey + 26, top + 10.2, 300, 470, "ESP32-S3, above the board")
+pl(ex + 10, ey - 0.5, top + 11, 300, 400, "USB-C: opening in the wall")
+pl(mx + 12, my + 12, top + 15, 1560, 240, "MAX31865 (25.4 x 27.9, height 15)")
+pl(ax0 + 11, ay0 + 10, top + HDR + 1.6, 1560, 300, "your FPC adapter board (on sockets)")
+pl(ax0 + 11, ay0 + 22, top + HDR + 4.2, 1560, 420, "FPC connector pre-soldered")
+pl(ax0 + 11, ay0 + 40, top + HDR + 2, 1560, 510, "ribbon to the remote display")
+pl(CX0 + 25.5, CY0 + 38, top + 10.5, 300, 560, "J8 dimmer (I2C), J9 pressure")
+pl(CX0 + 16, CY0 + 66, top + 3.5, 300, 650, "J2: 5 V + 3 SSRs (4 housings, 2 x 4)")
+pl(CX0 + 31, CY0 + 66, top + 3.5, 300, 735, "J7: button + encoder (1 x 6)")
+pl(CX0 + 40, CY0 + 65, top + 6, 1560, 640, "JST XH 3: flow sensors In and Out")
+pl(sx0, sy0 + 50, FLOOR + 3, 300, 820, "3 mm small posts (45 x 50)")
 
 # ---------------------------------------------------------------- the stack of heights
-text(1230, 800, "Usable height: 25 mm", 22, (30, 30, 36), True)
-text(1230, 836, "posts 3 + board 1.6 = 4.6 mm", 18, (60, 60, 66))
-text(1230, 862, "ESP32 (8.5 sockets): USB-C at 17.9 mm", 18, (60, 60, 66))
-text(1230, 888, "FPC board on 8.5 sockets: 17.7 mm", 18, (60, 60, 66))
-text(1230, 914, "MAX31865 (3 sockets): 22.6 mm, margin 2.4 mm", 18, (20, 110, 60), True)
+text(1560, 800, "Usable height: 25 mm", 22, (30, 30, 36), True)
+text(1560, 836, "posts 3 + board 1.6 = 4.6 mm", 18, (60, 60, 66))
+text(1560, 862, "ESP32 (8.5 sockets): USB-C at 17.9 mm", 18, (60, 60, 66))
+text(1560, 888, "FPC board on 8.5 sockets: 17.7 mm", 18, (60, 60, 66))
+text(1560, 914, "MAX31865 (3 sockets): 22.6 mm, margin 2.4 mm", 18, (20, 110, 60), True)
+text(1560, 950, "Electrolytic C1 and polyfuse F1: about 15 mm", 18, (60, 60, 66))
 
 im = im.resize((W, H), Image.LANCZOS)
 im.save(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'images', 'box_iso3.png'))
