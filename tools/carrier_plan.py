@@ -149,23 +149,29 @@ for i, name in enumerate(["C3", "C4"]):
     text(d, X(56.0), Y(15.0 + i * 3.0), name, 8, SILK, True, 'lm')
 
 # ---------------------------------------------------------------- front strip: J2 (2x4), J7 (1x6), polyfuse, diode, electrolytic, XH x2
-# J2: 2 x 4 right-angle header, SSR + power
+# Front edge: every right-angle header has its Dupont housings plugged in towards the front (about 9 mm of keep-out in front of the pads).
+# J2: 2 x 4 right-angle header, SSR + power (housing keep-out x 11.7 .. 21.9)
 for r_ in range(2):
     for c_ in range(4):
-        tpad(13.0 + c_ * 2.54, 57.0 + r_ * 2.54, square=(r_ == 0 and c_ == 0), ring=1.7, drill=1.0)
-rect(d, X(13.0) - 1.4 * K, Y(57.0) - 1.4 * K, X(13.0 + 3 * 2.54) + 1.4 * K, Y(59.54) + 1.4 * K, outline=SILK + (255,), width=2)
-silk(17.5, 54.8, "J2  SSRs + 5 V (2 x 4)", 10)
+        tpad(13.0 + c_ * 2.54, 59.0 + r_ * 2.54, square=(r_ == 0 and c_ == 0), ring=1.7, drill=1.0)
+rect(d, X(13.0) - 1.4 * K, Y(59.0) - 1.4 * K, X(13.0 + 3 * 2.54) + 1.4 * K, Y(61.54) + 1.4 * K, outline=SILK + (255,), width=2)
+silk(16.0, 56.4, "J2  SSRs + 5 V", 9)
 for c_, lab in enumerate(["+5V", "P+", "B+", "V+"]):
-    text(d, X(13.0 + c_ * 2.54), Y(57.0) - 1.9 * K, lab, 8, SILK, True)
+    text(d, X(13.0 + c_ * 2.54), Y(59.0) - 1.9 * K, lab, 8, SILK, True)
 for c_, lab in enumerate(["GND", "P−", "B−", "V−"]):
-    text(d, X(13.0 + c_ * 2.54), Y(59.54) + 1.9 * K, lab, 8, SILK, True)
-# J7: 1 x 6 right-angle header, button and encoder
-for i in range(6):
-    tpad(25.0 + i * 2.54, 58.2, square=(i == 0), ring=1.7, drill=1.0)
-rect(d, X(25.0) - 1.4 * K, Y(58.2) - 1.4 * K, X(25.0 + 5 * 2.54) + 1.4 * K, Y(58.2) + 1.4 * K, outline=SILK + (255,), width=2)
-silk(31.5, 55.4, "J7  button + encoder (1 x 6)", 10)
-for i, lab in enumerate(["BT", "G", "5V", "G", "A", "B"]):
-    text(d, X(25.0 + i * 2.54), Y(58.2) + 2.1 * K, lab, 8, SILK, True)
+    text(d, X(13.0 + c_ * 2.54), Y(61.54) + 1.9 * K, lab, 8, SILK, True)
+# J7: 2 x 5 right-angle header (two stacked rows of housings): button, encoder, and 3 spare pins (+5 V, GPIO 38, GND)
+# row A (top): BT, GND | +5 V, IO38, GND      row B (bottom): +5 V, GND, A, B
+for c_ in range(5):
+    tpad(24.0 + c_ * 2.54, 59.0, square=(c_ == 0), ring=1.7, drill=1.0)
+for c_ in range(4):
+    tpad(24.0 + c_ * 2.54, 61.54, ring=1.7, drill=1.0)
+rect(d, X(24.0) - 1.4 * K, Y(59.0) - 1.4 * K, X(24.0 + 4 * 2.54) + 1.4 * K, Y(61.54) + 1.4 * K, outline=SILK + (255,), width=2)
+silk(31.5, 56.4, "J7  button / encoder / spare", 9)
+for c_, lab in enumerate(["BT", "GND", "5V", "IO38", "GND"]):
+    text(d, X(24.0 + c_ * 2.54), Y(59.0) - 1.9 * K, lab, 7, SILK, True)
+for c_, lab in enumerate(["5V", "GND", "A", "B"]):
+    text(d, X(24.0 + c_ * 2.54), Y(61.54) + 1.9 * K, lab, 7, SILK, True)
 # J8: 1 x 4 vertical header, dimmer (UART / I2C) in the corridor between ESP32 and FPC board; J9: 1 x 3, pressure sensor
 for i, lab in enumerate(["3V3", "GND", "SDA", "SCL"]):
     tpad(25.5, 33.0 + i * 2.54, square=(i == 0), ring=1.7, drill=1.0)
@@ -177,22 +183,24 @@ for i, lab in enumerate(["5V", "GND", "SIG"]):
     text(d, X(27.0), Y(43.2 + i * 2.54), lab, 7, SILK, True, 'lm')
 rect(d, X(25.5) - 1.4 * K, Y(43.2) - 1.4 * K, X(25.5) + 1.4 * K, Y(43.2 + 2 * 2.54) + 1.4 * K, outline=SILK + (255,), width=2)
 silk(25.0, 41.5, "J9 pressure", 8)
-# F1 polyfuse (radial, pitch 5), D1 1N5819 (axial 10.16), C1 470 uF (radial 5 mm dia, pitch 2.5), C2 100 nF
-tpad(3.0, 65.0, ring=1.8, drill=0.9); tpad(8.0, 65.0, ring=1.8, drill=0.9)
-rrect(d, X(1.9), Y(63.4), X(9.1), Y(66.6), 6, outline=SILK + (255,), width=2); silk(5.5, 61.9, "F1 1,1 A", 9)
-axial(18.0, 64.2, pitch=10.16); text(d, X(18.0), Y(64.2) - 2.1 * K, "D1", 9, SILK, True)
-circ(d, X(27.0), Y(64.0), 3.15 * K, fill=None, outline=SILK + (255,), width=2)
-tpad(25.75, 64.0, ring=1.8, drill=0.8); tpad(28.25, 64.0, ring=1.8, drill=0.8); silk(27.0, 61.2, "C1", 9)
-tpad(12.5, 66.8, ring=1.6, drill=0.8); tpad(15.0, 66.8, ring=1.6, drill=0.8); silk(13.8, 62.2, "C2", 9)
-# XH x2 (side entry, 3 pins 2.5 pitch)
-for k, (x0, name) in enumerate([(32.0, "J3  flow In"), (41.5, "J4  flow Out")]):
+# F1 polyfuse (radial, pitch 5) and D1 1N5819 (standing) in the front-left corner, in front of the mounting hole
+tpad(3.0, 66.0, ring=1.8, drill=0.9); tpad(8.0, 66.0, ring=1.8, drill=0.9)
+rrect(d, X(1.9), Y(64.4), X(9.1), Y(67.6), 6, outline=SILK + (255,), width=2); text(d, X(10.4), Y(66.0), "F1", 8, SILK, True, 'lm')
+tpad(2.5, 62.6, ring=1.8, drill=0.8); tpad(5.04, 62.6, ring=1.8, drill=0.8)
+text(d, X(6.6), Y(62.6), "D1", 8, SILK, True, 'lm')
+# C1 470 uF (radial 6.3 mm) and C2 100 nF, in the corridor between ESP32 and MAX31865
+circ(d, X(25.7), Y(54.3), 3.15 * K, fill=None, outline=SILK + (255,), width=2)
+tpad(24.45, 54.3, ring=1.8, drill=0.8); tpad(26.95, 54.3, ring=1.8, drill=0.8); silk(25.7, 54.3, "C1", 9)
+tpad(24.5, 50.4, ring=1.6, drill=0.8); tpad(27.0, 50.4, ring=1.6, drill=0.8); silk(25.7, 49.2, "C2", 8) if False else text(d, X(28.4), Y(50.4), "C2", 8, SILK, True, 'lm')
+# JST XH x2: vertical headers, rotated (pins along y), the plugs come out upwards: no keep-out towards the front
+for k, (x0, name) in enumerate([(39.2, "J3 flow In"), (45.2, "J4 flow Out")]):
     for i in range(3):
-        tpad(x0 + i * 2.5, 62.8, square=(i == 0), ring=1.8, drill=1.0)
-    rect(d, X(x0) - 1.9 * K, Y(62.8) - 1.8 * K, X(x0 + 5) + 1.9 * K, Y(62.8) + 4.6 * K, outline=SILK + (255,), width=2)
-    text(d, X(x0 + 2.5), Y(62.8) - 2.9 * K, name, 9, SILK, True)
+        tpad(x0, 59.5 + i * 2.5, square=(i == 0), ring=1.8, drill=1.0)
+    rect(d, X(x0) - 2.9 * K, Y(59.5) - 2.1 * K, X(x0) + 2.9 * K, Y(64.5) + 2.1 * K, outline=SILK + (255,), width=2)
+    text(d, X(x0), Y(64.5) + 3.4 * K, name, 8, SILK, True)
 
 # silkscreen title
-silk(46.0, 66.6, "ESP32-S3 / SSR  rev A", 9)
+silk(53.0, 66.6, "rev A", 9)
 
 # ---------------------------------------------------------------- the raised boards, translucent (they hide nothing)
 # ESP32-S3 board 21 x 52 at x 1..22, y 3..55
@@ -252,7 +260,7 @@ comp = [
     "J2  right-angle 2 x 4 header: SSRs and 5 V supply",
     "J3, J4  JST XH 3-pin: flow sensors In and Out",
     "J5  2 x 4 socket: FPC adapter board",
-    "J7  right-angle 1 x 6 header: button and encoder (5 V)",
+    "J7  right-angle 2 x 5 header: button, encoder (5 V), 3 spare pins",
     "J8  1 x 4: pump dimmer (I2C)  ·  J9  1 x 3: pressure sensor",
     "Q1 to Q3  SSR drive ; Q4  backlight (2N2222A)",
     "R1 to R4  1 kΩ  ·  R5 to R8  10 kΩ  ·  R9, R10  encoder dividers",
@@ -279,6 +287,7 @@ text(d, lx, 1060, "Points to check on your board:", 18, (190, 40, 40), True, 'lm
 chk = [
     "the FPC ribbon leaves through the back wall (slot to cut), next to the USB-C opening;",
     "PT100 wires leave at the front above J7 / J3 / J4, at about 14 mm;",
+    "Dupont housings need about 9 mm in front of J2 / J7 (cable slot in the front wall);",
     "M2 holes and pin-1 orientation of the FPC board; pin order of J5, J6 and J7.",
 ]
 for i, t in enumerate(chk):
