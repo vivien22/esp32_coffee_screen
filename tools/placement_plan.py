@@ -310,5 +310,5 @@ for i, t in enumerate(chk):
     text(d, lx, 1092 + i * 26, t, 15, INK, False, 'lm')
 
 out = base.resize((W, H), Image.LANCZOS).convert('RGB')
-out.save(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'images', 'carrier_plan.png'))
+out.save(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'images', 'placement_plan.png'))
 print('ok')

@@ -7,7 +7,7 @@ Status: **working design, nothing has been manufactured.** Placement is to scale
 ## Overview
 
 ### Placement inside the enclosure (to scale, top view)
-![Carrier board placement](images/carrier_plan.png)
+![Carrier board placement](images/placement_plan.png)
 
 ### 3D view of the enclosure with the board and its cables
 ![Enclosure 3D view](images/enclosure.png)
@@ -17,7 +17,7 @@ Status: **working design, nothing has been manufactured.** Placement is to scale
 
 ## Contents
 - `docs/carrier_spec.md`: full specification (dimensions, connectors, pin assignment, circuits, bill of materials, open points).
-- `images/`: the three pictures above, all generated from the scripts in `tools/` (Python + Pillow + numpy; measurements are at the top of each file): `carrier_plan.py`, `enclosure.py`, `carrier_schema.py`.
+- `images/`: the three pictures above, all generated from the scripts in `tools/` (Python + Pillow + numpy; measurements are at the top of each file): `placement_plan.py`, `enclosure.py`, `carrier_schema.py`.
 
 ## Principles
 - 58 x 68 mm board with a 42 x 7 mm tab on the cable side, in the plus-shaped free area of the 60 x 85 mm enclosure (8 x 8 mm corner posts), on four 3 mm standoffs (45 x 50 mm spacing), 25 mm usable depth.
