@@ -20,7 +20,7 @@ Status: **working design, nothing has been manufactured.** Placement is to scale
 - `images/`: the three pictures above, all generated from the scripts in `tools/` (Python + Pillow; measurements are at the top of each file): `carrier_plan.py`, `box_iso3.py`, `carrier_schema.py`.
 
 ## Principles
-- 58 x 68 mm board in the 60 x 70 mm free area, on four 3 mm standoffs (45 x 50 mm spacing), 25 mm usable depth.
+- 58 x 68 mm board with a 40 x 6 mm tab on the cable side, in the plus-shaped free area of the enclosure (58 x 68 plus 40 x 80), on four 3 mm standoffs (45 x 50 mm spacing), 25 mm usable depth.
 - Through-hole parts only (no SMD soldering).
 - ESP32-S3 and MAX31865 module on sockets; FPC adapter board (remote display) on a 2 x 4 socket.
 - SSRs are kept, driven by 2N2222A transistors from the external 5 V supply.

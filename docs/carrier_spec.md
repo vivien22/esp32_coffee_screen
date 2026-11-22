@@ -3,7 +3,8 @@
 All **through-hole** parts (no SMD soldering). Related files: `images/carrier_plan.png` (to-scale placement), `images/box_iso3.png` (3D view), `images/carrier_schema.png` (connection schematic).
 
 ## Dimensions and mounting
-- Board: **58 x 68 mm**, two layers, ground plane. Free area in the enclosure: **58 x 68 mm** between the large posts (the board fills it exactly). In the middle of the enclosure the free length can reach **80 mm over a 40 mm width**, avoiding the posts: optional extension tabs of about 6 mm at the front and at the back (dashed in the placement plan), not used for now.
+- Usable area in the enclosure (interior 66 x 80 mm), from your measurements: **58 x 68 mm** between the big posts, and in the middle **80 mm long over a 40 mm width** avoiding the posts. Together they form a plus-shaped area, so each corner is blocked over **13 x 6 mm** (the posts are drawn as these corner blocks; if they are round, send me their diameter and centres).
+- Board: **58 x 68 mm main body, plus a 40 x 6 mm tab on the cable (front) side** (x from 9 to 49), so the board is 74 mm long at the tab; two layers, ground plane. The tab lets the Dupont housings of J2 / J7 and the JST XH plugs sit on the board up to the front wall; the back extension (also 40 x 6 mm) is not used.
 - 4 mounting holes on the **3 mm** small posts, **45 x 50 mm** spacing.
 - Usable depth **25 mm**: posts 3 + board 1.6 = 4.6 mm; ESP32 on 8.5 mm sockets (USB-C at 17.9 mm); FPC adapter board on 8.5 mm sockets (17.7 mm); MAX31865 on low 3 mm sockets (22.6 mm, 2.4 mm margin).
 - **Front connector row:** right-angle headers with their Dupont housings need about **9 mm in front of the pads** (keep-out, nothing else there); J2, J7 and the vertical JST XH J3 / J4 are side by side on the front edge. F1 and D1 sit in the front-left corner (in front of the mounting hole), C1 and C2 in the corridor between the ESP32 and the MAX31865. A cable slot is needed in the front wall (housings end about 6 mm from it).
@@ -114,7 +115,7 @@ VIN (3.3 V), 3Vo (unused), GND, CLK (GPIO 12), SDO (GPIO 13), SDI (GPIO 11), CS 
 | 1 | 470 µF 10 V radial capacitor; 4 x 100 nF; 2 x 1 nF | 1 € |
 | 4 | 3 mm standoffs (existing) + M2.5 screws | 0 |
 | | **Total parts** | **about 6 to 9 €** |
-| 5 | bare boards, 58 x 68 mm, 2 layers (shipping included) | 10 to 20 € |
+| 5 | bare boards, 58 x 68 mm + 40 x 6 mm tab, 2 layers (shipping included) | 10 to 20 € |
 
 ## Points to confirm before manufacturing
 1. Pin order, supply and backlight of your display ribbon (J5).

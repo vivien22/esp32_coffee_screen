@@ -64,9 +64,9 @@ poly([(ux0, WALL, 7), (ux0 + 12, WALL, 7), (ux0 + 12, WALL, 15), (ux0, WALL, 15)
 # top of the back walls
 poly([(0, 0, BASE_H), (BX, 0, BASE_H), (BX - WALL, WALL, BASE_H), (WALL, WALL, BASE_H)], shade(PLASTIC, 1.25), (20, 20, 24))
 poly([(0, 0, BASE_H), (0, BY, BASE_H), (WALL, BY - WALL, BASE_H), (WALL, WALL, BASE_H)], shade(PLASTIC, 1.2), (20, 20, 24))
-# the four big posts at the corners (lid screws)
-for (px, py) in [(WALL + 3.5, WALL + 3.5), (BX - WALL - 3.5, WALL + 3.5), (WALL + 3.5, BY - WALL - 3.5), (BX - WALL - 3.5, BY - WALL - 3.5)]:
-    cuboid(px - 3.4, py - 3.4, FLOOR, 6.8, 6.8, BASE_H - FLOOR, (40, 40, 46))
+# the big posts (plus-shaped usable area: each corner blocked over 13 x 6 mm); the back ones here, the front ones after the board
+for (px, py) in [(WALL, WALL), (BX - WALL - 13, WALL)]:
+    cuboid(px, py, FLOOR, 13, 6, BASE_H - FLOOR, (40, 40, 46))
 
 # ---------------------------------------------------------------- the carrier and what it holds
 CX0, CY0 = WALL + 4.0, WALL + 6.0     # origin of the carrier (58 x 68)
@@ -83,6 +83,7 @@ sy0 = CY0 + (68 - 50) / 2
 for (ax, ay) in [(sx0, sy0), (sx0 + 45, sy0), (sx0, sy0 + 50), (sx0 + 45, sy0 + 50)]:
     cuboid(ax - 2.4, ay - 2.4, FLOOR, 4.8, 4.8, 3.0, (36, 36, 42))
 cuboid(CX0, CY0, PCB_Z, 58, 68, PCBT, (22, 110, 66))
+cuboid(CX0 + 9, CY0 + 68, PCB_Z, 40, 6, PCBT, (22, 110, 66))          # front tab (cable side)
 
 GOLD = (214, 178, 70)
 BLACK = (24, 24, 28)
@@ -116,14 +117,14 @@ J9X, J9Y = CX0 + 25.5 - 1.27, CY0 + 43.2 - 1.27
 add(J8X, J8Y, top, 2.54, 10.16, 2.5, BLACK); add(J8X + 0.2, J8Y + 0.2, top + 2.5, 2.14, 9.76, 8.0, WHITE)
 add(J9X, J9Y, top, 2.54, 7.62, 2.5, BLACK); add(J9X + 0.2, J9Y + 0.2, top + 2.5, 2.14, 7.22, 8.0, WHITE)
 # J2 (2 x 4 right-angle, rows stacked vertically) and four 2-pin housings plugged in from the front
-add(CX0 + 12.2 - 1.27, CY0 + 58.2, top, 10.16, 5.0, 5.9, BLACK)
+add(CX0 + 12.2 - 1.27, CY0 + 60.2, top, 10.16, 5.0, 5.9, BLACK)
 for k in range(4):
-    add(CX0 + 12.2 - 1.27 + k * 2.54 + 0.15, CY0 + 63.2, top + 0.4, 2.24, 8.6, 5.1, WHITE)
+    add(CX0 + 12.2 - 1.27 + k * 2.54 + 0.15, CY0 + 65.2, top + 0.4, 2.24, 8.6, 5.1, WHITE)
 # J7 (2 x 5 right-angle): lower row = 4-pin encoder housing, upper row = 2-pin button + 3-pin spare housings
-add(CX0 + 22.4 - 1.27, CY0 + 58.2, top, 15.24, 5.0, 5.9, BLACK)
-add(CX0 + 22.4 - 1.27 + 0.15, CY0 + 63.2, top + 0.4, 10.0, 8.6, 2.3, WHITE)
-add(CX0 + 22.4 - 1.27 + 0.15, CY0 + 63.2, top + 3.0, 4.9, 8.6, 2.3, WHITE)
-add(CX0 + 22.4 - 1.27 + 5.23, CY0 + 63.2, top + 3.0, 9.9, 8.6, 2.3, (225, 222, 205))
+add(CX0 + 22.4 - 1.27, CY0 + 60.2, top, 15.24, 5.0, 5.9, BLACK)
+add(CX0 + 22.4 - 1.27 + 0.15, CY0 + 65.2, top + 0.4, 10.0, 8.6, 2.3, WHITE)
+add(CX0 + 22.4 - 1.27 + 0.15, CY0 + 65.2, top + 3.0, 4.9, 8.6, 2.3, WHITE)
+add(CX0 + 22.4 - 1.27 + 5.23, CY0 + 65.2, top + 3.0, 9.9, 8.6, 2.3, (225, 222, 205))
 # polyfuse, standing diode, electrolytic, 100 nF, and the two JST XH (vertical headers with their plugs)
 add(CX0 + 1.9, CY0 + 64.4, top, 7.2, 3.2, 11.0, (232, 200, 60))                # polyfuse
 add(CX0 + 1.2, CY0 + 61.2, top, 2.7, 2.7, 5.2, BLACK)                          # 1N5819 standing
@@ -131,12 +132,14 @@ add(CX0 + 22.55, CY0 + 51.15, top, 6.3, 6.3, 12.0, (30, 40, 90))               #
 add(CX0 + 24.0, CY0 + 49.9, top, 4.0, 1.6, 4.2, (200, 120, 40))                # 100 nF
 for k in range(2):
     xb = CX0 + 39.6 + k * 6.0 - 2.9
-    add(xb, CY0 + 58.1, top, 5.8, 9.9, 5.8, WHITE)                             # JST XH header
-    add(xb + 0.3, CY0 + 58.4, top + 5.8, 5.2, 9.3, 6.0, (225, 215, 190))      # its plug
+    add(xb, CY0 + 60.1, top, 5.8, 9.9, 5.8, WHITE)                             # JST XH header
+    add(xb + 0.3, CY0 + 60.4, top + 5.8, 5.2, 9.3, 6.0, (225, 215, 190))      # its plug
 
 items.sort(key=lambda t: t[0])
 for _, fn in items:
     fn()
+for (px, py) in [(WALL, BY - WALL - 6), (BX - WALL - 13, BY - WALL - 6)]:
+    cuboid(px, py, FLOOR, 13, 6, BASE_H - FLOOR, (40, 40, 46))
 
 # ---------------------------------------------------------------- the front walls of the base (cut low, to see inside)
 FW = 5.0
@@ -149,17 +152,17 @@ poly([(BX, 0, FW), (BX, BY, FW), (BX - WALL, BY - WALL, FW), (BX - WALL, WALL, F
 j2cols = [((200, 30, 30), (20, 20, 24)), ((150, 90, 40), (235, 235, 235)), ((230, 130, 30), (235, 235, 235)), ((235, 200, 40), (235, 235, 235))]
 for k, (c1, c2) in enumerate(j2cols):
     xk = CX0 + 12.2 + k * 2.54
-    d.line([P(xk, CY0 + 71.8, top + 4.1), P(xk, CY0 + 84, top + 3.0)], fill=c1, width=3 * SS)
-    d.line([P(xk, CY0 + 71.8, top + 1.6), P(xk, CY0 + 84, top + 0.6)], fill=c2, width=3 * SS)
+    d.line([P(xk, CY0 + 73.8, top + 4.1), P(xk, CY0 + 84, top + 3.0)], fill=c1, width=3 * SS)
+    d.line([P(xk, CY0 + 73.8, top + 1.6), P(xk, CY0 + 84, top + 0.6)], fill=c2, width=3 * SS)
 # J7 upper row: button (2) + spare (3); lower row: encoder (4)
 upper = [(240, 240, 240), (20, 20, 24), (200, 30, 30), (235, 200, 40), (150, 90, 200), (20, 20, 24)]
 lower = [(200, 30, 30), (20, 20, 24), (40, 150, 70), (60, 110, 210)]
 for k, col in enumerate(upper):
     xk = CX0 + 22.4 + k * 2.54
-    d.line([P(xk, CY0 + 71.8, top + 4.2), P(xk, CY0 + 84, top + 3.2)], fill=col, width=3 * SS)
+    d.line([P(xk, CY0 + 73.8, top + 4.2), P(xk, CY0 + 84, top + 3.2)], fill=col, width=3 * SS)
 for k, col in enumerate(lower):
     xk = CX0 + 22.4 + k * 2.54
-    d.line([P(xk, CY0 + 71.8, top + 1.5), P(xk, CY0 + 84, top + 0.5)], fill=col, width=3 * SS)
+    d.line([P(xk, CY0 + 73.8, top + 1.5), P(xk, CY0 + 84, top + 0.5)], fill=col, width=3 * SS)
 # J8 / J9: wires rise above the plugs then leave towards the front, above everything
 for k, col in enumerate([(200, 30, 30), (20, 20, 24), (235, 200, 40), (60, 110, 210)]):
     y = CY0 + 33.0 + k * 2.54
@@ -170,7 +173,7 @@ for k, col in enumerate([(200, 30, 30), (20, 20, 24), (40, 150, 70)]):
 # JST XH flow sensors: the cables come out of the top of the plugs and go forward
 for kx in range(2):
     for k, col in enumerate([(200, 30, 30), (235, 200, 40), (20, 20, 24)]):
-        yk = CY0 + 59.5 + k * 2.5
+        yk = CY0 + 61.5 + k * 2.5
         xk = CX0 + 39.6 + kx * 6.0
         d.line([P(xk, yk, top + 11.8), P(xk, yk, top + 15), P(xk, CY0 + 84, top + 5 + kx)], fill=col, width=3 * SS)
 # PT100 wires leave the terminal block towards the front, above J7 / XH

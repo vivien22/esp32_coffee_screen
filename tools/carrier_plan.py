@@ -42,28 +42,25 @@ rect(d, bx0, by0, bx1, by1, fill=(74, 74, 82, 255))
 # the opening for the USB-C cable in the back wall (y = top)
 rect(d, X(5.5), by0 - 3 * K, X(18.5), by0, fill=(20, 20, 24, 255), outline=(230, 230, 235, 255), width=2)
 text(d, X(12), by0 - 1.5 * K, "USB-C opening", 12, (230, 230, 235), True)
-# the four big posts (lid screws), diameter 8, at the corners of the interior
-for (cx, cy) in [(bx0 + 3.6 * K, by0 + 3.6 * K), (bx1 - 3.6 * K, by0 + 3.6 * K), (bx0 + 3.6 * K, by1 - 3.6 * K), (bx1 - 3.6 * K, by1 - 3.6 * K)]:
-    circ(d, cx, cy, 4.0 * K, fill=(30, 30, 34, 255), outline=(120, 120, 128, 255), width=3)
-    circ(d, cx, cy, 1.1 * K, fill=(70, 70, 78, 255))
-# the free area 58 x 68 between the posts, and the optional central extension (40 wide, up to 80 long in total)
-fx0, fy0 = X(0), Y(0)
-for (xa, ya, xb, yb) in [(fx0, fy0, fx0 + 58 * K, fy0), (fx0, fy0 + 68 * K, fx0 + 58 * K, fy0 + 68 * K), (fx0, fy0, fx0, fy0 + 68 * K), (fx0 + 58 * K, fy0, fx0 + 58 * K, fy0 + 68 * K)]:
-    line(d, [(xa, ya), (xb, yb)], (200, 200, 205), 1.5)
-for (ya, yb, lab) in [(-6.0, 0.0, "back"), (68.0, 74.0, "front")]:
-    for t in range(0, 40, 4):
-        line(d, [(X(9 + t), Y(ya)), (X(9 + t + 2), Y(ya))], (150, 200, 150), 1.5)
-        line(d, [(X(9 + t), Y(yb)), (X(9 + t + 2), Y(yb))], (150, 200, 150), 1.5)
-    line(d, [(X(9), Y(ya)), (X(9), Y(yb))], (150, 200, 150), 1.5)
-    line(d, [(X(49), Y(ya)), (X(49), Y(yb))], (150, 200, 150), 1.5)
-text(d, X(29), Y(-3.0), "optional extension: 40 wide, 80 mm total length", 10, (150, 220, 150), True)
-text(d, X(29), Y(71.0), "optional extension: 40 wide, 80 mm total length", 10, (150, 220, 150), True)
+# the big posts (lid screws): they leave a plus-shaped usable area (58 x 68 across, plus 40 x 80 along the middle),
+# so each corner is blocked over 13 x 6 mm
+for (xa, xb, ya, yb) in [(-4, 9, -6, 0), (49, 62, -6, 0), (-4, 9, 68, 74), (49, 62, 68, 74)]:
+    rrect(d, X(xa), Y(ya), X(xb), Y(yb), 10, fill=(30, 30, 34, 255), outline=(120, 120, 128, 255), width=3)
+    circ(d, (X(xa) + X(xb)) / 2, (Y(ya) + Y(yb)) / 2, 1.6 * K, fill=(70, 70, 78, 255))
+# plus-shaped free area: 58 x 68 plus the central 40 x 80
+cross = [(0, 0), (9, 0), (9, -6), (49, -6), (49, 0), (58, 0), (58, 68), (49, 68), (49, 74), (9, 74), (9, 68), (0, 68)]
+line(d, [(X(a), Y(b)) for a, b in cross + [cross[0]]], (150, 200, 150), 2)
+text(d, X(29), Y(-3.0), "optional back extension (not used)", 10, (150, 220, 150), True)
 
 # ---------------------------------------------------------------- the board 58 x 68
 PW, PL = 58.0, 68.0
 rrect(d, X(0) + 6, Y(0) + 8, X(PW) + 6, Y(PL) + 8, 12, fill=(0, 0, 0, 90))          # shadow
 rrect(d, X(0), Y(0), X(PW), Y(PL), 2.5 * K / 2.5, fill=MASK + (255,), outline=(8, 60, 36, 255), width=3)
 rect(d, X(0.8), Y(0.8), X(PW - 0.8), Y(PL - 0.8), outline=MASK2 + (255,), width=1)
+# front tab of the board (40 x 6) on the cable side, in the central extension
+rect(d, X(9) + 6, Y(PL) + 4, X(49) + 6, Y(74) + 8, fill=(0, 0, 0, 90))
+rect(d, X(9), Y(PL) - 5, X(49), Y(74), fill=MASK + (255,))
+line(d, [(X(9), Y(PL)), (X(9), Y(74)), (X(49), Y(74)), (X(49), Y(PL))], (8, 60, 36, 255), 3)
 
 def hole(cx, cy, dia, ring):
     circ(d, X(cx), Y(cy), ring / 2 * K, fill=PAD + (255,), outline=(120, 120, 126, 255), width=1)
@@ -166,25 +163,25 @@ for i, name in enumerate(["C3", "C4"]):
 # J2: 2 x 4 right-angle header, SSR + power (housing keep-out x 11.7 .. 21.9)
 for r_ in range(2):
     for c_ in range(4):
-        tpad(12.2 + c_ * 2.54, 59.0 + r_ * 2.54, square=(r_ == 0 and c_ == 0), ring=1.7, drill=1.0)
-rect(d, X(12.2) - 1.4 * K, Y(59.0) - 1.4 * K, X(12.2 + 3 * 2.54) + 1.4 * K, Y(61.54) + 1.4 * K, outline=SILK + (255,), width=2)
-silk(15.4, 56.4, "J2  SSRs + 5 V", 9)
+        tpad(12.2 + c_ * 2.54, 61.0 + r_ * 2.54, square=(r_ == 0 and c_ == 0), ring=1.7, drill=1.0)
+rect(d, X(12.2) - 1.4 * K, Y(61.0) - 1.4 * K, X(12.2 + 3 * 2.54) + 1.4 * K, Y(63.54) + 1.4 * K, outline=SILK + (255,), width=2)
+silk(15.4, 58.4, "J2  SSRs + 5 V", 9)
 for c_, lab in enumerate(["+5V", "P+", "B+", "V+"]):
-    text(d, X(12.2 + c_ * 2.54), Y(59.0) - 1.9 * K, lab, 8, SILK, True)
+    text(d, X(12.2 + c_ * 2.54), Y(61.0) - 1.9 * K, lab, 8, SILK, True)
 for c_, lab in enumerate(["GND", "P−", "B−", "V−"]):
-    text(d, X(12.2 + c_ * 2.54), Y(61.54) + 1.9 * K, lab, 8, SILK, True)
+    text(d, X(12.2 + c_ * 2.54), Y(63.54) + 1.9 * K, lab, 8, SILK, True)
 # J7: 2 x 6 right-angle header (two stacked rows of housings): button, encoder, and 4 spare pins (+5 V, IN, OUT, GND)
 # row A (top): BT, GND | +5 V, IN38, OUT39, GND      row B (bottom): +5 V, GND, A, B
 for c_ in range(6):
-    tpad(22.4 + c_ * 2.54, 59.0, square=(c_ == 0), ring=1.7, drill=1.0)
+    tpad(22.4 + c_ * 2.54, 61.0, square=(c_ == 0), ring=1.7, drill=1.0)
 for c_ in range(4):
-    tpad(22.4 + c_ * 2.54, 61.54, ring=1.7, drill=1.0)
-rect(d, X(22.4) - 1.4 * K, Y(59.0) - 1.4 * K, X(22.4 + 5 * 2.54) + 1.4 * K, Y(61.54) + 1.4 * K, outline=SILK + (255,), width=2)
-silk(31.0, 56.4, "J7  button / encoder / spare I/O", 9)
+    tpad(22.4 + c_ * 2.54, 63.54, ring=1.7, drill=1.0)
+rect(d, X(22.4) - 1.4 * K, Y(61.0) - 1.4 * K, X(22.4 + 5 * 2.54) + 1.4 * K, Y(63.54) + 1.4 * K, outline=SILK + (255,), width=2)
+silk(31.0, 58.4, "J7  button / encoder / spare I/O", 9)
 for c_, lab in enumerate(["BT", "GND", "5V", "IN", "OUT", "GND"]):
-    text(d, X(22.4 + c_ * 2.54), Y(59.0) - 1.9 * K, lab, 7, SILK, True)
+    text(d, X(22.4 + c_ * 2.54), Y(61.0) - 1.9 * K, lab, 7, SILK, True)
 for c_, lab in enumerate(["5V", "GND", "A", "B"]):
-    text(d, X(22.4 + c_ * 2.54), Y(61.54) + 1.9 * K, lab, 7, SILK, True)
+    text(d, X(22.4 + c_ * 2.54), Y(63.54) + 1.9 * K, lab, 7, SILK, True)
 # J8: 1 x 4 vertical header, dimmer (UART / I2C) in the corridor between ESP32 and FPC board; J9: 1 x 3, pressure sensor
 for i, lab in enumerate(["3V3", "GND", "SDA", "SCL"]):
     tpad(25.5, 33.0 + i * 2.54, square=(i == 0), ring=1.7, drill=1.0)
@@ -208,9 +205,9 @@ tpad(24.5, 50.4, ring=1.6, drill=0.8); tpad(27.0, 50.4, ring=1.6, drill=0.8); si
 # JST XH x2: vertical headers, rotated (pins along y), the plugs come out upwards: no keep-out towards the front
 for k, (x0, name) in enumerate([(39.6, "J3 flow In"), (45.6, "J4 flow Out")]):
     for i in range(3):
-        tpad(x0, 59.5 + i * 2.5, square=(i == 0), ring=1.8, drill=1.0)
-    rect(d, X(x0) - 2.9 * K, Y(59.5) - 2.1 * K, X(x0) + 2.9 * K, Y(64.5) + 2.1 * K, outline=SILK + (255,), width=2)
-    text(d, X(x0), Y(64.5) + 3.4 * K, name, 8, SILK, True)
+        tpad(x0, 61.5 + i * 2.5, square=(i == 0), ring=1.8, drill=1.0)
+    rect(d, X(x0) - 2.9 * K, Y(61.5) - 2.1 * K, X(x0) + 2.9 * K, Y(66.5) + 2.1 * K, outline=SILK + (255,), width=2)
+    text(d, X(x0), Y(66.5) + 3.4 * K, name, 8, SILK, True)
 
 # silkscreen title
 silk(53.0, 66.6, "rev A", 9)
@@ -246,7 +243,7 @@ def dim_v(x, y0, y1, label):
     for yy in (y0, y1):
         line(d, [(X(x) - 8, Y(yy)), (X(x) + 8, Y(yy))], (60, 60, 66), 2)
     d.text((px(X(x) - 14), px(Y((y0 + y1) / 2))), label, font=F(13, True), fill=(50, 50, 56), anchor='rm')
-dim_h(0, 58, 70.6, "58 mm")
+dim_h(0, 58, 78.2, "58 mm (tab 40 x 6 at the front)")
 dim_v(-7.2, 0, 68, "68 mm")
 
 # ---------------------------------------------------------------- legend, to the right
@@ -282,7 +279,7 @@ comp = [
     "C1  470 µF  ·  C2  100 nF",
 ]
 for i, t in enumerate(comp):
-    text(d, lx, 450 + i * 30, t, 15, INK, False, 'lm')
+    text(d, lx, 440 + i * 27, t, 15, INK, False, 'lm')
 
 text(d, lx, 810, "Heights (enclosure floor = 0)", 22, INK, True, 'lm')
 hs = [
@@ -300,7 +297,7 @@ text(d, lx, 1060, "Points to check on your board:", 18, (190, 40, 40), True, 'lm
 chk = [
     "the FPC ribbon goes over the MAX31865 (about 23.5 mm, 1 mm under the 25 mm limit);",
     "PT100 wires leave at the front above J7 / J3 / J4, at about 14 mm;",
-    "Dupont housings need about 9 mm in front of J2 / J7 (cable slot in the front wall);",
+    "Dupont housings end at the front wall (the board has a 40 x 6 tab there); cable slot in the wall;",
     "M2 holes and pin-1 orientation of the FPC board; pin order of J5, J6 and J7.",
 ]
 for i, t in enumerate(chk):
