@@ -337,5 +337,5 @@ text(1560, 874, "MAX31865 (3 sockets): 22.6 mm, margin 2.4 mm", 18, (20, 110, 60
 text(1560, 910, "Electrolytic C1 and polyfuse F1: about 15 mm", 18, (60, 60, 66))
 
 im = im.resize((W, H), Image.LANCZOS)
-im.save(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'images', 'enclosure_3d.png'))
+im.save(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'images', 'enclosure.png'))
 print('ok')
