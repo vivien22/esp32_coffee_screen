@@ -52,8 +52,8 @@ for i, (lab, col) in enumerate(j7a):
     pin(60 + i * 88, 382, lab, col, 14)
 for i, (lab, col) in enumerate(j7b):
     pin(60 + i * 88, 430, lab, col, 14)
-T(620, 404, "row A: 2-pin button + 4-pin spare (5 V, IN, OUT, GND)", F(14), GRY, 'lm')
-T(620, 452, "row B: 4-pin encoder: follow your module", F(14), GRY, 'lm')
+T(620, 404, "row A: 2-pin + 4-pin spare", F(14), GRY, 'lm')
+T(620, 452, "row B: 4-pin encoder", F(14), GRY, 'lm')
 
 # ---- J8 / J9
 head(60, 490, "J8: pump dimmer (I2C)", "RobotDyn 4 A, DimmerLink")
