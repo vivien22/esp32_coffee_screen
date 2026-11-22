@@ -60,7 +60,7 @@ T(620, 452, "row B: 4-pin encoder", F(14), GRY, 'lm')
 
 # ---- J8 / J9
 head(60, 490, "J8: pump dimmer (I2C)", "RobotDyn 4 A, DimmerLink")
-for i, (lab, col) in enumerate([("3V3", RED), ("GND", DK), ("SDA", VIO), ("SCL", VIO)]):
+for i, (lab, col) in enumerate([("+5 V", RED), ("GND", DK), ("SDA", VIO), ("SCL", VIO)]):
     pin(60 + i * 88, 548, lab, col, 14)
 head(480, 490, "J9: pressure sensor", "0.5 to 4.5 V, 0 to 12 bar")
 for i, (lab, col) in enumerate([("+5 V", RED), ("GND", DK), ("signal", BLU)]):
@@ -75,16 +75,16 @@ for k, (name, x) in enumerate([("J3  flow In", 60), ("J4  flow Out", 480)]):
 
 # ---- J5
 head(60, 790, "J5: 2 x 4 socket for your FPC adapter board (8 pins)", "your board's numbering: top row 1, 3, 5, 7; bottom row 2, 4, 6, 8")
-fpc_top = [("1", "GND"), ("3", "SCL"), ("5", "DC"), ("7", "RST")]
-fpc_bot = [("2", "3V3"), ("4", "SDA"), ("6", "CS"), ("8", "BL")]
+fpc_top = [("1", "BLK"), ("3", "DC"), ("5", "SDA"), ("7", "VCC")]
+fpc_bot = [("2", "CS"), ("4", "RES"), ("6", "SCL"), ("8", "GND")]
 for i, (n, sg) in enumerate(fpc_top):
     pin(60 + i * 96, 850, "%s  %s" % (n, sg), (60, 110, 170), 14, 90)
 for i, (n, sg) in enumerate(fpc_bot):
     pin(60 + i * 96, 900, "%s  %s" % (n, sg), (60, 110, 170), 14, 90)
-T(60, 966, "Provisional assignment (typical 8-pin GC9A01): the exact order comes from your display datasheet.", F(14), RED, 'lm')
+T(60, 966, "Display module order BLK, CS, DC, RES, SDA, SCL, VCC, GND (photo); straight ribbon assumed.", F(14), RED, 'lm')
 
 # ---- J6
-head(60, 1000, "J6: 1 x 8 socket for the MAX31865 module", "Adafruit order; powered from 3.3 V; 3Vo and RDY unused")
+head(60, 1000, "J6: 1 x 8 socket for the MAX31865 module", "Adafruit order; powered from 5 V (own regulator); 3Vo and RDY unused")
 mx = [("VIN", RED), ("3Vo", LG), ("GND", DK), ("CLK", VIO), ("SDO", VIO), ("SDI", VIO), ("CS", VIO), ("RDY", LG)]
 for i, (lab, col) in enumerate(mx):
     pin(60 + i * 88, 1060, lab, col, 14)
@@ -92,13 +92,13 @@ for i, (lab, col) in enumerate(mx):
 # ================================================================ 2. GPIO table
 gx = 860
 T(gx, 118, "ESP32-S3: pins used", F(22, True), INK, 'lm')
-rows = [("5V", "+5 V (after diode and fuse)", RED), ("3V3", "powers MAX31865, display, dimmer", RED),
+rows = [("5V", "+5 V (after diode and fuse): MAX, dimmer", RED), ("3V3", "display, I2C pull-ups (3.3 V side)", RED),
         ("GPIO 17", "pump SSR drive", BRN), ("GPIO 18", "boiler SSR drive", ORG), ("GPIO 21", "valve SSR drive", YEL),
         ("GPIO 15", "flow In", BLU), ("GPIO 16", "flow Out", BLU), ("GPIO 1", "pressure sensor (ADC)", BLU),
         ("GPIO 4 / 5", "encoder A / B", GRN), ("GPIO 6", "start button", (90, 90, 96)),
         ("GPIO 47 / 48", "dimmer I2C: SDA / SCL", VIO),
         ("GPIO 11 / 12 / 13", "SPI: MOSI / SCK / MISO", VIO), ("GPIO 10", "display CS", VIO), ("GPIO 9 / 8", "display DC / RST", VIO),
-        ("GPIO 14", "display backlight (transistor)", VIO), ("GPIO 7", "MAX31865 CS", VIO), ("GPIO 38", "spare input on J7 (5 V divider)", (150, 150, 156)), ("GPIO 39", "spare output on J7 (to 5 V, inverting)", (150, 150, 156))]
+        ("GPIO 14", "display BLK (direct, Q4 optional)", VIO), ("GPIO 7", "MAX31865 CS", VIO), ("GPIO 38", "spare input on J7 (5 V divider)", (150, 150, 156)), ("GPIO 39", "spare output on J7 (to 5 V, inverting)", (150, 150, 156))]
 for i, (a, b, col) in enumerate(rows):
     y = 150 + i * 34
     RR(gx, y, gx + 180, y + 28, 5, fill=col, outline=(20, 20, 24), width=1)
@@ -127,8 +127,8 @@ def chain(x, y, title, src, res, end, shunts, col):
 cy = 850
 chain(gx, cy, "Encoder A, B, button, spare IN 38 (x4): 5 V to 3.3 V", "module out", "4.7 k", "GPIO", [(270, "10 k")], GRN)
 chain(gx, cy + 120, "Pressure input: 4.5 V to 3.0 V", "sensor", "10 k", "GPIO 1", [(250, "20 k"), (320, "100 nF")], BLU)
-T(gx, cy + 262, "Dimmer I2C pull-ups: 4.7 k from SDA (GPIO 47) and from SCL (GPIO 48) to 3V3", F(14, True), VIO, 'lm')
-T(gx, cy + 286, "(100 kHz, cable under 30 cm; the module is shipped in UART mode: switch it to I2C once)", F(13), GRY, 'lm')
+T(gx, cy + 262, "Dimmer I2C (5 V module): 2 x 2N7000 level shifter, 10 k pull-ups to 3V3 and to +5 V", F(14, True), VIO, 'lm')
+T(gx, cy + 286, "(SDA = GPIO 47, SCL = GPIO 48, 100 kHz; the module ships in UART mode: switch it to I2C once)", F(13), GRY, 'lm')
 
 # ================================================================ 3. circuits
 cx0 = 1370
@@ -203,8 +203,8 @@ T(cx0 + 20, 1310, "GPIO high -> OUT low; GPIO low -> OUT 5 V (invert in firmware
 T(60, 1140, "Design notes", F(22, True), INK, 'lm')
 notes = [
     "The three voltage levels: +5 V board (after fuse and diode), 3.3 V from the ESP32-S3 board, common GND.",
-    "The display backlight is driven by a transistor on GPIO 14 (the current exceeds what a pin can supply).",
-    "No regulator on the board: the ESP32-S3 provides the 3.3 V (check it can supply the MAX31865, display and dimmer).",
+    "The display module has its own backlight transistor: BLK is driven directly by GPIO 14 (stage Q4 optional).",
+    "No regulator on the board: the ESP32-S3 provides the 3.3 V, which now only feeds the display and the I2C pull-ups.",
     "The pump dimmer stays off the board on the mains side: only its 4-wire I2C cable comes to J8.",
     "All parts are through-hole (TO-92, axial resistors, radial capacitors, DO-41): ordinary soldering iron.",
     "On the board: a ground plane, no copper under the ESP32 antenna, 4 mounting holes (45 x 50 mm).",

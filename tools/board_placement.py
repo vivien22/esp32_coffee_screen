@@ -187,7 +187,7 @@ for c_, lab in enumerate(["BT", "GND", "5V", "IN", "OUT", "GND"]):
 for c_, lab in enumerate(["5V", "GND", "A", "B"]):
     text(d, X(22.4 + c_ * 2.54), Y(63.54) + 1.9 * K, lab, 7, SILK, True)
 # J8: 1 x 4 vertical header, dimmer (I2C), in the corridor between the FPC board and the MAX31865; J9: 1 x 3, pressure sensor
-for i, lab in enumerate(["3V3", "GND", "SDA", "SCL"]):
+for i, lab in enumerate(["5V", "GND", "SDA", "SCL"]):
     tpad(27.2, 31.0 + i * 2.54, square=(i == 0), ring=1.7, drill=1.0)
     text(d, X(28.6), Y(31.0 + i * 2.54), lab, 7, SILK, True, 'lm')
 rect(d, X(27.2) - 1.4 * K, Y(31.0) - 1.4 * K, X(27.2) + 1.4 * K, Y(31.0 + 3 * 2.54) + 1.4 * K, outline=SILK + (255,), width=2)
@@ -276,9 +276,10 @@ comp = [
     "J5  2 x 4 socket: FPC adapter board",
     "J7  right-angle 2 x 6 header: button, encoder (5 V), 4 spare I/O pins",
     "J8  1 x 4: pump dimmer (I2C)  ·  J9  1 x 3: pressure sensor",
-    "Q1 to Q3  SSR drive ; Q4  backlight (2N2222A)",
+    "Q1 to Q3  SSR drive ; Q4  backlight (optional)",
     "R1 to R4  1 kΩ  ·  R5 to R8  10 kΩ  ·  R9, R10, R17, R18  5 V input dividers",
     "Q5, R19 to R21  spare output stage (3.3 V to 5 V)",
+    "I2C level shifter: 2 x 2N7000 + 4 x 10 kΩ (to place at routing)",
     "R11 to R16  flow sensor inputs  ·  C3, C4  1 nF",
     "F1  1.1 A resettable fuse  ·  D1  1N5819",
     "C1  470 µF  ·  C2  100 nF",

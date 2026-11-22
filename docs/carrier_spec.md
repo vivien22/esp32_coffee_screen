@@ -26,7 +26,7 @@ All **through-hole** parts (no SMD soldering). Related files: `images/board_plac
 | J5 | 2 x 4 female socket | FPC adapter board (8 pins, ribbon to the remote display) |
 | J6 | 1 x 8 female socket (low, 3 mm) | MAX31865 module |
 | J7 | 2 x 6 right-angle male header | button + encoder (encoder powered from 5 V) + 4 spare I/O pins (+5 V, level-adapted input, level-adapted output, GND) |
-| J8 | 1 x 4 header | RobotDyn 4 A pump dimmer, **I2C** (powered from 3.3 V) |
+| J8 | 1 x 4 header | RobotDyn 4 A pump dimmer, **I2C** (powered from 5 V, through an I2C level shifter) |
 | J9 | 1 x 3 header | pressure sensor 0.5 to 4.5 V, 0 to 12 bar (powered from 5 V) |
 | ESP | 2 x 1 x 20 female sockets | ESP32-S3 board (about 22 x 54 mm from the photo; row spacing to be measured) |
 
@@ -58,15 +58,15 @@ The ESP32-S3 only accepts 3.3 V. Since the encoder module is powered from 5 V, i
 ### J8 (pump dimmer, 1 x 4, in the module's order)
 | 1 | 2 | 3 | 4 |
 |---|---|---|---|
-| VCC (3.3 V) | GND | SDA | SCL |
+| VCC (+5 V) | GND | SDA | SCL |
 
-RobotDyn "4 A Dimmer, DimmerLink UART / I2C interface" module (53 x 16 mm): no zero-cross pin and no PWM, everything goes through the bus. Reference code and documentation: https://github.com/robotdyn-dimmer/DimmerLink. Powered from 3.3 V (the module accepts 1.8 / 3.3 / 5 V and its logic follows VCC, so no level converter); 100 nF decoupling near the module. **Selected mode: I2C**, GPIO 47 = SDA, GPIO 48 = SCL (**provisional**).
+RobotDyn "4 A Dimmer, DimmerLink UART / I2C interface" module (53 x 16 mm): no zero-cross pin and no PWM, everything goes through the bus. Reference code and documentation: https://github.com/robotdyn-dimmer/DimmerLink. Powered from **+5 V**. The module accepts 1.8 / 3.3 / 5 V but its logic levels follow VCC: at 5 V it expects roughly 3.5 V for a high and may drive its lines up to 5 V, which the ESP32-S3 does not tolerate. SDA and SCL therefore go through a **bidirectional level shifter**, one 2N7000 per line (gate on +3.3 V, source on the ESP32 side with a 10 kΩ pull-up to +3.3 V, drain on the module side with a 10 kΩ pull-up to +5 V). 100 nF decoupling near the module. *Simpler alternative:* keep VCC at 3.3 V and drop the shifter. **Selected mode: I2C**, GPIO 47 = SDA, GPIO 48 = SCL (**provisional**).
 
 **Important: the module ships in UART mode.** It must be switched to I2C once, by sending the UART frame `02 5B` (SWITCH_I2C) to it; the same two pins are then SDA / SCL. Plan a one-time switch (temporary UART sketch on GPIO 47 / 48, or a USB-serial adapter on J8) before using I2C. Going back to UART is done by writing `0x03` to the COMMAND register.
 
 I2C summary (from the DimmerLink documentation, version 1.0):
 - Address **0x50** (7-bit), changeable through register 0x30 (0x08 to 0x77, saved to EEPROM). Speed **100 kHz**.
-- Pull-ups: **4.7 kΩ to 3.3 V on SDA and SCL** (the ESP32 internal ones are too weak): fit them on the board (R-SDA, R-SCL). Keep the cable under 30 cm.
+- Pull-ups: 10 kΩ on each side of the level shifter (+3.3 V side and +5 V side), four resistors in total; the ESP32 internal ones are too weak. If the module has its own pull-ups, measure to which voltage. Keep the cable under 30 cm.
 - Registers: 0x00 STATUS (bit 0 ready, bit 1 error), 0x01 COMMAND (1 reset, 2 recalibrate, 3 switch to UART), 0x02 ERROR, 0x03 VERSION, **0x10 DIM0_LEVEL (0 to 100 %, read/write)**, 0x11 DIM0_CURVE (0 linear, 1 RMS, 2 log), 0x20 AC_FREQ (50 or 60), 0x21 / 0x22 AC_PERIOD (µs, half-wave), 0x23 CALIBRATION (1 = done).
 - Resolution is 1 % steps, and mains frequency is detected automatically. Use the linear curve for the pump.
 - Not stated in the documentation: power-on delay, EEPROM write time, maximum load, mains isolation. Wait a few hundred ms after power-up and poll STATUS bit 0 (ready) before the first write.
@@ -88,10 +88,20 @@ G1/4 sensor, 0 to 12 bar, 0.5 to 4.5 V output. The signal goes through a divider
 1 = +5 V, 2 = signal, 3 = GND. The exact order comes from the sensor cable (often red / yellow / black).
 
 ### J5 (FPC adapter board, your numbering: top row 1 3 5 7, bottom row 2 4 6 8)
-**Provisional** assignment (typical 8-pin GC9A01): 1 GND, 2 3V3, 3 SCL (GPIO 12), 4 SDA (GPIO 11), 5 DC (GPIO 9), 6 CS (GPIO 10), 7 RST (GPIO 8), 8 BL (GPIO 14 through a transistor). **To confirm with the display datasheet.** The display is powered from 3.3 V.
+Read on the photo of the display module (1.28" round TFT V1.0, GC9A01, 240 x 240, active diameter 32.4 mm): its 8-pin FPC connector J1 is silkscreened, from left to right, **BLK, CS, DC, RES, SDA, SCL, VCC, GND**. Assuming a straight ribbon and an adapter that maps FPC pin n to header pin n:
+
+| | 1 | 3 | 5 | 7 |
+|---|---|---|---|---|
+| top row | BLK (GPIO 14) | DC (GPIO 9) | SDA = MOSI (GPIO 11) | VCC (+3.3 V) |
+
+| | 2 | 4 | 6 | 8 |
+|---|---|---|---|---|
+| bottom row | CS (GPIO 10) | RES (GPIO 8) | SCL = SCK (GPIO 12) | GND |
+
+SDA and SCL are the SPI data and clock (write-only, the display has no MISO); the display shares the SPI bus with the MAX31865 (own chip select). The module carries its own backlight transistor and resistors (Q2, R1 to R3 on the photo), so **BLK is driven directly from GPIO 14**: the 2N2222A stage Q4 and its two resistors become **optional**, to be fitted only if the module's schematic shows that BLK drives the LED directly. Because the display is on a flat ribbon, 33 Ω series resistors on SCL and SDA near the carrier are advised (damping). The display is powered from 3.3 V.
 
 ### J6 (MAX31865 module)
-VIN (3.3 V), 3Vo (unused), GND, CLK (GPIO 12), SDO (GPIO 13), SDI (GPIO 11), CS (GPIO 7), RDY (unused). This is the Adafruit order (VIN, 3Vo, GND, CLK, SDO, SDI, CS, RDY).
+VIN (**+5 V**: the Adafruit board has its own 3.3 V regulator), 3Vo (unused), GND, CLK (GPIO 12), SDO (GPIO 13), SDI (GPIO 11), CS (GPIO 7), RDY (unused). This is the Adafruit order (VIN, 3Vo, GND, CLK, SDO, SDI, CS, RDY). **To measure before routing:** with VIN at 5 V, check the high level of SDO; if it is 5 V (not 3.3 V), put the same 4.7 kΩ / 10 kΩ divider on GPIO 13 (a divider on a 3.3 V output would give only 2.2 V, too low).
 
 ## ESP32-S3 board (read on the photo)
 Silkscreen read on the photo, left column from the USB-C end: GND, 5V, G48, BOOT, 48, 47, 38, 39, 40, 21, GND, 18, 17, 16, 15, 41, 42, 45, 46. Right column: GND, 3V3, PWR, RST, 14, 13, 12, 11, 10, 09, 08, 07, GND, 06, 05, 04, 03, 02, 01. Every GPIO used in this design (1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 21, 38, 39, 47, 48) is broken out on this board, and the strapping pins to avoid (0 = BOOT, 3, 45, 46) are the ones marked. Still free: 2 (right), 40, 41, 42 (left). To confirm by you: exact board size (the photo suggests about 22 x 54 mm plus about 1.5 mm of USB-C overhang), pin count per side (about 20), and row spacing.
@@ -103,7 +113,7 @@ Silkscreen read on the photo, left column from the USB-C end: GND, 5V, G48, BOOT
 - **Power:** J2 A1 (+5 V) → 1.1 A resettable fuse → 1N5819 diode (reverse protection) → +5 V rail (470 µF + 100 nF) → ESP32 5V pin. The 3.3 V comes from the ESP32 board.
 - **SSR (x3):** GPIO → 1 kΩ → 2N2222A base; 10 kΩ base → GND; SSR "+" input to the +5 V rail, "−" input to the collector; emitter to GND. The SSR input receives about 4.8 V.
 - **Flow sensor (x2):** signal → 10 kΩ to +5 V; signal → 4.7 kΩ → GPIO; GPIO → 10 kΩ → GND; 1 nF GPIO → GND. Works with a 5 V output (the divider gives about 3.4 V) or with an open collector.
-- **Display backlight:** GPIO 14 → 1 kΩ → 2N2222A base; the backlight current flows through the collector (adapt to the display).
+- **Display backlight:** BLK ← GPIO 14 directly (the display module has its own transistor). Optional stage Q4: GPIO 14 → 1 kΩ → 2N2222A base, not fitted by default.
 - **Encoder / button:** see "5 V inputs protection"; 100 nF against bounce.
 
 ## Bill of materials (through-hole)
@@ -115,7 +125,8 @@ Silkscreen read on the photo, left column from the USB-C end: GND, 5V, G48, BOOT
 | 1 | 8-pin FPC board (owned) + 2 x 4 male header + 2 x 4 female socket | 0.5 € |
 | 1 | right-angle 2 x 4 + right-angle 2 x 6 male headers, 1 x 4 and 1 x 3 male headers | 0.8 € |
 | 2 | JST XH 3-pin headers | 0.5 € |
-| 5 | 2N2222A transistors (3 SSRs + backlight + spare output) | 0.7 € |
+| 4 | 2N2222A transistors (3 SSRs + spare output; backlight stage optional) | 0.6 € |
+| 2 | 2N7000 MOSFETs (I2C level shifter) | 0.3 € |
 | ~20 | axial resistors (1 kΩ, 10 kΩ, 4.7 kΩ, 20 kΩ; to be recounted at routing) | 1 € |
 | 1 | 1.1 A resettable fuse (radial) | 0.5 € |
 | 1 | 1N5819 diode | 0.2 € |
@@ -125,13 +136,15 @@ Silkscreen read on the photo, left column from the USB-C end: GND, 5V, G48, BOOT
 | 5 | bare boards, 58 x 68 mm + 42 x 7 mm tab, 2 layers (shipping included) | 10 to 20 € |
 
 ## Points to confirm before manufacturing
-1. Pin order, supply and backlight of your display ribbon (J5).
+1. Display ribbon (J5): the pinout of the module is known (BLK, CS, DC, RES, SDA, SCL, VCC, GND); still to confirm the ribbon type (straight or reversed contacts) and the adapter's FPC-pin-to-header mapping, and the backlight polarity of BLK.
 2. Pin order of your encoder, and whether it has pull-up resistors.
 3. Pin spacing (rows and pitch) and true width of your ESP32-S3 board.
 4. Dimensions of your FPC adapter board (about 22 x 26 mm estimated) and position of its mounting holes.
 5. Flow sensor output type (5 V or open collector): the planned circuit suits both.
 6. MAX31865 module (Adafruit, measured from the manufacturer's drawing): 25.4 x 27.9 mm, mounting holes 0.9" apart and 0.1" from the terminal-block edge, 1 x 8 header at 0.1" pitch on the short edge.
-7. Pump dimmer: one-time switch from UART to I2C (see J8); behaviour with the vibration pump to test; I2C pull-ups (4.7 kΩ) fitted on the board.
+7. Pump dimmer: one-time switch from UART to I2C (see J8); behaviour with the vibration pump to test; powered from 5 V through the 2N7000 I2C level shifter (or 3.3 V without it); pull-ups of the module, if any.
 8. Pressure sensor: confirm 3 wires (+5 V, GND, signal) and the G1/4 fitting on the hydraulic circuit.
 9. USB-C opening in the left wall (y 9 to 19 mm) and the USB cable bend outside the box.
 10. Display ribbon: length, thickness and pin-1 orientation of your FPC adapter board; the column x 7 to 18 mm in front of it must stay free of tall parts.
+10. MAX31865 at 5 V: high level of SDO (3.3 V or 5 V).
+11. Rotary knob (CJMCU-111): a library note says the push button can share the **Ga line through a 3 kΩ resistor** (pressing pulls Ga low through that resistor, which can be told apart from a rotation by an analog read of Ga). Confirm whether your module has a separate push pin (design assumption: yes, GPIO 6). If the push is on Ga, read Ga as an analog level: GPIO 4 is ADC-capable and the 4.7 kΩ / 10 kΩ divider keeps the information.
