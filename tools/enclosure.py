@@ -153,8 +153,13 @@ cuboid(ax0 + 17.5, ay0 + 3.1, top, 3.5, 3.5, HDR, (110, 110, 118))
 # J8 (dimmer, 1 x 4) and J9 (pressure, 1 x 3): straight headers in the corridor, plugs seated on top
 J8X, J8Y = CX0 + 27.2 - 1.27, CY0 + 31.0 - 1.27
 J9X, J9Y = CX0 + 27.2 - 1.27, CY0 + 42.0 - 1.27
-cuboid(J8X, J8Y, top, 2.54, 10.16, 2.5, BLACK); cuboid(J8X + 0.2, J8Y + 0.2, top + 2.5, 2.14, 9.76, 8.0, WHITE)
-cuboid(J9X, J9Y, top, 2.54, 7.62, 2.5, BLACK); cuboid(J9X + 0.2, J9Y + 0.2, top + 2.5, 2.14, 7.22, 8.0, WHITE)
+# (provisioned only: bare headers with their pins, nothing plugged in)
+cuboid(J8X, J8Y, top, 2.54, 10.16, 2.5, BLACK)
+cuboid(J9X, J9Y, top, 2.54, 7.62, 2.5, BLACK)
+for i in range(4):
+    cuboid(CX0 + 27.2 - 0.32, CY0 + 31.0 + i * 2.54 - 0.32, top + 2.5, 0.64, 0.64, 6.0, GOLD)
+for i in range(3):
+    cuboid(CX0 + 27.2 - 0.32, CY0 + 42.0 + i * 2.54 - 0.32, top + 2.5, 0.64, 0.64, 6.0, GOLD)
 # J2 (2 x 4 right-angle, rows stacked vertically) and four 2-pin housings plugged in from the front
 cuboid(CX0 + 12.2 - 1.27, CY0 + 60.2, top, 10.16, 5.0, 5.9, BLACK)
 for k in range(4):
@@ -226,14 +231,7 @@ xb, xe, xs = CX0 + 22.4 + 1.27, CX0 + 22.4 + 3.81, CX0 + 22.4 + 8.89
 run_x(xb, Y0, Y_END, top + 4.15, 2, (240, 240, 240)); cable("button", "J7", 2, (240, 240, 240), (xb, Y_END, top + 4.15))
 run_x(xe, Y0, Y_END, top + 1.55, 4, (40, 150, 70)); cable("encoder", "J7", 4, (40, 150, 70), (xe, Y_END, top + 1.55))
 run_x(xs, Y0, Y_END, top + 4.15, 4, (150, 90, 200)); cable("spare I/O", "J7", 4, (150, 90, 200), (xs, Y_END, top + 4.15))
-# J8 (4 wires) and J9 (3 wires): up from the plugs, then forward; J9 passes under J8 and over C1
-c8, c9 = (30, 170, 200), BLU
-riser_y(CX0 + 27.2, CY0 + 34.8, top + 10.5, top + 17.0, 4, c8)
-cuboid(CX0 + 26.2 - 3.0, CY0 + 34.8 - 3.0, top + 17.0, 6.0, Y_END - (CY0 + 34.8 - 3.0), TH, c8)
-cable("pump dimmer (I2C)", "J8", 4, c8, (CX0 + 26.2, Y_END, top + 17.0))
-riser_y(CX0 + 27.2, CY0 + 44.5, top + 10.5, top + 14.2, 3, c9)
-cuboid(CX0 + 29.0 - 2.25, CY0 + 44.5 - 2.25, top + 14.2, 4.5, Y_END - (CY0 + 44.5 - 2.25), TH, c9)
-cable("pressure sensor", "J9", 3, c9, (CX0 + 29.0, Y_END, top + 14.2))
+# J8 (dimmer) and J9 (pressure sensor) are provisioned but not plugged: no cable here
 # JST XH: flow sensors (3 wires each), up from the plugs then forward
 c3, c4 = (20, 150, 150), (90, 80, 190)
 riser_x(CX0 + 40.5, CY0 + 65.0, top + 11.8, top + 14.0, 3, c3)
@@ -298,7 +296,7 @@ pl(ax0 + 11, ay0 + 22, top + HDR + 4.2, 330, 520, "FPC connector pre-soldered")
 pl(sx0, sy0 + 50, FLOOR + 3, 330, 640, "3 mm small posts (45 x 50)")
 pl(BX - WALL - 4, BY - WALL - 4, BASE_H, 1560, 520, "8 mm round corner posts")
 pl(CX0 + 30, BY, FW, 1560, 640, "slot to cut in the front wall (cables)")
-pl(CX0 + 27.2, CY0 + 40, top + 11, 330, 740, "J8 dimmer and J9 pressure (corridor)")
+pl(CX0 + 27.2, CY0 + 40, top + 8.5, 330, 740, "J8, J9: provisioned, not plugged")
 
 # numbered tags at the cable ends, staggered so that they do not overlap
 ends = []
