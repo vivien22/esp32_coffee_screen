@@ -6,6 +6,9 @@ All **through-hole** parts (no SMD soldering). Related files: `images/carrier_pl
 - Board: **58 x 68 mm**, two layers, ground plane. Free area in the enclosure: 60 x 70 mm between the large posts.
 - 4 mounting holes on the **3 mm** small posts, **45 x 50 mm** spacing.
 - Usable depth **25 mm**: posts 3 + board 1.6 = 4.6 mm; ESP32 on 8.5 mm sockets (USB-C at 17.9 mm); FPC adapter board on 8.5 mm sockets (17.7 mm); MAX31865 on low 3 mm sockets (22.6 mm, 2.4 mm margin).
+- **Cable sides:** all cables leave through the **front** (J2, J7, J3, J4, and the PT100 wires). The USB-C and the display ribbon are at the **back**.
+- **MAX31865 rotated 180 degrees and swapped with the FPC board:** the MAX31865 is at the bottom right (header on its rear edge, pin 1 VIN on the right; PT100 terminal block facing the front, wires at about 14 mm above J7 / J3 / J4). The FPC adapter board is at the top right, its FPC connector towards the back wall, with the flow-input resistors R11 to R16 and C3, C4 under it. Only the MAX terminal block needs the front: if it stayed at the top (even rotated), its wires would have to cross the FPC board, which is at 13.1 to 17.7 mm.
+- The display ribbon (flat, at about 15.5 mm) goes out through the **back wall**: a slot has to be cut in the wall (or the lid), next to the USB-C opening. If the display must also be reached from the front, the ribbon has to be routed around the enclosure.
 - No copper and no component under the ESP32 antenna (the end of the ESP32 board opposite the USB-C).
 
 ## Connectors
@@ -113,4 +116,4 @@ VIN (3.3 V), 3Vo (unused), GND, CLK (GPIO 12), SDO (GPIO 13), SDI (GPIO 11), CS 
 6. MAX31865 module (Adafruit, measured from the manufacturer's drawing): 25.4 x 27.9 mm, mounting holes 0.9" apart and 0.1" from the terminal-block edge, 1 x 8 header at 0.1" pitch on the short edge.
 7. Pump dimmer: one-time switch from UART to I2C (see J8); behaviour with the vibration pump to test; I2C pull-ups (4.7 kΩ) fitted on the board.
 8. Pressure sensor: confirm 3 wires (+5 V, GND, signal) and the G1/4 fitting on the hydraulic circuit.
-9. One mounting hole (top right) passes under the MAX31865: flat-head screw, 1.5 mm high at most, under the module's 3 mm.
+9. Slot for the display ribbon in the back wall or lid; orientation of pin 1 on your FPC adapter board (the board is mounted rotated 180 degrees compared to the previous layout).

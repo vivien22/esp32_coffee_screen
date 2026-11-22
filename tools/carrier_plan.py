@@ -120,32 +120,33 @@ for k in range(0, 14):
     line(d, [(X(3.6), Y(49 + k)), (X(19.4), Y(49 + k - 6))], (170, 30, 30, 160), 1)
 rect(d, X(3.6), Y(49.0), X(19.4), Y(55), outline=(210, 50, 50, 255), width=2)
 
-# ---------------------------------------------------------------- U2: MAX31865 module socket (1x8) along the left edge of the module
+# ---------------------------------------------------------------- U2: MAX31865 module socket (1x8), module rotated 180 degrees:
+# header on the rear edge of the module (pin 1 VIN on the right), PT100 terminal block facing the front
 for i in range(8):
-    tpad(32.8 + i * 2.54, 27.1, square=(i == 0), ring=1.7, drill=1.0)
-rect(d, X(32.8) - 1.27 * K, Y(27.1) - 1.27 * K, X(32.8 + 7 * 2.54) + 1.27 * K, Y(27.1) + 1.27 * K, outline=(20, 20, 24, 255), width=2)
-silk(41.7, 25.0, "U2  MAX31865 (1x8)", 11)
+    tpad(32.8 + i * 2.54, 31.6, square=(i == 7), ring=1.7, drill=1.0)
+rect(d, X(32.8) - 1.27 * K, Y(31.6) - 1.27 * K, X(32.8 + 7 * 2.54) + 1.27 * K, Y(31.6) + 1.27 * K, outline=(20, 20, 24, 255), width=2)
+silk(41.7, 29.9, "U2  MAX31865 (1x8, pin 1 VIN on the right)", 10)
 
-# ---------------------------------------------------------------- J5: socket 2 x 4 for the FPC adapter
+# ---------------------------------------------------------------- J5: socket 2 x 4 for the FPC adapter (board at the top right, connector towards the back wall)
 for r_ in range(2):
     for c_ in range(4):
-        tpad(35.5 + c_ * 2.54, 36.0 + r_ * 2.54, square=(r_ == 0 and c_ == 0), ring=1.7, drill=1.0)
-rect(d, X(35.5) - 1.5 * K, Y(36.0) - 1.5 * K, X(35.5 + 3 * 2.54) + 1.5 * K, Y(38.54) + 1.5 * K, outline=SILK + (255,), width=2)
-silk(40.6, 34.4, "J5  FPC board (2 x 4)", 11)
+        tpad(35.5 + c_ * 2.54, 20.0 + r_ * 2.54, square=(r_ == 1 and c_ == 3), ring=1.7, drill=1.0)
+rect(d, X(35.5) - 1.5 * K, Y(20.0) - 1.5 * K, X(35.5 + 3 * 2.54) + 1.5 * K, Y(22.54) + 1.5 * K, outline=SILK + (255,), width=2)
+silk(41.0, 18.3, "J5  FPC board (2 x 4)", 10)
 # two M2 holes for the standoffs of the FPC adapter (positions to be taken from your board)
-for (cx, cy) in [(31.0, 33.5), (49.0, 33.5)]:
+for (cx, cy) in [(31.0, 25.4), (49.0, 25.4)]:
     hole(cx, cy, 2.2, 4.2)
-silk(40, 31.7, "2 x M2 (position to measure)", 9)
+silk(40, 25.9, "2 x M2 (to measure)", 9)
 
-# flow input conditioning under the adapter: R11..R16 + C3, C4
+# flow input conditioning under the adapter: R11..R16 (two columns of three, pitch 7.62) + C3, C4
 for i, name in enumerate(["R11", "R12", "R13", "R14", "R15", "R16"]):
-    axial(36.5, 42.5 + i * 2.7, pitch=10.16, label=None)
-    text(d, X(42.5), Y(42.5 + i * 2.7), name, 9, SILK, True, 'lm')
-for cx, name in [(48.2, "C3"), (48.2, "C4")]:
-    pass
+    cx_ = 34.3 if i < 3 else 44.9
+    cy_ = 11.6 + (i % 3) * 2.6
+    axial(cx_, cy_, pitch=7.62, label=None)
+    text(d, X(cx_ + 4.6), Y(cy_), name, 8, SILK, True, 'lm') if False else text(d, X(cx_), Y(cy_) - 1.6 * K, name, 8, SILK, True)
 for i, name in enumerate(["C3", "C4"]):
-    tpad(47.5, 43.0 + i * 3.0, ring=1.6, drill=0.8); tpad(49.5, 43.0 + i * 3.0, ring=1.6, drill=0.8)
-    text(d, X(51.0), Y(43.0 + i * 3.0), name, 9, SILK, True, 'lm')
+    tpad(52.4, 15.0 + i * 3.0, ring=1.6, drill=0.8); tpad(54.4, 15.0 + i * 3.0, ring=1.6, drill=0.8)
+    text(d, X(56.0), Y(15.0 + i * 3.0), name, 8, SILK, True, 'lm')
 
 # ---------------------------------------------------------------- front strip: J2 (2x4), J7 (1x6), polyfuse, diode, electrolytic, XH x2
 # J2: 2 x 4 right-angle header, SSR + power
@@ -200,17 +201,17 @@ rect(o, px(X(7.5)) / SS, px(Y(1.7)) / SS, px(X(15.5)) / SS, px(Y(7.0)) / SS, fil
 text(o, X(11.5), Y(10.2), "ESP32-S3   21 x 52  (at 8.5 mm)", 11, (60, 60, 70), True)
 text(o, X(11.5), Y(51.8), "antenna zone: nothing underneath", 10, (150, 30, 30), True)
 text(o, X(11.5), Y(4.5), "USB-C", 10, (60, 60, 70), True)
-# MAX31865 module 25 x 28 at x 29..54, y 2..30
-rrect(o, px(X(29.0)) / SS, px(Y(2.0)) / SS, px(X(54.4)) / SS, px(Y(29.9)) / SS, 6, fill=(20, 80, 170, 150), outline=(150, 190, 250, 255), width=3)
-rect(o, px(X(33.3)) / SS, px(Y(2.4)) / SS, px(X(50.5)) / SS, px(Y(9.5)) / SS, fill=(46, 104, 180, 220), outline=(180, 210, 250, 255), width=2)
-text(o, X(41.7), Y(14.5), "MAX31865", 15, (235, 240, 255), True)
-text(o, X(41.7), Y(17.0), "25.4 x 27.9, height 15", 11, (220, 232, 255))
-text(o, X(41.9), Y(6.0), "PT100 terminal", 10, (235, 240, 255), True)
-# FPC adapter board ~22 x 28 at x 29..51, y 32..60
-rrect(o, px(X(29.0)) / SS, px(Y(30.4)) / SS, px(X(51.0)) / SS, px(Y(56.9)) / SS, 6, fill=(22, 150, 80, 130), outline=(150, 240, 190, 255), width=3)
-rect(o, px(X(35.0)) / SS, px(Y(49.0)) / SS, px(X(45.0)) / SS, px(Y(54.5)) / SS, fill=(236, 236, 228, 230), outline=(120, 120, 110, 255), width=2)
-text(o, X(40.0), Y(51.8), "FPC connector", 10, (50, 50, 44), True)
-text(o, X(40.0), Y(47.0), "FPC board ~22 x 26 (at 8.5 mm)", 10, (230, 255, 240), True)
+# MAX31865 module 25.4 x 27.9 at x 29..54.4, y 28.8..56.7, rotated 180 degrees (terminal block at the front)
+rrect(o, px(X(29.0)) / SS, px(Y(28.8)) / SS, px(X(54.4)) / SS, px(Y(56.7)) / SS, 6, fill=(20, 80, 170, 150), outline=(150, 190, 250, 255), width=3)
+rect(o, px(X(33.3)) / SS, px(Y(49.2)) / SS, px(X(50.5)) / SS, px(Y(56.3)) / SS, fill=(46, 104, 180, 220), outline=(180, 210, 250, 255), width=2)
+text(o, X(41.7), Y(40.0), "MAX31865", 15, (235, 240, 255), True)
+text(o, X(41.7), Y(42.6), "25.4 x 27.9, height 15", 11, (220, 232, 255))
+text(o, X(41.9), Y(52.7), "PT100 terminal (wires exit to the front)", 10, (235, 240, 255), True)
+# FPC adapter board ~22 x 26.5 at x 29..51, y 2..28.5 (connector towards the back wall)
+rrect(o, px(X(29.0)) / SS, px(Y(2.0)) / SS, px(X(51.0)) / SS, px(Y(28.5)) / SS, 6, fill=(22, 150, 80, 130), outline=(150, 240, 190, 255), width=3)
+rect(o, px(X(35.0)) / SS, px(Y(2.4)) / SS, px(X(45.0)) / SS, px(Y(7.9)) / SS, fill=(236, 236, 228, 230), outline=(120, 120, 110, 255), width=2)
+text(o, X(40.0), Y(5.2), "FPC connector (ribbon to the back)", 9, (50, 50, 44), True)
+text(o, X(40.0), Y(8.6), "FPC board ~22 x 26 (at 8.5 mm)", 10, (230, 255, 240), True)
 base = Image.alpha_composite(base, ov)
 d = ImageDraw.Draw(base)
 
@@ -276,9 +277,9 @@ for i, t in enumerate(hs):
 
 text(d, lx, 1060, "Points to check on your board:", 18, (190, 40, 40), True, 'lm')
 chk = [
-    "one mounting hole (top right) passes under the MAX31865: flat-head screw,",
-    "1.5 mm high at most, under the module's 3 mm;",
-    "positions of the 2 M2 holes of the FPC board; pin order of J5, J6 and J7.",
+    "the FPC ribbon leaves through the back wall (slot to cut), next to the USB-C opening;",
+    "PT100 wires leave at the front above J7 / J3 / J4, at about 14 mm;",
+    "M2 holes and pin-1 orientation of the FPC board; pin order of J5, J6 and J7.",
 ]
 for i, t in enumerate(chk):
     text(d, lx, 1092 + i * 26, t, 15, INK, False, 'lm')
