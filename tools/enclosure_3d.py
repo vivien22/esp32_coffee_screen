@@ -88,8 +88,8 @@ PCB_Z = FLOOR + 3.0                   # on the four small standoffs of 3 mm
 PCBT = 1.6
 top = PCB_Z + PCBT
 items = []
-def add(x, y, z, w, dp, h, color):
-    items.append(((x + w / 2) + (y + dp / 2) + z * 0.001, lambda x=x, y=y, z=z, w=w, dp=dp, h=h, color=color: cuboid(x, y, z, w, dp, h, color)))
+def add(x, y, z, w, dp, h, color, bias=0.0):
+    items.append(((x + w) + (y + dp) + (z + h) + bias, lambda x=x, y=y, z=z, w=w, dp=dp, h=h, color=color: cuboid(x, y, z, w, dp, h, color)))
 
 # the standoffs (3 mm), 45 x 50 apart, then the carrier slab itself: they are under it, it is under everything else
 sx0 = CX0 + (58 - 45) / 2
@@ -107,21 +107,21 @@ WHITE = (238, 236, 226)
 ex, ey = CX0 + 2.5, CY0 + 3
 add(CX0 + 3.1, CY0 + 5.11 - 1.2, top, 50.8, 2.4, 8.5, BLACK); add(CX0 + 3.1, CY0 + 22.89 - 1.2, top, 50.8, 2.4, 8.5, BLACK)
 add(ex, ey, top + 8.5, 54, 22, 1.6, (236, 236, 242))
-add(CX0 + 1.0, CY0 + 9.9, top + 8.5 + 1.6, 7.5, 8.2, 3.2, (190, 194, 200))        # USB-C
-add(CX0 + 22, CY0 + 9.5, top + 8.5 + 1.6, 9, 9, 1.0, BLACK)                        # the module (shield)
-add(CX0 + 48.5, CY0 + 6, top + 8.5 + 1.6, 7.5, 16, 0.8, (236, 226, 196))           # antenna
+add(CX0 + 1.0, CY0 + 9.9, top + 8.5 + 1.6, 7.5, 8.2, 3.2, (190, 194, 200), bias=6)        # USB-C
+add(CX0 + 22, CY0 + 9.5, top + 8.5 + 1.6, 9, 9, 1.0, BLACK, bias=6)                        # the module (shield)
+add(CX0 + 48.5, CY0 + 6, top + 8.5 + 1.6, 7.5, 16, 0.8, (236, 226, 196), bias=6)           # antenna
 # MAX31865 (25.4 x 27.9, 15 high) on low sockets of 3 mm, rotated 180 degrees: header at the rear, PT100 terminal at the front
 mx, my = CX0 + 31, CY0 + 27.5
 add(mx + 3.8, my + 1.4, top, 19.0, 2.5, 3.0, BLACK)
 add(mx, my, top + 3.0, 25.4, 27.9, 1.6, (130, 30, 40))                      # Adafruit board is red-purple
-add(mx + 4.2, my + 20.5, top + 3.0 + 1.6, 17.0, 7.0, 10.4, (46, 120, 190))  # PT100 terminal block (blue)
-add(mx + 9.4, my + 9.9, top + 3.0 + 1.6, 7, 7, 1.6, BLACK)                  # the MAX31865 chip
+add(mx + 4.2, my + 20.5, top + 3.0 + 1.6, 17.0, 7.0, 10.4, (46, 120, 190), bias=6)  # PT100 terminal block (blue)
+add(mx + 9.4, my + 9.9, top + 3.0 + 1.6, 7, 7, 1.6, BLACK, bias=6)                  # the MAX31865 chip
 # the FPC adapter board (~22 x 26.5) on a 2 x 4 header, at the left, FPC connector towards the front
 ax0, ay0 = CX0 + 1.5, CY0 + 27.5
 HDR = 8.5
 add(ax0 + 6.5, ay0 + 5.6, top, 10.2, 5.1, HDR, BLACK)                       # 2 x 4 header + socket
 add(ax0, ay0, top + HDR, 22, 26.5, 1.6, (22, 130, 70))
-add(ax0 + 6, ay0 + 19.0, top + HDR + 1.6, 10, 5.5, 2.6, WHITE)              # its FPC connector (front side)
+add(ax0 + 6, ay0 + 19.0, top + HDR + 1.6, 10, 5.5, 2.6, WHITE, bias=6)              # its FPC connector (front side)
 add(ax0 + 1.0, ay0 + 3.1, top, 3.5, 3.5, HDR, (110, 110, 118))              # standoffs under the mounting holes
 add(ax0 + 17.5, ay0 + 3.1, top, 3.5, 3.5, HDR, (110, 110, 118))
 
