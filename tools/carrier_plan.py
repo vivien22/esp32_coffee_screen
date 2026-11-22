@@ -4,7 +4,7 @@ import os
 from PIL import Image, ImageDraw, ImageFont
 
 SS = 2
-W, H = 1760, 1260
+W, H = 1760, 1340
 K = 12.5                      # px per mm
 base = Image.new('RGBA', (W * SS, H * SS), (244, 244, 240, 255))
 ov = Image.new('RGBA', (W * SS, H * SS), (0, 0, 0, 0))
@@ -16,7 +16,7 @@ def F(sz, b=False):
 def px(x): return x * SS
 
 # the PCB origin on the page and the conversion
-OX, OY = 150, 225
+OX, OY = 150, 262
 def X(mm): return OX + mm * K
 def Y(mm): return OY + mm * K
 
@@ -33,34 +33,33 @@ SILK = (240, 240, 232); PAD = (205, 205, 210); HOLE = (36, 36, 40)
 text(d, W / 2, 36, "Carrier board in the enclosure: to-scale placement (top view)", 30, INK, True)
 text(d, W / 2, 74, "Proposed component placement: track routing is done afterwards in a CAD tool. Enclosure base, lid removed.", 18, GRY)
 
-# ---------------------------------------------------------------- the box (interior 66 x 80, free area 60 x 70)
-INT_W, INT_L = 66.0, 80.0
-bx0, by0 = X(-4), Y(-6)
+# ---------------------------------------------------------------- the box (interior 60 x 85, posts 8 x 8 in the corners)
+INT_W, INT_L = 60.0, 85.0
+bx0, by0 = X(-1), Y(-8.5)
 bx1, by1 = bx0 + INT_W * K, by0 + INT_L * K
 rrect(d, bx0 - 3 * K, by0 - 3 * K, bx1 + 3 * K, by1 + 3 * K, 14, fill=(52, 52, 58, 255), outline=(30, 30, 34, 255), width=4)
 rect(d, bx0, by0, bx1, by1, fill=(74, 74, 82, 255))
 # the opening for the USB-C cable in the back wall (y = top)
 rect(d, X(5.5), by0 - 3 * K, X(18.5), by0, fill=(20, 20, 24, 255), outline=(230, 230, 235, 255), width=2)
 text(d, X(12), by0 - 1.5 * K, "USB-C opening", 12, (230, 230, 235), True)
-# the big posts (lid screws): they leave a plus-shaped usable area (58 x 68 across, plus 40 x 80 along the middle),
-# so each corner is blocked over 13 x 6 mm
-for (xa, xb, ya, yb) in [(-4, 9, -6, 0), (49, 62, -6, 0), (-4, 9, 68, 74), (49, 62, 68, 74)]:
-    rrect(d, X(xa), Y(ya), X(xb), Y(yb), 10, fill=(30, 30, 34, 255), outline=(120, 120, 128, 255), width=3)
+# the four big posts (lid screws): 8 x 8 mm in the corners of the interior. They leave a plus-shaped usable area:
+# 60 wide over 69 long, and 44 wide over the full 85 length.
+for (xa, xb, ya, yb) in [(-1, 7, -8.5, -0.5), (51, 59, -8.5, -0.5), (-1, 7, 68.5, 76.5), (51, 59, 68.5, 76.5)]:
+    rrect(d, X(xa), Y(ya), X(xb), Y(yb), 8, fill=(30, 30, 34, 255), outline=(120, 120, 128, 255), width=3)
     circ(d, (X(xa) + X(xb)) / 2, (Y(ya) + Y(yb)) / 2, 1.6 * K, fill=(70, 70, 78, 255))
-# plus-shaped free area: 58 x 68 plus the central 40 x 80
-cross = [(0, 0), (9, 0), (9, -6), (49, -6), (49, 0), (58, 0), (58, 68), (49, 68), (49, 74), (9, 74), (9, 68), (0, 68)]
+cross = [(-1, -0.5), (7, -0.5), (7, -8.5), (51, -8.5), (51, -0.5), (59, -0.5), (59, 68.5), (51, 68.5), (51, 76.5), (7, 76.5), (7, 68.5), (-1, 68.5)]
 line(d, [(X(a), Y(b)) for a, b in cross + [cross[0]]], (150, 200, 150), 2)
-text(d, X(29), Y(-3.0), "optional back extension (not used)", 10, (150, 220, 150), True)
+text(d, X(29), Y(-4.5), "back extension (not used)", 10, (150, 220, 150), True)
 
 # ---------------------------------------------------------------- the board 58 x 68
 PW, PL = 58.0, 68.0
 rrect(d, X(0) + 6, Y(0) + 8, X(PW) + 6, Y(PL) + 8, 12, fill=(0, 0, 0, 90))          # shadow
 rrect(d, X(0), Y(0), X(PW), Y(PL), 2.5 * K / 2.5, fill=MASK + (255,), outline=(8, 60, 36, 255), width=3)
 rect(d, X(0.8), Y(0.8), X(PW - 0.8), Y(PL - 0.8), outline=MASK2 + (255,), width=1)
-# front tab of the board (40 x 6) on the cable side, in the central extension
-rect(d, X(9) + 6, Y(PL) + 4, X(49) + 6, Y(74) + 8, fill=(0, 0, 0, 90))
-rect(d, X(9), Y(PL) - 5, X(49), Y(74), fill=MASK + (255,))
-line(d, [(X(9), Y(PL)), (X(9), Y(74)), (X(49), Y(74)), (X(49), Y(PL))], (8, 60, 36, 255), 3)
+# front tab of the board (42 x 7) on the cable side, in the central extension
+rect(d, X(8) + 6, Y(PL) + 4, X(50) + 6, Y(75) + 8, fill=(0, 0, 0, 90))
+rect(d, X(8), Y(PL) - 5, X(50), Y(75), fill=MASK + (255,))
+line(d, [(X(8), Y(PL)), (X(8), Y(75)), (X(50), Y(75)), (X(50), Y(PL))], (8, 60, 36, 255), 3)
 
 def hole(cx, cy, dia, ring):
     circ(d, X(cx), Y(cy), ring / 2 * K, fill=PAD + (255,), outline=(120, 120, 126, 255), width=1)
@@ -126,9 +125,9 @@ for i, name in enumerate(["R17", "R18", "R19", "R20", "R21"]):
     text(d, X(47.6), Y(35.5 + i * 2.7), name, 8, SILK, True, 'lm')
 
 # keep-out under the antenna
-for k in range(0, 14):
+for k in range(0, 12):
     line(d, [(X(3.6), Y(49 + k)), (X(19.4), Y(49 + k - 6))], (170, 30, 30, 160), 1)
-rect(d, X(3.6), Y(49.0), X(19.4), Y(55), outline=(210, 50, 50, 255), width=2)
+rect(d, X(3.6), Y(49.0), X(19.4), Y(57), outline=(210, 50, 50, 255), width=2)
 
 # ---------------------------------------------------------------- U2: MAX31865 module socket (1x8), module rotated 180 degrees:
 # header on the rear edge of the module (pin 1 VIN on the right), PT100 terminal block facing the front
@@ -214,10 +213,10 @@ silk(53.0, 66.6, "rev A", 9)
 
 # ---------------------------------------------------------------- the raised boards, translucent (they hide nothing)
 # ESP32-S3 board 21 x 52 at x 1..22, y 3..55
-rrect(o, px(X(1.0)) / SS, px(Y(3.0)) / SS, px(X(22.0)) / SS, px(Y(55.0)) / SS, 6, fill=(240, 240, 248, 120), outline=(240, 240, 248, 255), width=3)
+rrect(o, px(X(0.5)) / SS, px(Y(3.0)) / SS, px(X(22.5)) / SS, px(Y(57.0)) / SS, 6, fill=(240, 240, 248, 120), outline=(240, 240, 248, 255), width=3)
 rect(o, px(X(7.5)) / SS, px(Y(1.7)) / SS, px(X(15.5)) / SS, px(Y(7.0)) / SS, fill=(190, 194, 200, 200), outline=(120, 124, 130, 255), width=2)
-text(o, X(11.5), Y(10.2), "ESP32-S3   21 x 52  (at 8.5 mm)", 11, (60, 60, 70), True)
-text(o, X(11.5), Y(51.8), "antenna zone: nothing underneath", 10, (150, 30, 30), True)
+text(o, X(11.5), Y(10.2), "ESP32-S3   ~22 x 54  (at 8.5 mm)", 11, (60, 60, 70), True)
+text(o, X(11.5), Y(53.5), "antenna zone: nothing underneath", 10, (150, 30, 30), True)
 text(o, X(11.5), Y(4.5), "USB-C", 10, (60, 60, 70), True)
 # MAX31865 module 25.4 x 27.9 at x 29..54.4, y 28.8..56.7, rotated 180 degrees (terminal block at the front)
 rrect(o, px(X(29.0)) / SS, px(Y(28.8)) / SS, px(X(54.4)) / SS, px(Y(56.7)) / SS, 6, fill=(20, 80, 170, 150), outline=(150, 190, 250, 255), width=3)
@@ -243,7 +242,7 @@ def dim_v(x, y0, y1, label):
     for yy in (y0, y1):
         line(d, [(X(x) - 8, Y(yy)), (X(x) + 8, Y(yy))], (60, 60, 66), 2)
     d.text((px(X(x) - 14), px(Y((y0 + y1) / 2))), label, font=F(13, True), fill=(50, 50, 56), anchor='rm')
-dim_h(0, 58, 78.2, "58 mm (tab 40 x 6 at the front)")
+dim_h(0, 58, 82.6, "58 mm (tab 42 x 7 at the front)")
 dim_v(-7.2, 0, 68, "68 mm")
 
 # ---------------------------------------------------------------- legend, to the right
@@ -297,7 +296,7 @@ text(d, lx, 1060, "Points to check on your board:", 18, (190, 40, 40), True, 'lm
 chk = [
     "the FPC ribbon goes over the MAX31865 (about 23.5 mm, 1 mm under the 25 mm limit);",
     "PT100 wires leave at the front above J7 / J3 / J4, at about 14 mm;",
-    "Dupont housings end at the front wall (the board has a 40 x 6 tab there); cable slot in the wall;",
+    "Dupont housings end at the front wall (the board has a 42 x 7 tab there); cable slot in the wall;",
     "M2 holes and pin-1 orientation of the FPC board; pin order of J5, J6 and J7.",
 ]
 for i, t in enumerate(chk):

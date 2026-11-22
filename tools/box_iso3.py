@@ -43,7 +43,7 @@ def label(px, py, tx, ty, t, color=(30, 30, 36), size=17):
 
 # ---------------------------------------------------------------- dimensions (mm)
 WALL = 3.0
-INT_X, INT_Y = 66.0, 80.0           # interior: x across, y along (the long side)
+INT_X, INT_Y = 60.0, 85.0           # interior: x across, y along (the long side)
 BX, BY = INT_X + 2 * WALL, INT_Y + 2 * WALL
 BASE_H = 16.0                        # height of the base half (the walls)
 FLOOR = 2.0
@@ -59,17 +59,17 @@ poly([(0, 0, FLOOR), (BX, 0, FLOOR), (BX, BY, FLOOR), (0, BY, FLOOR)], shade(PLA
 poly([(WALL, WALL, FLOOR), (BX - WALL, WALL, FLOOR), (BX - WALL, WALL, BASE_H), (WALL, WALL, BASE_H)], shade(PLASTIC, 0.78), (20, 20, 24))
 poly([(WALL, WALL, FLOOR), (WALL, BY - WALL, FLOOR), (WALL, BY - WALL, BASE_H), (WALL, WALL, BASE_H)], shade(PLASTIC, 0.9), (20, 20, 24))
 # the opening for the USB-C cable in the back wall y = 0 (seen on its inner face)
-ux0 = WALL + 9.0
+ux0 = WALL + 8.0
 poly([(ux0, WALL, 7), (ux0 + 12, WALL, 7), (ux0 + 12, WALL, 15), (ux0, WALL, 15)], (14, 14, 18), (230, 230, 235), 2)
 # top of the back walls
 poly([(0, 0, BASE_H), (BX, 0, BASE_H), (BX - WALL, WALL, BASE_H), (WALL, WALL, BASE_H)], shade(PLASTIC, 1.25), (20, 20, 24))
 poly([(0, 0, BASE_H), (0, BY, BASE_H), (WALL, BY - WALL, BASE_H), (WALL, WALL, BASE_H)], shade(PLASTIC, 1.2), (20, 20, 24))
 # the big posts (plus-shaped usable area: each corner blocked over 13 x 6 mm); the back ones here, the front ones after the board
-for (px, py) in [(WALL, WALL), (BX - WALL - 13, WALL)]:
-    cuboid(px, py, FLOOR, 13, 6, BASE_H - FLOOR, (40, 40, 46))
+for (px, py) in [(WALL, WALL), (BX - WALL - 8, WALL)]:
+    cuboid(px, py, FLOOR, 8, 8, BASE_H - FLOOR, (40, 40, 46))
 
 # ---------------------------------------------------------------- the carrier and what it holds
-CX0, CY0 = WALL + 4.0, WALL + 6.0     # origin of the carrier (58 x 68)
+CX0, CY0 = WALL + 1.0, WALL + 8.5     # origin of the carrier (58 x 68)
 PCB_Z = FLOOR + 3.0                   # on the four small standoffs of 3 mm
 PCBT = 1.6
 top = PCB_Z + PCBT
@@ -83,7 +83,7 @@ sy0 = CY0 + (68 - 50) / 2
 for (ax, ay) in [(sx0, sy0), (sx0 + 45, sy0), (sx0, sy0 + 50), (sx0 + 45, sy0 + 50)]:
     cuboid(ax - 2.4, ay - 2.4, FLOOR, 4.8, 4.8, 3.0, (36, 36, 42))
 cuboid(CX0, CY0, PCB_Z, 58, 68, PCBT, (22, 110, 66))
-cuboid(CX0 + 9, CY0 + 68, PCB_Z, 40, 6, PCBT, (22, 110, 66))          # front tab (cable side)
+cuboid(CX0 + 8, CY0 + 68, PCB_Z, 42, 7, PCBT, (22, 110, 66))          # front tab (cable side)
 
 GOLD = (214, 178, 70)
 BLACK = (24, 24, 28)
@@ -92,7 +92,7 @@ WHITE = (238, 236, 226)
 # ESP32-S3 (21 x 52) on sockets of 8.5 mm, at the left; USB-C towards the back wall
 ex, ey = CX0 + 1, CY0 + 3
 add(ex, ey + 1, top, 2.4, 50, 8.5, BLACK); add(ex + 21 - 2.4, ey + 1, top, 2.4, 50, 8.5, BLACK)
-add(ex, ey, top + 8.5, 21, 52, 1.6, (236, 236, 242))
+add(ex - 0.5, ey, top + 8.5, 22, 54, 1.6, (236, 236, 242))
 add(ex + 5.5, ey - 1.3, top + 8.5 + 1.6, 10, 7.5, 3.2, (190, 194, 200))     # USB-C
 add(ex + 6, ey + 14, top + 8.5 + 1.6, 9, 9, 1.0, BLACK)                     # the module (shield)
 add(ex + 3, ey + 43, top + 8.5 + 1.6, 15, 8, 0.8, (236, 226, 196))          # antenna
@@ -138,8 +138,8 @@ for k in range(2):
 items.sort(key=lambda t: t[0])
 for _, fn in items:
     fn()
-for (px, py) in [(WALL, BY - WALL - 6), (BX - WALL - 13, BY - WALL - 6)]:
-    cuboid(px, py, FLOOR, 13, 6, BASE_H - FLOOR, (40, 40, 46))
+for (px, py) in [(WALL, BY - WALL - 8), (BX - WALL - 8, BY - WALL - 8)]:
+    cuboid(px, py, FLOOR, 8, 8, BASE_H - FLOOR, (40, 40, 46))
 
 # ---------------------------------------------------------------- the front walls of the base (cut low, to see inside)
 FW = 5.0

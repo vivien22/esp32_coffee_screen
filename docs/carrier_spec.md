@@ -3,9 +3,10 @@
 All **through-hole** parts (no SMD soldering). Related files: `images/carrier_plan.png` (to-scale placement), `images/box_iso3.png` (3D view), `images/carrier_schema.png` (connection schematic).
 
 ## Dimensions and mounting
-- Usable area in the enclosure (interior 66 x 80 mm), from your measurements: **58 x 68 mm** between the big posts, and in the middle **80 mm long over a 40 mm width** avoiding the posts. Together they form a plus-shaped area, so each corner is blocked over **13 x 6 mm** (the posts are drawn as these corner blocks; if they are round, send me their diameter and centres).
-- Board: **58 x 68 mm main body, plus a 40 x 6 mm tab on the cable (front) side** (x from 9 to 49), so the board is 74 mm long at the tab; two layers, ground plane. The tab lets the Dupont housings of J2 / J7 and the JST XH plugs sit on the board up to the front wall; the back extension (also 40 x 6 mm) is not used.
-- 4 mounting holes on the **3 mm** small posts, **45 x 50 mm** spacing.
+- Enclosure interior (measured): **60 mm wide x 85 mm long**. The four big posts are **8 x 8 mm** in the corners. The small posts (3 mm high) are at **45 x 50 mm**, centred.
+- The posts leave a plus-shaped usable area: **60 x 69 mm** between the posts along the long sides (y from 8 to 77) and **44 mm wide over the full 85 mm length** between the end posts.
+- Board: **58 x 68 mm main body** (0.5 to 1 mm of margin all round) **plus a 42 x 7 mm tab on the cable (front) side**, so the board is 75 mm long at the tab; two layers, ground plane. The tab lets the Dupont housings of J2 / J7 and the JST XH plugs sit on the board up to the front wall; the back extension (same size) is not used.
+- 4 mounting holes on the **3 mm** small posts, **45 x 50 mm** spacing, centred in the interior (board coordinates (6.5, 9), (51.5, 9), (6.5, 59), (51.5, 59)).
 - Usable depth **25 mm**: posts 3 + board 1.6 = 4.6 mm; ESP32 on 8.5 mm sockets (USB-C at 17.9 mm); FPC adapter board on 8.5 mm sockets (17.7 mm); MAX31865 on low 3 mm sockets (22.6 mm, 2.4 mm margin).
 - **Front connector row:** right-angle headers with their Dupont housings need about **9 mm in front of the pads** (keep-out, nothing else there); J2, J7 and the vertical JST XH J3 / J4 are side by side on the front edge. F1 and D1 sit in the front-left corner (in front of the mounting hole), C1 and C2 in the corridor between the ESP32 and the MAX31865. A cable slot is needed in the front wall (housings end about 6 mm from it).
 - **Cable sides:** all cables leave through the **front** (J2, J7, J3, J4, and the PT100 wires). The USB-C and the display ribbon are at the **back**.
@@ -24,7 +25,7 @@ All **through-hole** parts (no SMD soldering). Related files: `images/carrier_pl
 | J7 | 2 x 6 right-angle male header | button + encoder (encoder powered from 5 V) + 4 spare I/O pins (+5 V, level-adapted input, level-adapted output, GND) |
 | J8 | 1 x 4 header | RobotDyn 4 A pump dimmer, **I2C** (powered from 3.3 V) |
 | J9 | 1 x 3 header | pressure sensor 0.5 to 4.5 V, 0 to 12 bar (powered from 5 V) |
-| ESP | 2 x 1 x 20 female sockets | ESP32-S3 board (row spacing to be measured) |
+| ESP | 2 x 1 x 20 female sockets | ESP32-S3 board (about 22 x 54 mm from the photo; row spacing to be measured) |
 
 ### J2 (2 x 4: row A on top, row B at the bottom, pin 1 on the left)
 | | 1 | 2 | 3 | 4 |
@@ -89,8 +90,11 @@ G1/4 sensor, 0 to 12 bar, 0.5 to 4.5 V output. The signal goes through a divider
 ### J6 (MAX31865 module)
 VIN (3.3 V), 3Vo (unused), GND, CLK (GPIO 12), SDO (GPIO 13), SDI (GPIO 11), CS (GPIO 7), RDY (unused). This is the Adafruit order (VIN, 3Vo, GND, CLK, SDO, SDI, CS, RDY).
 
+## ESP32-S3 board (read on the photo)
+Silkscreen read on the photo, left column from the USB-C end: GND, 5V, G48, BOOT, 48, 47, 38, 39, 40, 21, GND, 18, 17, 16, 15, 41, 42, 45, 46. Right column: GND, 3V3, PWR, RST, 14, 13, 12, 11, 10, 09, 08, 07, GND, 06, 05, 04, 03, 02, 01. Every GPIO used in this design (1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 21, 38, 39, 47, 48) is broken out on this board, and the strapping pins to avoid (0 = BOOT, 3, 45, 46) are the ones marked. Still free: 2 (right), 40, 41, 42 (left). To confirm by you: exact board size (the photo suggests about 22 x 54 mm plus about 1.5 mm of USB-C overhang), pin count per side (about 20), and row spacing.
+
 ## ESP32-S3 pins
-5V, 3V3, GND; GPIO 17 (pump SSR), 18 (boiler SSR), 21 (valve SSR); 15 (flow In), 16 (flow Out); 4 / 5 (encoder); 6 (button); 11 / 12 / 13 (SPI MOSI / SCK / MISO); 10 (display CS); 9 / 8 (display DC / RST); 14 (backlight); 7 (MAX31865 CS); 47 / 48 (dimmer, I2C SDA / SCL); 1 (pressure, ADC); 38 (spare, on J7). Avoided: 0, 3, 45, 46, 19, 20, 35 to 37.
+5V, 3V3, GND; GPIO 17 (pump SSR), 18 (boiler SSR), 21 (valve SSR); 15 (flow In), 16 (flow Out); 4 / 5 (encoder); 6 (button); 11 / 12 / 13 (SPI MOSI / SCK / MISO); 10 (display CS); 9 / 8 (display DC / RST); 14 (backlight); 7 (MAX31865 CS); 47 / 48 (dimmer, I2C SDA / SCL); 1 (pressure, ADC); 38 (spare, on J7). Avoided: 0, 3, 45, 46, 19, 20, 35 to 37 (not broken out on this board).
 
 ## Circuits
 - **Power:** J2 A1 (+5 V) → 1.1 A resettable fuse → 1N5819 diode (reverse protection) → +5 V rail (470 µF + 100 nF) → ESP32 5V pin. The 3.3 V comes from the ESP32 board.
@@ -115,7 +119,7 @@ VIN (3.3 V), 3Vo (unused), GND, CLK (GPIO 12), SDO (GPIO 13), SDI (GPIO 11), CS 
 | 1 | 470 µF 10 V radial capacitor; 4 x 100 nF; 2 x 1 nF | 1 € |
 | 4 | 3 mm standoffs (existing) + M2.5 screws | 0 |
 | | **Total parts** | **about 6 to 9 €** |
-| 5 | bare boards, 58 x 68 mm + 40 x 6 mm tab, 2 layers (shipping included) | 10 to 20 € |
+| 5 | bare boards, 58 x 68 mm + 42 x 7 mm tab, 2 layers (shipping included) | 10 to 20 € |
 
 ## Points to confirm before manufacturing
 1. Pin order, supply and backlight of your display ribbon (J5).
@@ -126,4 +130,5 @@ VIN (3.3 V), 3Vo (unused), GND, CLK (GPIO 12), SDO (GPIO 13), SDI (GPIO 11), CS 
 6. MAX31865 module (Adafruit, measured from the manufacturer's drawing): 25.4 x 27.9 mm, mounting holes 0.9" apart and 0.1" from the terminal-block edge, 1 x 8 header at 0.1" pitch on the short edge.
 7. Pump dimmer: one-time switch from UART to I2C (see J8); behaviour with the vibration pump to test; I2C pull-ups (4.7 kΩ) fitted on the board.
 8. Pressure sensor: confirm 3 wires (+5 V, GND, signal) and the G1/4 fitting on the hydraulic circuit.
-9. Display ribbon over the MAX31865: ribbon length and thickness, clearance to the lid; orientation of pin 1 on your FPC adapter board (mounted rotated 180 degrees).
+9. USB-C: the connector (x 7.5 to 15.5 mm) is right next to the 8 x 8 mm back-left post (x up to 7 mm); a plug body wider than the connector would touch the post, so check the plug or shift the ESP32 by 1 to 2 mm.
+10. Display ribbon over the MAX31865: ribbon length and thickness, clearance to the lid; orientation of pin 1 on your FPC adapter board (mounted rotated 180 degrees).
