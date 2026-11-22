@@ -114,6 +114,8 @@ for i, name in enumerate(["R5", "R6", "R7", "R8"]):          # base pull-downs 1
     axial(11.5, 31.5 + i * 3.0, label=name)
 axial(11.5, 43.5, label="R9")                                  # encoder pull-up A
 axial(11.5, 46.2, label="R10")                                 # encoder pull-up B
+axial(11.5, 7.6, label="R17")                                  # IO38 input: series 4.7 k
+axial(11.5, 10.4, label="R18")                                 # IO38 input: 10 k to GND
 
 # keep-out under the antenna
 for k in range(0, 14):
@@ -263,7 +265,7 @@ comp = [
     "J7  right-angle 2 x 5 header: button, encoder (5 V), 3 spare pins",
     "J8  1 x 4: pump dimmer (I2C)  ·  J9  1 x 3: pressure sensor",
     "Q1 to Q3  SSR drive ; Q4  backlight (2N2222A)",
-    "R1 to R4  1 kΩ  ·  R5 to R8  10 kΩ  ·  R9, R10  encoder dividers",
+    "R1 to R4  1 kΩ  ·  R5 to R8  10 kΩ  ·  R9, R10, R17, R18  5 V input dividers",
     "R11 to R16  flow sensor inputs  ·  C3, C4  1 nF",
     "F1  1.1 A resettable fuse  ·  D1  1N5819",
     "C1  470 µF  ·  C2  100 nF",

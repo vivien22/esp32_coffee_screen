@@ -92,7 +92,7 @@ rows = [("5V", "+5 V (after diode and fuse)", RED), ("3V3", "powers MAX31865, di
         ("GPIO 4 / 5", "encoder A / B", GRN), ("GPIO 6", "start button", (90, 90, 96)),
         ("GPIO 47 / 48", "dimmer I2C: SDA / SCL", VIO),
         ("GPIO 11 / 12 / 13", "SPI: MOSI / SCK / MISO", VIO), ("GPIO 10", "display CS", VIO), ("GPIO 9 / 8", "display DC / RST", VIO),
-        ("GPIO 14", "display backlight (transistor)", VIO), ("GPIO 7", "MAX31865 CS", VIO), ("GPIO 38", "spare", (150, 150, 156))]
+        ("GPIO 14", "display backlight (transistor)", VIO), ("GPIO 7", "MAX31865 CS", VIO), ("GPIO 38", "spare input on J7 (5 V divider)", (150, 150, 156))]
 for i, (a, b, col) in enumerate(rows):
     y = 150 + i * 34
     RR(gx, y, gx + 180, y + 28, 5, fill=col, outline=(20, 20, 24), width=1)
@@ -119,7 +119,7 @@ def chain(x, y, title, src, res, end, shunts, col):
         L([(x + sx, y), (x + sx, y)], col, 2)
         shunt(x + sx, y, lab)
 cy = 850
-chain(gx, cy, "Encoder A, B, button (x3): 5 V to 3.3 V", "module out", "4.7 k", "GPIO", [(270, "10 k")], GRN)
+chain(gx, cy, "Encoder A, B, button, spare IO38 (x4): 5 V to 3.3 V", "module out", "4.7 k", "GPIO", [(270, "10 k")], GRN)
 chain(gx, cy + 120, "Pressure input: 4.5 V to 3.0 V", "sensor", "10 k", "GPIO 1", [(250, "20 k"), (320, "100 nF")], BLU)
 T(gx, cy + 262, "Dimmer I2C pull-ups: 4.7 k from SDA (GPIO 47) and from SCL (GPIO 48) to 3V3", F(14, True), VIO, 'lm')
 T(gx, cy + 286, "(100 kHz, cable under 30 cm; the module is shipped in UART mode: switch it to I2C once)", F(13), GRY, 'lm')
