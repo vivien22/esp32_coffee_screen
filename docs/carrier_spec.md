@@ -10,6 +10,7 @@ All **through-hole** parts (no SMD soldering). Related files: `images/board_plac
 - Usable depth **25 mm**: posts 3 + board 1.6 = 4.6 mm; ESP32 on 8.5 mm sockets (USB-C at 17.9 mm); FPC adapter board on 8.5 mm sockets (17.7 mm); MAX31865 on low 3 mm sockets (22.6 mm, 2.4 mm margin).
 - **ESP32-S3 rotated 90 degrees** (long side across the board, at the back, y 3 to 25 mm): **USB-C towards the left wall**, with an opening in that wall at y 9 to 19 mm (the connector is then far from the 8 mm corner posts). The antenna end is on the right (x 48.5 to 56.5 mm).
 - **Under the ESP32 (between the two socket rows, 8.5 mm clearance):** vertical axial resistors R1 to R10, then Q1 to Q4 on the right; Q5 (spare output) at the left, next to the USB end. The two small standoffs at the back (6.5, 9) and (51.5, 9) are under the ESP32; the one on the right is under the antenna, so use a **non-plated hole with no copper ring** there.
+- **Connector rows:** J8 is the lowest row of the J2 header and J9 the lowest row of the J7 header (3-row right-angle strips; each row has its own Dupont housing, rows are 2.54 mm apart vertically, the housings are not keyed: mind the order). J8 and J9 stay bare for now. The corridor between the FPC board and the MAX31865 holds JP1, C1 and C2.
 - **Below the ESP32, side by side:** the FPC adapter board on the **left** (x 1.5 to 23.5 mm, connector towards the front, flow-input parts R11 to R16 and C3, C4 under it), the MAX31865 on the **right** (x 31 to 56.4 mm, rotated 180 degrees: header on its rear edge, pin 1 VIN on the right, PT100 terminal block facing the front), and a corridor between them (x 23.5 to 31 mm) holding J8, J9, C1 and C2.
 - **Front connector row:** right-angle headers with their Dupont housings need about **9 mm in front of the pads** (keep-out, nothing else there); J2 and J7 are on the 42 x 7 mm tab, the vertical JST XH J3 and J4 at the front right, F1 and D1 in the front-left corner. A cable slot is needed in the front wall (housings end about 1 mm from it).
 - **All cables leave through the front** (J2, J7, J3, J4, the PT100 wires and the display ribbon). Only the USB-C cable leaves through the left wall.
@@ -21,16 +22,17 @@ All **through-hole** parts (no SMD soldering). Related files: `images/board_plac
 ## Connectors
 | Ref | Type | Role |
 |---|---|---|
-| J2 | 2 x 4 right-angle male header, one 2 x 4 female Dupont housing (two ribbons of 4 wires) | 5 V supply + 3 SSRs |
+| J2 | rows A and B of a **3 x 4 right-angle male header** (one 2 x 4 female Dupont housing, two ribbons of 4 wires) | 5 V supply + 3 SSRs |
 | J3, J4 | JST XH 3-pin, vertical, rotated (real pitch 2.5 mm) | flow sensors In and Out |
 | J5 | 2 x 4 female socket | FPC adapter board (8 pins, ribbon to the remote display) |
 | J6 | 1 x 8 female socket (low, 3 mm) | MAX31865 module |
-| J7 | 2 x 6 right-angle male header | button + encoder (encoder powered from 5 V) + 4 spare I/O pins (+5 V, level-adapted input, level-adapted output, GND) |
-| J8 | 1 x 4 header | RobotDyn 4 A pump dimmer, **I2C** (powered from 5 V, through an I2C level shifter) |
-| J9 | 1 x 3 header | pressure sensor 0.5 to 4.5 V, 0 to 12 bar (powered from 5 V) |
+| J7 | rows A and B of a **3 x 6 right-angle male header** | button + encoder (encoder powered from 5 V) + 4 spare I/O pins (+5 V, level-adapted input, level-adapted output, GND) |
+| J8 | row C (the lowest) of the J2 header, 4 pins | RobotDyn 4 A pump dimmer, **I2C** (powered from 5 V, through an I2C level shifter) |
+| J9 | row C (the lowest) of the J7 header, first 3 pins | pressure sensor 0.5 to 4.5 V, 0 to 12 bar (powered from 5 V) |
+| JP1 | 1 x 2 male header + shunt jumper | +5 V board to the 5V pin of the ESP32 (see Circuits) |
 | ESP | 2 x 1 x 20 female sockets | ESP32-S3 board (about 22 x 54 mm from the photo; row spacing to be measured) |
 
-### J2 (2 x 4: row A on top, row B at the bottom, pin 1 on the left)
+### J2 (rows A and B of the 3 x 4 header: row A at the back, row B below it, row C = J8 at the bottom; pin 1 on the left)
 | | 1 | 2 | 3 | 4 |
 |---|---|---|---|---|
 | A | +5 V | GND | pump + | pump − |
@@ -38,7 +40,7 @@ All **through-hole** parts (no SMD soldering). Related files: `images/board_plac
 
 **One 2 x 4 Dupont housing**, two ribbons of 4 wires (one per row): ribbon 1 = 5 V supply and pump SSR, ribbon 2 = boiler SSR and valve SSR. Warning: an unkeyed 2 x 4 housing can be plugged 180 degrees the wrong way round (+5 V would land on the valve SSR "−" input and so on). Use a **keyed (shrouded) 2 x 4 IDC-style header** with its notch, or at least mark the housing and the header.
 
-### J7 (2 x 6, right-angle: two stacked rows of Dupont housings)
+### J7 (rows A and B of the 3 x 6 header, right-angle: stacked rows of Dupont housings; row C = J9 at the bottom)
 | | 1 | 2 | 3 | 4 | 5 | 6 |
 |---|---|---|---|---|---|---|
 | Row A (upper) | button (GPIO 6) | GND | **+5 V** | **IN (GPIO 38)** | **OUT (GPIO 39)** | **GND** |
@@ -55,7 +57,7 @@ The two GPIO numbers (38 and 39) are provisional free GPIOs of the ESP32-S3 chip
 ### 5 V inputs protection (encoder)
 The ESP32-S3 only accepts 3.3 V. Since the encoder module is powered from 5 V, its outputs (A, B, button) can reach 5 V if the module has pull-ups to 5 V. GA, GB and the spare GPIO 38 therefore each go through a divider: 4.7 kΩ in series to the GPIO, then 10 kΩ from the GPIO to GND (5 V becomes 3.4 V). The start button (J7 row A, "button") is a dry contact to GND: it needs no divider, only the ESP32 internal pull-up and 100 nF against bounce. **To check:** if your module is a bare encoder without pull-up resistors, 10 kΩ pull-ups to 5 V are needed (provide optional footprints).
 
-### J8 (pump dimmer, 1 x 4, in the module's order)
+### J8 (pump dimmer, row C of the J2 header, 4 pins in the module's order)
 | 1 | 2 | 3 | 4 |
 |---|---|---|---|
 | VCC (+5 V) | GND | SDA | SCL |
@@ -77,7 +79,7 @@ The module stays off the board, on the mains side: only the control cable comes 
 
 Pump: Olab Silent Green K09541 / K09541L (datasheet): self-priming vibration pump, 35 W class F coil, available in 230 V / 50 Hz or 120 V / 60 Hz (check the label of yours), water 5 to 35 °C, brass or plastic outlet. Pressure-flow curve (±15 %): about 19 bar at zero flow, 13 bar at 100 cm³/min, 3.5 bar at 300 cm³/min, 0 bar at about 420 cm³/min. Phase-angle dimming is a common practice on this type of pump. The dimmer goes in series with the pump; keep the pump SSR in series as a hard cut-off (the dimmer alone does not guarantee a complete stop). At low power the pump may vibrate without pumping: provide a minimum setting, to be calibrated with the pressure sensor. 35 W (about 0.15 A at 230 V) is far below the 4 A rating of the dimmer.
 
-### J9 (pressure sensor, 1 x 3)
+### J9 (pressure sensor, row C of the J7 header, first 3 pins)
 | 1 | 2 | 3 |
 |---|---|---|
 | +5 V | GND | signal |
@@ -110,7 +112,7 @@ Silkscreen read on the photo, left column from the USB-C end: GND, 5V, G48, BOOT
 5V, 3V3, GND; GPIO 17 (pump SSR), 18 (boiler SSR), 21 (valve SSR); 15 (flow In), 16 (flow Out); 4 / 5 (encoder); 6 (button); 11 / 12 / 13 (SPI MOSI / SCK / MISO); 10 (display CS); 9 / 8 (display DC / RST); 14 (backlight); 7 (MAX31865 CS); 47 / 48 (dimmer, I2C SDA / SCL); 1 (pressure, ADC); 38 (spare, on J7). Avoided: 0, 3, 45, 46, 19, 20, 35 to 37 (not broken out on this board).
 
 ## Circuits
-- **Power:** J2 A1 (+5 V) → 1.1 A resettable fuse → 1N5819 diode (reverse protection) → +5 V rail (470 µF + 100 nF) → ESP32 5V pin. The 3.3 V comes from the ESP32 board.
+- **Power:** J2 A1 (+5 V) → 1.1 A resettable fuse → 1N5819 diode (reverse protection) → +5 V rail (470 µF + 100 nF) → **JP1** → 5V pin of the ESP32. The 3.3 V comes from the ESP32 board. **JP1** (1 x 2 header + shunt jumper): **fitted = normal operation**, the ESP32 takes its 5 V from the external supply through the Dupont connector; **removed = the ESP32 is powered by its USB port only** (the rest of the board stays on the external supply). Never fit JP1 while a USB cable is plugged in: the two 5 V sources would be tied together (and the supply could back-feed the computer).
 - **SSR (x3):** GPIO → 1 kΩ → 2N2222A base; 10 kΩ base → GND; SSR "+" input to the +5 V rail, "−" input to the collector; emitter to GND. The SSR input receives about 4.8 V.
 - **Flow sensor (x2):** signal → 10 kΩ to +5 V; signal → 4.7 kΩ → GPIO; GPIO → 10 kΩ → GND; 1 nF GPIO → GND. Works with a 5 V output (the divider gives about 3.4 V) or with an open collector.
 - **Display backlight:** BLK ← GPIO 14 directly (the display module has its own transistor). Optional stage Q4: GPIO 14 → 1 kΩ → 2N2222A base, not fitted by default.
@@ -123,7 +125,8 @@ Silkscreen read on the photo, left column from the USB-C end: GND, 5V, G48, BOOT
 | 2 | 1 x 20 female sockets, 8.5 mm | 1 € |
 | 1 | MAX31865 module (owned) + low 1 x 8 socket | 0.3 € |
 | 1 | 8-pin FPC board (owned) + 2 x 4 male header + 2 x 4 female socket | 0.5 € |
-| 1 | right-angle 2 x 4 + right-angle 2 x 6 male headers, 1 x 4 and 1 x 3 male headers | 0.8 € |
+| 1 | 3-row right-angle 2.54 mm male header strip ("courbé" 3 x 40, e.g. Funduino, about 1.7 €): cut one 3 x 4 (J2 + J8) and one 3 x 6 (J7 + J9) | 1.7 € |
+| 1 | 1 x 2 male header + shunt jumper (JP1) | 0.2 € |
 | 2 | JST XH 3-pin headers | 0.5 € |
 | 4 | 2N2222A transistors (3 SSRs + spare output; backlight stage optional) | 0.6 € |
 | 2 | 2N7000 MOSFETs (I2C level shifter) | 0.3 € |

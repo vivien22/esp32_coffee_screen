@@ -31,40 +31,37 @@ def head(x, y, title, sub=None):
     if sub:
         T(x, y + 28, sub, F(15), GRY, 'lm')
 
-# ---- J2 : 2 x 4 right-angle header, ONE 2 x 4 Dupont housing, two ribbons of 4 wires (one per row)
-head(60, 118, "J2: right-angle 2 x 4 male header, one 2 x 4 Dupont housing", "two ribbons of 4 wires: row A (top) and row B (bottom)")
+# ---- J2 + J8 : 3 x 4 right-angle header (3 stacked rows), J7 + J9 : 3 x 6
+head(60, 118, "J2 + J8: right-angle 3 x 4 male header", "rows A and B: J2 (one 2 x 4 housing, two ribbons of 4 wires); row C: J8")
 rowA = [("+5 V", RED), ("GND", DK), ("pump +", BRN), ("pump −", BRN)]
 rowB = [("boiler +", ORG), ("boiler −", ORG), ("valve +", YEL), ("valve −", YEL)]
-x0, yA, yB = 60, 190, 240
+rowC = [("+5 V", RED), ("GND", DK), ("SDA", VIO), ("SCL", VIO)]
+x0, yA, yB, yC = 60, 186, 232, 278
 for i, (lab, col) in enumerate(rowA):
     pin(x0 + i * 88, yA, lab, col, 14)
 for i, (lab, col) in enumerate(rowB):
     pin(x0 + i * 88, yB, lab, col, 14)
-T(x0 + 2 * 88, 306, "ribbon 1: 5 V supply + pump SSR", F(13, True), RED, 'mm') if False else None
-T(x0 + 176, 306, "ribbon 1 (row A): 5 V supply, then pump SSR", F(13, True), RED)
-T(x0 + 176, 328, "ribbon 2 (row B): boiler SSR, then valve SSR", F(13, True), ORG)
-T(x0 + 370, 214, "a 2 x 4 housing can be plugged 180 degrees", F(14), GRY, 'lm')
-T(x0 + 370, 236, "the wrong way round: use a keyed (shrouded)", F(14), GRY, 'lm')
-T(x0 + 370, 258, "2 x 4 header, or mark the housing", F(14), GRY, 'lm')
+for i, (lab, col) in enumerate(rowC):
+    pin(x0 + i * 88, yC, lab, col, 14)
+T(x0 + 370, 196, "row A: 5 V supply + pump SSR (ribbon 1)", F(14, True), RED, 'lm')
+T(x0 + 370, 242, "row B: boiler SSR + valve SSR (ribbon 2)", F(14, True), ORG, 'lm')
+T(x0 + 370, 288, "row C: J8 pump dimmer, RobotDyn (I2C)", F(14, True), VIO, 'lm')
+T(x0 + 370, 312, "a 2 x 4 housing can be plugged 180 degrees the wrong way:", F(13), GRY, 'lm')
+T(x0 + 370, 330, "mark it, or key the header", F(13), GRY, 'lm')
 
-# ---- J7 : 2 x 6 (two stacked rows of housings)
-head(60, 350, "J7: right-angle 2 x 6 male header: button, encoder (5 V) and 4 spare I/O pins")
+head(60, 366, "J7 + J9: right-angle 3 x 6 male header")
 j7a = [("button", (90, 90, 96)), ("GND", DK), ("+5 V", RED), ("IN 38", VIO), ("OUT 39", VIO), ("GND", DK)]
 j7b = [("GA", GRN), ("GB", GRN), ("+5 V", RED), ("GND", DK)]
+j7c = [("+5 V", RED), ("GND", DK), ("signal", BLU)]
 for i, (lab, col) in enumerate(j7a):
-    pin(60 + i * 88, 382, lab, col, 14)
+    pin(60 + i * 88, 396, lab, col, 14)
 for i, (lab, col) in enumerate(j7b):
-    pin(60 + i * 88, 430, lab, col, 14)
-T(620, 404, "row A: 2-pin + 4-pin spare", F(14), GRY, 'lm')
-T(620, 452, "row B: 4-pin encoder (module order)", F(14), GRY, 'lm')
-
-# ---- J8 / J9
-head(60, 490, "J8: pump dimmer (I2C)", "RobotDyn 4 A, DimmerLink")
-for i, (lab, col) in enumerate([("+5 V", RED), ("GND", DK), ("SDA", VIO), ("SCL", VIO)]):
-    pin(60 + i * 88, 548, lab, col, 14)
-head(480, 490, "J9: pressure sensor", "0.5 to 4.5 V, 0 to 12 bar")
-for i, (lab, col) in enumerate([("+5 V", RED), ("GND", DK), ("signal", BLU)]):
-    pin(480 + i * 88, 548, lab, col, 14)
+    pin(60 + i * 88, 442, lab, col, 14)
+for i, (lab, col) in enumerate(j7c):
+    pin(60 + i * 88, 488, lab, col, 14)
+T(620, 418, "row A: button (2) + spare I/O (4)", F(14), GRY, 'lm')
+T(620, 464, "row B: encoder (module order)", F(14), GRY, 'lm')
+T(620, 510, "row C: J9 pressure sensor", F(14), GRY, 'lm')
 
 # ---- J3 / J4
 head(60, 628, "J3, J4: JST XH 3-pin, flow sensors In and Out", "sensor wire order: often red / yellow / black: check your cable")
@@ -92,7 +89,7 @@ for i, (lab, col) in enumerate(mx):
 # ================================================================ 2. GPIO table
 gx = 860
 T(gx, 118, "ESP32-S3: pins used", F(22, True), INK, 'lm')
-rows = [("5V", "+5 V (after diode and fuse): MAX, dimmer", RED), ("3V3", "display, I2C pull-ups (3.3 V side)", RED),
+rows = [("5V", "+5 V via JP1 (after diode and fuse)", RED), ("3V3", "display, I2C pull-ups (3.3 V side)", RED),
         ("GPIO 17", "pump SSR drive", BRN), ("GPIO 18", "boiler SSR drive", ORG), ("GPIO 21", "valve SSR drive", YEL),
         ("GPIO 15", "flow In", BLU), ("GPIO 16", "flow Out", BLU), ("GPIO 1", "pressure sensor (ADC)", BLU),
         ("GPIO 4 / 5", "encoder A / B", GRN), ("GPIO 6", "start button", (90, 90, 96)),
@@ -146,6 +143,9 @@ T(cx0 + 300, 200, "+5 V board", F(14, True), RED, 'lm')
 L([(cx0 + 215, 200), (cx0 + 215, 232)], RED, 2)
 L([(cx0 + 205, 232), (cx0 + 225, 232)], INK, 3); L([(cx0 + 205, 240), (cx0 + 225, 240)], INK, 3)
 L([(cx0 + 215, 240), (cx0 + 215, 262)], INK, 2); T(cx0 + 215, 276, "470 µF + 100 nF", F(11, True))
+
+T(cx0, 292, "JP1 (1 x 2 header + jumper): +5 V board -> ESP32 5V pin", F(12, True), RED, 'lm')
+T(cx0, 306, "fitted: normal; removed: the ESP32 is powered by its USB port", F(12), GRY, 'lm')
 
 # SSR driver
 T(cx0, 330, "SSR drive (x3)", F(17, True), BRN, 'lm')
@@ -202,6 +202,7 @@ T(cx0 + 20, 1310, "GPIO high -> OUT low; GPIO low -> OUT 5 V (invert in firmware
 # ================================================================ 4. notes
 T(60, 1140, "Design notes", F(22, True), INK, 'lm')
 notes = [
+    "JP1: fitted, the ESP32 takes its 5 V from the board; removed, from its USB port only (never fit it with USB plugged).",
     "The three voltage levels: +5 V board (after fuse and diode), 3.3 V from the ESP32-S3 board, common GND.",
     "The display module has its own backlight transistor: BLK is driven directly by GPIO 14 (stage Q4 optional).",
     "No regulator on the board: the ESP32-S3 provides the 3.3 V, which now only feeds the display and the I2C pull-ups.",

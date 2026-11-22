@@ -164,48 +164,45 @@ for i, (name, xa) in enumerate([("C3", 7.0), ("C4", 14.0)]):
 
 # ---------------------------------------------------------------- front strip: J2 (2x4), J7 (1x6), polyfuse, diode, electrolytic, XH x2
 # Front edge: every right-angle header has its Dupont housings plugged in towards the front (about 9 mm of keep-out in front of the pads).
-# J2: 2 x 4 right-angle header, SSR + power (housing keep-out x 11.7 .. 21.9)
-for r_ in range(2):
+# J2 + J8: 3 x 4 right-angle header (three stacked rows of Dupont housings, "courbe" 3 x 40 strip cut to length). From the back of the
+# board: row A (+5 V, GND, pump) and row B (boiler, valve) are J2; row C, the lowest one, is J8 (pump dimmer, I2C), bare for now.
+ROWS = [58.5, 61.04, 63.58]
+for r_ in range(3):
     for c_ in range(4):
-        tpad(12.2 + c_ * 2.54, 61.0 + r_ * 2.54, square=(r_ == 0 and c_ == 0), ring=1.7, drill=1.0)
-rect(d, X(12.2) - 1.4 * K, Y(61.0) - 1.4 * K, X(12.2 + 3 * 2.54) + 1.4 * K, Y(63.54) + 1.4 * K, outline=SILK + (255,), width=2)
-silk(15.4, 58.4, "J2  SSRs + 5 V", 9)
+        tpad(12.2 + c_ * 2.54, ROWS[r_], square=(r_ == 0 and c_ == 0), ring=1.7, drill=1.0)
+rect(d, X(12.2) - 1.4 * K, Y(ROWS[0]) - 1.4 * K, X(12.2 + 3 * 2.54) + 1.4 * K, Y(ROWS[2]) + 1.4 * K, outline=SILK + (255,), width=2)
+silk(17.3, 55.3, "J2 (A, B) + J8 (C)", 9)
 for c_, lab in enumerate(["+5V", "GND", "P+", "P−"]):
-    text(d, X(12.2 + c_ * 2.54), Y(61.0) - 1.9 * K, lab, 8, SILK, True)
-for c_, lab in enumerate(["B+", "B−", "V+", "V−"]):
-    text(d, X(12.2 + c_ * 2.54), Y(63.54) + 1.9 * K, lab, 8, SILK, True)
-# J7: 2 x 6 right-angle header (two stacked rows of housings): button, encoder, and 4 spare pins (+5 V, IN, OUT, GND)
-# row A (top): BT, GND | +5 V, IN38, OUT39, GND      row B (bottom): +5 V, GND, A, B
+    text(d, X(12.2 + c_ * 2.54), Y(ROWS[0]) - 1.9 * K, lab, 7, SILK, True)
+for c_, lab in enumerate(["5V", "GND", "SDA", "SCL"]):
+    text(d, X(12.2 + c_ * 2.54), Y(ROWS[2]) + 1.9 * K, lab, 7, SILK, True)
+# J7 + J9: 3 x 6 right-angle header. Row A: button (2) + spare I/O (4); row B: encoder (GA, GB, VCC, GND); row C: J9, pressure sensor, bare.
 for c_ in range(6):
-    tpad(22.4 + c_ * 2.54, 61.0, square=(c_ == 0), ring=1.7, drill=1.0)
+    tpad(22.4 + c_ * 2.54, ROWS[0], square=(c_ == 0), ring=1.7, drill=1.0)
 for c_ in range(4):
-    tpad(22.4 + c_ * 2.54, 63.54, ring=1.7, drill=1.0)
-rect(d, X(22.4) - 1.4 * K, Y(61.0) - 1.4 * K, X(22.4 + 5 * 2.54) + 1.4 * K, Y(63.54) + 1.4 * K, outline=SILK + (255,), width=2)
-silk(31.0, 58.4, "J7  button / encoder / spare I/O", 9)
+    tpad(22.4 + c_ * 2.54, ROWS[1], ring=1.7, drill=1.0)
+for c_ in range(3):
+    tpad(22.4 + c_ * 2.54, ROWS[2], ring=1.7, drill=1.0)
+rect(d, X(22.4) - 1.4 * K, Y(ROWS[0]) - 1.4 * K, X(22.4 + 5 * 2.54) + 1.4 * K, Y(ROWS[2]) + 1.4 * K, outline=SILK + (255,), width=2)
+silk(33.2, 55.3, "J7 (A, B) + J9 (C)", 9)
 for c_, lab in enumerate(["BT", "GND", "5V", "IN", "OUT", "GND"]):
-    text(d, X(22.4 + c_ * 2.54), Y(61.0) - 1.9 * K, lab, 7, SILK, True)
-for c_, lab in enumerate(["GA", "GB", "5V", "GND"]):
-    text(d, X(22.4 + c_ * 2.54), Y(63.54) + 1.9 * K, lab, 7, SILK, True)
-# J8: 1 x 4 vertical header, dimmer (I2C), in the corridor between the FPC board and the MAX31865; J9: 1 x 3, pressure sensor
-for i, lab in enumerate(["5V", "GND", "SDA", "SCL"]):
-    tpad(27.2, 31.0 + i * 2.54, square=(i == 0), ring=1.7, drill=1.0)
-    text(d, X(28.6), Y(31.0 + i * 2.54), lab, 7, SILK, True, 'lm')
-rect(d, X(27.2) - 1.4 * K, Y(31.0) - 1.4 * K, X(27.2) + 1.4 * K, Y(31.0 + 3 * 2.54) + 1.4 * K, outline=SILK + (255,), width=2)
-silk(27.2, 29.2, "J8 dimmer", 8)
-for i, lab in enumerate(["5V", "GND", "SIG"]):
-    tpad(27.2, 42.0 + i * 2.54, square=(i == 0), ring=1.7, drill=1.0)
-    text(d, X(28.6), Y(42.0 + i * 2.54), lab, 7, SILK, True, 'lm')
-rect(d, X(27.2) - 1.4 * K, Y(42.0) - 1.4 * K, X(27.2) + 1.4 * K, Y(42.0 + 2 * 2.54) + 1.4 * K, outline=SILK + (255,), width=2)
-silk(27.2, 40.2, "J9 pressure", 8)
+    text(d, X(22.4 + c_ * 2.54), Y(ROWS[0]) - 1.9 * K, lab, 7, SILK, True)
+for c_, lab in enumerate(["5V", "GND", "SIG"]):
+    text(d, X(22.4 + c_ * 2.54), Y(ROWS[2]) + 1.9 * K, lab, 7, SILK, True)
+# JP1: 1 x 2 header + shunt in the corridor: +5 V board to the 5V pin of the ESP32 (fitted: normal; removed: the ESP32 on USB only)
+tpad(27.2, 33.0, square=True, ring=1.7, drill=1.0); tpad(27.2, 35.54, ring=1.7, drill=1.0)
+rect(d, X(27.2) - 1.4 * K, Y(33.0) - 1.4 * K, X(27.2) + 1.4 * K, Y(35.54) + 1.4 * K, outline=SILK + (255,), width=2)
+silk(27.2, 31.1, "JP1  ESP 5V", 8)
+text(d, X(28.7), Y(33.0), "+5V", 7, SILK, True, 'lm'); text(d, X(28.7), Y(35.54), "ESP", 7, SILK, True, 'lm')
 # F1 polyfuse (radial, pitch 5) and D1 1N5819 (standing) in the front-left corner, in front of the mounting hole
 tpad(3.0, 66.0, ring=1.8, drill=0.9); tpad(8.0, 66.0, ring=1.8, drill=0.9)
 rrect(d, X(1.9), Y(64.4), X(9.1), Y(67.6), 6, outline=SILK + (255,), width=2); text(d, X(10.4), Y(66.0), "F1", 8, SILK, True, 'lm')
 tpad(2.5, 62.6, ring=1.8, drill=0.8); tpad(5.04, 62.6, ring=1.8, drill=0.8)
 text(d, X(6.6), Y(62.6), "D1", 8, SILK, True, 'lm')
 # C1 470 uF (radial 6.3 mm) and C2 100 nF, in the corridor
-circ(d, X(27.2), Y(54.0), 3.15 * K, fill=None, outline=SILK + (255,), width=2)
-tpad(25.95, 54.0, ring=1.8, drill=0.8); tpad(28.45, 54.0, ring=1.8, drill=0.8); silk(27.2, 54.0, "C1", 9)
-tpad(26.0, 49.0, ring=1.6, drill=0.8); tpad(28.5, 49.0, ring=1.6, drill=0.8); text(d, X(29.8), Y(49.0), "C2", 8, SILK, True, 'lm')
+circ(d, X(27.2), Y(46.5), 3.15 * K, fill=None, outline=SILK + (255,), width=2)
+tpad(25.95, 46.5, ring=1.8, drill=0.8); tpad(28.45, 46.5, ring=1.8, drill=0.8); silk(27.2, 46.5, "C1", 9)
+tpad(26.0, 40.0, ring=1.6, drill=0.8); tpad(28.5, 40.0, ring=1.6, drill=0.8); text(d, X(29.8), Y(40.0), "C2", 8, SILK, True, 'lm')
 # JST XH x2: vertical headers, pins along x, the plugs come out upwards: no keep-out towards the front, away from the ribbon path (x 7 to 18)
 for k, (x0, name) in enumerate([(42.0, "J3 flow In"), (52.5, "J4 flow Out")]):
     for i in range(3):
@@ -271,11 +268,11 @@ text(d, lx, 410, "Components", 22, INK, True, 'lm')
 comp = [
     "U1  2 female 1 x 20 sockets (ESP32-S3 board)",
     "U2  low 1 x 8 socket (MAX31865 module)",
-    "J2  right-angle 2 x 4 header: SSRs and 5 V supply",
+    "J2  right-angle 3 x 4 header, rows A, B: 5 V supply and SSRs  ·  row C: J8, pump dimmer (I2C)",
     "J3, J4  JST XH 3-pin: flow sensors In and Out",
     "J5  2 x 4 socket: FPC adapter board",
-    "J7  right-angle 2 x 6 header: button, encoder (5 V), 4 spare I/O pins",
-    "J8  1 x 4: pump dimmer (I2C)  ·  J9  1 x 3: pressure sensor",
+    "J7  right-angle 3 x 6 header, rows A, B: button, encoder, spare I/O  ·  row C: J9, pressure sensor",
+    "JP1  1 x 2 header + jumper: +5 V to the ESP32 (removed: ESP32 on USB only)",
     "Q1 to Q3  SSR drive ; Q4  backlight (optional)",
     "R1 to R4  1 kΩ  ·  R5 to R8  10 kΩ  ·  R9, R10, R17, R18  5 V input dividers (GA, GB, IN)",
     "Q5, R19 to R21  spare output stage (3.3 V to 5 V)",
@@ -285,7 +282,7 @@ comp = [
     "C1  470 µF  ·  C2  100 nF",
 ]
 for i, t in enumerate(comp):
-    text(d, lx, 440 + i * 27, t, 15, INK, False, 'lm')
+    text(d, lx, 438 + i * 24, t, 15, INK, False, 'lm')
 
 text(d, lx, 810, "Heights (enclosure floor = 0)", 22, INK, True, 'lm')
 hs = [
