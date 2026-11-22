@@ -170,9 +170,9 @@ for r_ in range(2):
         tpad(12.2 + c_ * 2.54, 61.0 + r_ * 2.54, square=(r_ == 0 and c_ == 0), ring=1.7, drill=1.0)
 rect(d, X(12.2) - 1.4 * K, Y(61.0) - 1.4 * K, X(12.2 + 3 * 2.54) + 1.4 * K, Y(63.54) + 1.4 * K, outline=SILK + (255,), width=2)
 silk(15.4, 58.4, "J2  SSRs + 5 V", 9)
-for c_, lab in enumerate(["+5V", "P+", "B+", "V+"]):
+for c_, lab in enumerate(["+5V", "GND", "P+", "P−"]):
     text(d, X(12.2 + c_ * 2.54), Y(61.0) - 1.9 * K, lab, 8, SILK, True)
-for c_, lab in enumerate(["GND", "P−", "B−", "V−"]):
+for c_, lab in enumerate(["B+", "B−", "V+", "V−"]):
     text(d, X(12.2 + c_ * 2.54), Y(63.54) + 1.9 * K, lab, 8, SILK, True)
 # J7: 2 x 6 right-angle header (two stacked rows of housings): button, encoder, and 4 spare pins (+5 V, IN, OUT, GND)
 # row A (top): BT, GND | +5 V, IN38, OUT39, GND      row B (bottom): +5 V, GND, A, B

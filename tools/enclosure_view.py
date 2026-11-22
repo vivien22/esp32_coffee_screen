@@ -160,10 +160,9 @@ for i in range(4):
     cuboid(CX0 + 27.2 - 0.32, CY0 + 31.0 + i * 2.54 - 0.32, top + 2.5, 0.64, 0.64, 6.0, GOLD)
 for i in range(3):
     cuboid(CX0 + 27.2 - 0.32, CY0 + 42.0 + i * 2.54 - 0.32, top + 2.5, 0.64, 0.64, 6.0, GOLD)
-# J2 (2 x 4 right-angle, rows stacked vertically) and four 2-pin housings plugged in from the front
+# J2 (2 x 4 right-angle, rows stacked vertically) and ONE 2 x 4 housing plugged in from the front
 cuboid(CX0 + 12.2 - 1.27, CY0 + 60.2, top, 10.16, 5.0, 5.9, BLACK)
-for k in range(4):
-    cuboid(CX0 + 12.2 - 1.27 + k * 2.54 + 0.15, CY0 + 65.2, top + 0.4, 2.24, 8.6, 5.1, WHITE)
+cuboid(CX0 + 12.2 - 1.27 + 0.15, CY0 + 65.2, top + 0.4, 10.0, 8.6, 5.1, WHITE)
 # J7 (2 x 6 right-angle): lower row = 4-pin encoder housing, upper row = 2-pin button + 4-pin spare housings
 cuboid(CX0 + 22.4 - 1.27, CY0 + 60.2, top, 15.24, 5.0, 5.9, BLACK)
 cuboid(CX0 + 22.4 - 1.27 + 0.15, CY0 + 65.2, top + 0.4, 10.0, 8.6, 2.3, WHITE)
@@ -220,12 +219,11 @@ def riser_x(xc, yc, z0, z1, wires, color):
 
 
 Y0 = CY0 + 73.8
-# J2: four 2-pin housings -> 5 V supply and the three SSRs (2 wires each)
-for k, (lab, col) in enumerate([("5 V supply", RED), ("pump SSR", (150, 90, 40)), ("boiler SSR", (232, 130, 30)), ("valve SSR", YEL)]):
-    xk = CX0 + 12.2 + k * 2.54
-    zk = top + 0.4 + 2.55
-    run_z(xk, Y0, Y_END, zk, 2, col)
-    cable(lab, "J2", 2, col, (xk, Y_END, zk))
+# J2: one 2 x 4 housing, two ribbons of 4 wires (row A on top: 5 V, GND, pump; row B below: boiler, valve)
+xj2 = CX0 + 12.2 + 1.5 * 2.54
+cA, cB = (205, 35, 35), (232, 130, 30)
+run_x(xj2, Y0, Y_END, top + 0.4 + 3.82, 4, cA); cable("row A: 5 V, GND, pump", "J2", 4, cA, (xj2, Y_END, top + 0.4 + 3.82))
+run_x(xj2, Y0, Y_END, top + 0.4 + 1.28, 4, cB); cable("row B: boiler, valve", "J2", 4, cB, (xj2, Y_END, top + 0.4 + 1.28))
 # J7: button (2 wires), encoder (4 wires, lower row), spare I/O (4 wires)
 xb, xe, xs = CX0 + 22.4 + 1.27, CX0 + 22.4 + 3.81, CX0 + 22.4 + 8.89
 run_x(xb, Y0, Y_END, top + 4.15, 2, (240, 240, 240)); cable("button", "J7", 2, (240, 240, 240), (xb, Y_END, top + 4.15))

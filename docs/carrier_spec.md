@@ -14,14 +14,14 @@ All **through-hole** parts (no SMD soldering). Related files: `images/placement_
 - **Front connector row:** right-angle headers with their Dupont housings need about **9 mm in front of the pads** (keep-out, nothing else there); J2 and J7 are on the 42 x 7 mm tab, the vertical JST XH J3 and J4 at the front right, F1 and D1 in the front-left corner. A cable slot is needed in the front wall (housings end about 1 mm from it).
 - **All cables leave through the front** (J2, J7, J3, J4, the PT100 wires and the display ribbon). Only the USB-C cable leaves through the left wall.
 - **Display ribbon:** the FPC adapter board is rotated so that its connector faces the front: the flat ribbon (about 6 mm wide, at about 15.5 mm) runs **straight to the front** between x 7 and 18 mm, above J2's housings (10.5 mm) and F1; no tall part (JST XH plugs reach about 16 mm) may sit in that column. Nothing crosses the MAX31865 any more.
-- **Cables:** small flat ribbons (Dupont wires side by side), about **1.5 mm per wire** (4 wires = 6 mm, 3 wires = 4.5 mm, 2 wires = 3 mm), 1.3 mm thick. In the 3D view the cables are numbered 1 to 11 (J2 x4, J7 x3, J3, J4, PT100 probe, display ribbon); J3 / J4 leave their plugs upwards at about 12 mm and the PT100 ribbon at about 15 mm; all go through the front slot. **J8 (pump dimmer) and J9 (pressure sensor) are provisioned on the board but not plugged for now**: they are shown as bare headers, and their cables (4 wires = 6 mm, 3 wires = 4.5 mm) are not counted in the slot width.
+- **Cables:** small flat ribbons (Dupont wires side by side), about **1.5 mm per wire** (4 wires = 6 mm, 3 wires = 4.5 mm, 2 wires = 3 mm), 1.3 mm thick. In the 3D view the cables are numbered 1 to 9 (J2 x2, J7 x3, J3, J4, PT100 probe, display ribbon); J3 / J4 leave their plugs upwards at about 12 mm and the PT100 ribbon at about 15 mm; all go through the front slot. **J8 (pump dimmer) and J9 (pressure sensor) are provisioned on the board but not plugged for now**: they are shown as bare headers, and their cables (4 wires = 6 mm, 3 wires = 4.5 mm) are not counted in the slot width.
 - The spare-I/O resistors R17 to R21 are flat resistors under the MAX31865 (3 mm clearance, enough for axial 1/4 W parts).
 - No copper and no component under the ESP32 antenna (the end of the ESP32 board opposite the USB-C).
 
 ## Connectors
 | Ref | Type | Role |
 |---|---|---|
-| J2 | 2 x 4 right-angle male header, female Dupont housings | 5 V supply + 3 SSRs |
+| J2 | 2 x 4 right-angle male header, one 2 x 4 female Dupont housing (two ribbons of 4 wires) | 5 V supply + 3 SSRs |
 | J3, J4 | JST XH 3-pin, vertical, rotated (real pitch 2.5 mm) | flow sensors In and Out |
 | J5 | 2 x 4 female socket | FPC adapter board (8 pins, ribbon to the remote display) |
 | J6 | 1 x 8 female socket (low, 3 mm) | MAX31865 module |
@@ -33,10 +33,10 @@ All **through-hole** parts (no SMD soldering). Related files: `images/placement_
 ### J2 (2 x 4: row A on top, row B at the bottom, pin 1 on the left)
 | | 1 | 2 | 3 | 4 |
 |---|---|---|---|---|
-| A | +5 V | pump + | boiler + | valve + |
-| B | GND | pump − | boiler − | valve − |
+| A | +5 V | GND | pump + | pump − |
+| B | boiler + | boiler − | valve + | valve − |
 
-Four 2-pin Dupont housings (one per column). Warning: a 2 x 4 header is not keyed and a 2-pin housing can be plugged the wrong way round; mark the wires (red on row A) or add a key / use a keyed housing.
+**One 2 x 4 Dupont housing**, two ribbons of 4 wires (one per row): ribbon 1 = 5 V supply and pump SSR, ribbon 2 = boiler SSR and valve SSR. Warning: an unkeyed 2 x 4 housing can be plugged 180 degrees the wrong way round (+5 V would land on the valve SSR "−" input and so on). Use a **keyed (shrouded) 2 x 4 IDC-style header** with its notch, or at least mark the housing and the header.
 
 ### J7 (2 x 6, right-angle: two stacked rows of Dupont housings)
 | | 1 | 2 | 3 | 4 | 5 | 6 |

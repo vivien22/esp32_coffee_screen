@@ -31,18 +31,21 @@ def head(x, y, title, sub=None):
     if sub:
         T(x, y + 28, sub, F(15), GRY, 'lm')
 
-# ---- J2 : 2 x 4 right-angle header, 4 two-pin housings (one per column)
-head(60, 118, "J2: right-angle 2 x 4 male header, four 2-pin Dupont housings", "row A (top), row B (bottom); one housing per column")
-colsJ2 = [(("+5 V", RED), ("GND", DK)), (("pump +", BRN), ("pump −", BRN)), (("boiler +", ORG), ("boiler −", ORG)), (("valve +", YEL), ("valve −", YEL))]
+# ---- J2 : 2 x 4 right-angle header, ONE 2 x 4 Dupont housing, two ribbons of 4 wires (one per row)
+head(60, 118, "J2: right-angle 2 x 4 male header, one 2 x 4 Dupont housing", "two ribbons of 4 wires: row A (top) and row B (bottom)")
+rowA = [("+5 V", RED), ("GND", DK), ("pump +", BRN), ("pump −", BRN)]
+rowB = [("boiler +", ORG), ("boiler −", ORG), ("valve +", YEL), ("valve −", YEL)]
 x0, yA, yB = 60, 190, 240
-for i, (a, b) in enumerate(colsJ2):
-    pin(x0 + i * 88, yA, a[0], a[1], 14)
-    pin(x0 + i * 88, yB, b[0], b[1], 14)
-for i, t in enumerate(["5 V supply", "pump SSR", "boiler SSR", "valve SSR"]):
-    T(x0 + i * 88 + 42, 306, t, F(13, True), colsJ2[i][0][1])
-T(x0 + 370, 214, "pins in the same housing share one", F(14), GRY, 'lm')
-T(x0 + 370, 236, "SSR; a 2 x 4 header is not keyed:", F(14), GRY, 'lm')
-T(x0 + 370, 258, "mark the wires (red on row A)", F(14), GRY, 'lm')
+for i, (lab, col) in enumerate(rowA):
+    pin(x0 + i * 88, yA, lab, col, 14)
+for i, (lab, col) in enumerate(rowB):
+    pin(x0 + i * 88, yB, lab, col, 14)
+T(x0 + 2 * 88, 306, "ribbon 1: 5 V supply + pump SSR", F(13, True), RED, 'mm') if False else None
+T(x0 + 176, 306, "ribbon 1 (row A): 5 V supply, then pump SSR", F(13, True), RED)
+T(x0 + 176, 328, "ribbon 2 (row B): boiler SSR, then valve SSR", F(13, True), ORG)
+T(x0 + 370, 214, "a 2 x 4 housing can be plugged 180 degrees", F(14), GRY, 'lm')
+T(x0 + 370, 236, "the wrong way round: use a keyed (shrouded)", F(14), GRY, 'lm')
+T(x0 + 370, 258, "2 x 4 header, or mark the housing", F(14), GRY, 'lm')
 
 # ---- J7 : 2 x 6 (two stacked rows of housings)
 head(60, 350, "J7: right-angle 2 x 6 male header: button, encoder (5 V) and 4 spare I/O pins")
