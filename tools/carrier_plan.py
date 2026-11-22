@@ -1,3 +1,4 @@
+import os
 # -*- coding: utf-8 -*-
 """Top view, to scale, of the carrier board in the box: placement of the parts (not a routed layout)."""
 from PIL import Image, ImageDraw, ImageFont
@@ -29,8 +30,8 @@ INK = (30, 30, 36); GRY = (110, 110, 116)
 MASK = (20, 100, 62); MASK2 = (26, 116, 72)
 SILK = (240, 240, 232); PAD = (205, 205, 210); HOLE = (36, 36, 40)
 
-text(d, W / 2, 36, "La carte porteuse dans le boîtier : implantation à l'échelle (vue de dessus)", 30, INK, True)
-text(d, W / 2, 74, "Placement proposé des composants : le routage des pistes se fait ensuite dans un logiciel de CAO. Le fond du boîtier, couvercle retiré.", 18, GRY)
+text(d, W / 2, 36, "Carrier board in the enclosure: to-scale placement (top view)", 30, INK, True)
+text(d, W / 2, 74, "Proposed component placement: track routing is done afterwards in a CAD tool. Enclosure base, lid removed.", 18, GRY)
 
 # ---------------------------------------------------------------- the box (interior 66 x 80, free area 60 x 70)
 INT_W, INT_L = 66.0, 80.0
@@ -40,7 +41,7 @@ rrect(d, bx0 - 3 * K, by0 - 3 * K, bx1 + 3 * K, by1 + 3 * K, 14, fill=(52, 52, 5
 rect(d, bx0, by0, bx1, by1, fill=(74, 74, 82, 255))
 # the opening for the USB-C cable in the back wall (y = top)
 rect(d, X(5.5), by0 - 3 * K, X(18.5), by0, fill=(20, 20, 24, 255), outline=(230, 230, 235, 255), width=2)
-text(d, X(12), by0 - 1.5 * K, "ouverture USB-C", 12, (230, 230, 235), True)
+text(d, X(12), by0 - 1.5 * K, "USB-C opening", 12, (230, 230, 235), True)
 # the four big posts (lid screws), diameter 8, at the corners of the interior
 for (cx, cy) in [(bx0 + 3.6 * K, by0 + 3.6 * K), (bx1 - 3.6 * K, by0 + 3.6 * K), (bx0 + 3.6 * K, by1 - 3.6 * K), (bx1 - 3.6 * K, by1 - 3.6 * K)]:
     circ(d, cx, cy, 4.0 * K, fill=(30, 30, 34, 255), outline=(120, 120, 128, 255), width=3)
@@ -130,11 +131,11 @@ for r_ in range(2):
     for c_ in range(4):
         tpad(35.5 + c_ * 2.54, 36.0 + r_ * 2.54, square=(r_ == 0 and c_ == 0), ring=1.7, drill=1.0)
 rect(d, X(35.5) - 1.5 * K, Y(36.0) - 1.5 * K, X(35.5 + 3 * 2.54) + 1.5 * K, Y(38.54) + 1.5 * K, outline=SILK + (255,), width=2)
-silk(40.6, 34.4, "J5  carte FPC (2 x 4)", 11)
+silk(40.6, 34.4, "J5  FPC board (2 x 4)", 11)
 # two M2 holes for the standoffs of the FPC adapter (positions to be taken from your board)
 for (cx, cy) in [(31.0, 33.5), (49.0, 33.5)]:
     hole(cx, cy, 2.2, 4.2)
-silk(40, 31.7, "2 x M2 (position à relever)", 9)
+silk(40, 31.7, "2 x M2 (position to measure)", 9)
 
 # flow input conditioning under the adapter: R11..R16 + C3, C4
 for i, name in enumerate(["R11", "R12", "R13", "R14", "R15", "R16"]):
@@ -152,29 +153,29 @@ for r_ in range(2):
     for c_ in range(4):
         tpad(13.0 + c_ * 2.54, 57.0 + r_ * 2.54, square=(r_ == 0 and c_ == 0), ring=1.7, drill=1.0)
 rect(d, X(13.0) - 1.4 * K, Y(57.0) - 1.4 * K, X(13.0 + 3 * 2.54) + 1.4 * K, Y(59.54) + 1.4 * K, outline=SILK + (255,), width=2)
-silk(17.5, 54.8, "J2  SSR + 5 V (2 x 4)", 10)
-for c_, lab in enumerate(["+5V", "P+", "C+", "V+"]):
+silk(17.5, 54.8, "J2  SSRs + 5 V (2 x 4)", 10)
+for c_, lab in enumerate(["+5V", "P+", "B+", "V+"]):
     text(d, X(13.0 + c_ * 2.54), Y(57.0) - 1.9 * K, lab, 8, SILK, True)
-for c_, lab in enumerate(["GND", "P−", "C−", "V−"]):
+for c_, lab in enumerate(["GND", "P−", "B−", "V−"]):
     text(d, X(13.0 + c_ * 2.54), Y(59.54) + 1.9 * K, lab, 8, SILK, True)
 # J7: 1 x 6 right-angle header, button and encoder
 for i in range(6):
     tpad(25.0 + i * 2.54, 58.2, square=(i == 0), ring=1.7, drill=1.0)
 rect(d, X(25.0) - 1.4 * K, Y(58.2) - 1.4 * K, X(25.0 + 5 * 2.54) + 1.4 * K, Y(58.2) + 1.4 * K, outline=SILK + (255,), width=2)
-silk(31.5, 55.4, "J7  bouton + encodeur (1 x 6)", 10)
+silk(31.5, 55.4, "J7  button + encoder (1 x 6)", 10)
 for i, lab in enumerate(["BT", "G", "5V", "G", "A", "B"]):
     text(d, X(25.0 + i * 2.54), Y(58.2) + 2.1 * K, lab, 8, SILK, True)
 # J8: 1 x 4 vertical header, dimmer (UART / I2C) in the corridor between ESP32 and FPC board; J9: 1 x 3, pressure sensor
-for i, lab in enumerate(["3V3", "GND", "TX/SDA", "RX/SCL"]):
+for i, lab in enumerate(["3V3", "GND", "SDA", "SCL"]):
     tpad(25.5, 33.0 + i * 2.54, square=(i == 0), ring=1.7, drill=1.0)
     text(d, X(27.0), Y(33.0 + i * 2.54), lab, 7, SILK, True, 'lm')
 rect(d, X(25.5) - 1.4 * K, Y(33.0) - 1.4 * K, X(25.5) + 1.4 * K, Y(33.0 + 3 * 2.54) + 1.4 * K, outline=SILK + (255,), width=2)
-silk(25.0, 31.4, "J8 variateur", 8)
+silk(25.0, 31.4, "J8 dimmer", 8)
 for i, lab in enumerate(["5V", "GND", "SIG"]):
     tpad(25.5, 43.2 + i * 2.54, square=(i == 0), ring=1.7, drill=1.0)
     text(d, X(27.0), Y(43.2 + i * 2.54), lab, 7, SILK, True, 'lm')
 rect(d, X(25.5) - 1.4 * K, Y(43.2) - 1.4 * K, X(25.5) + 1.4 * K, Y(43.2 + 2 * 2.54) + 1.4 * K, outline=SILK + (255,), width=2)
-silk(25.0, 41.5, "J9 pression", 8)
+silk(25.0, 41.5, "J9 pressure", 8)
 # F1 polyfuse (radial, pitch 5), D1 1N5819 (axial 10.16), C1 470 uF (radial 5 mm dia, pitch 2.5), C2 100 nF
 tpad(3.0, 65.0, ring=1.8, drill=0.9); tpad(8.0, 65.0, ring=1.8, drill=0.9)
 rrect(d, X(1.9), Y(63.4), X(9.1), Y(66.6), 6, outline=SILK + (255,), width=2); silk(5.5, 61.9, "F1 1,1 A", 9)
@@ -183,7 +184,7 @@ circ(d, X(27.0), Y(64.0), 3.15 * K, fill=None, outline=SILK + (255,), width=2)
 tpad(25.75, 64.0, ring=1.8, drill=0.8); tpad(28.25, 64.0, ring=1.8, drill=0.8); silk(27.0, 61.2, "C1", 9)
 tpad(12.5, 66.8, ring=1.6, drill=0.8); tpad(15.0, 66.8, ring=1.6, drill=0.8); silk(13.8, 62.2, "C2", 9)
 # XH x2 (side entry, 3 pins 2.5 pitch)
-for k, (x0, name) in enumerate([(32.0, "J3  débit In"), (41.5, "J4  débit Out")]):
+for k, (x0, name) in enumerate([(32.0, "J3  flow In"), (41.5, "J4  flow Out")]):
     for i in range(3):
         tpad(x0 + i * 2.5, 62.8, square=(i == 0), ring=1.8, drill=1.0)
     rect(d, X(x0) - 1.9 * K, Y(62.8) - 1.8 * K, X(x0 + 5) + 1.9 * K, Y(62.8) + 4.6 * K, outline=SILK + (255,), width=2)
@@ -196,20 +197,20 @@ silk(46.0, 66.6, "ESP32-S3 / SSR  rev A", 9)
 # ESP32-S3 board 21 x 52 at x 1..22, y 3..55
 rrect(o, px(X(1.0)) / SS, px(Y(3.0)) / SS, px(X(22.0)) / SS, px(Y(55.0)) / SS, 6, fill=(240, 240, 248, 120), outline=(240, 240, 248, 255), width=3)
 rect(o, px(X(7.5)) / SS, px(Y(1.7)) / SS, px(X(15.5)) / SS, px(Y(7.0)) / SS, fill=(190, 194, 200, 200), outline=(120, 124, 130, 255), width=2)
-text(o, X(11.5), Y(10.2), "ESP32-S3   21 x 52  (à 8,5 mm)", 11, (60, 60, 70), True)
-text(o, X(11.5), Y(51.8), "zone de l'antenne : rien dessous", 10, (150, 30, 30), True)
+text(o, X(11.5), Y(10.2), "ESP32-S3   21 x 52  (at 8.5 mm)", 11, (60, 60, 70), True)
+text(o, X(11.5), Y(51.8), "antenna zone: nothing underneath", 10, (150, 30, 30), True)
 text(o, X(11.5), Y(4.5), "USB-C", 10, (60, 60, 70), True)
 # MAX31865 module 25 x 28 at x 29..54, y 2..30
 rrect(o, px(X(29.0)) / SS, px(Y(2.0)) / SS, px(X(54.4)) / SS, px(Y(29.9)) / SS, 6, fill=(20, 80, 170, 150), outline=(150, 190, 250, 255), width=3)
 rect(o, px(X(33.3)) / SS, px(Y(2.4)) / SS, px(X(50.5)) / SS, px(Y(9.5)) / SS, fill=(46, 104, 180, 220), outline=(180, 210, 250, 255), width=2)
 text(o, X(41.7), Y(14.5), "MAX31865", 15, (235, 240, 255), True)
-text(o, X(41.7), Y(17.0), "25,4 x 27,9, hauteur 15", 11, (220, 232, 255))
-text(o, X(41.9), Y(6.0), "borne PT100", 10, (235, 240, 255), True)
+text(o, X(41.7), Y(17.0), "25.4 x 27.9, height 15", 11, (220, 232, 255))
+text(o, X(41.9), Y(6.0), "PT100 terminal", 10, (235, 240, 255), True)
 # FPC adapter board ~22 x 28 at x 29..51, y 32..60
 rrect(o, px(X(29.0)) / SS, px(Y(30.4)) / SS, px(X(51.0)) / SS, px(Y(56.9)) / SS, 6, fill=(22, 150, 80, 130), outline=(150, 240, 190, 255), width=3)
 rect(o, px(X(35.0)) / SS, px(Y(49.0)) / SS, px(X(45.0)) / SS, px(Y(54.5)) / SS, fill=(236, 236, 228, 230), outline=(120, 120, 110, 255), width=2)
-text(o, X(40.0), Y(51.8), "connecteur FPC", 10, (50, 50, 44), True)
-text(o, X(40.0), Y(47.0), "carte FPC ~22 x 26 (à 8,5 mm)", 10, (230, 255, 240), True)
+text(o, X(40.0), Y(51.8), "FPC connector", 10, (50, 50, 44), True)
+text(o, X(40.0), Y(47.0), "FPC board ~22 x 26 (at 8.5 mm)", 10, (230, 255, 240), True)
 base = Image.alpha_composite(base, ov)
 d = ImageDraw.Draw(base)
 
@@ -229,59 +230,59 @@ dim_v(-7.2, 0, 68, "68 mm")
 
 # ---------------------------------------------------------------- legend, to the right
 lx = 1010
-text(d, lx, 140, "Légende", 22, INK, True, 'lm')
+text(d, lx, 140, "Legend", 22, INK, True, 'lm')
 leg = [
-    ((205, 205, 210), "pastille traversante (trou de 1 mm)"),
-    ((240, 240, 232), "sérigraphie : repères et sens des connecteurs"),
-    ((240, 240, 248), "carte ESP32-S3, surélevée de 8,5 mm"),
-    ((20, 80, 170), "module MAX31865, surélevé de 3 mm"),
-    ((22, 150, 80), "carte FPC, surélevée de 8,5 mm"),
-    ((210, 50, 50), "zone interdite sous l'antenne"),
+    ((205, 205, 210), "through-hole pad (1 mm hole)"),
+    ((240, 240, 232), "silkscreen: connector marks and orientation"),
+    ((240, 240, 248), "ESP32-S3 board, raised 8.5 mm"),
+    ((20, 80, 170), "MAX31865 module, raised 3 mm"),
+    ((22, 150, 80), "FPC board, raised 8.5 mm"),
+    ((210, 50, 50), "keep-out under the antenna"),
 ]
 for i, (c, t) in enumerate(leg):
     y = 180 + i * 34
     rect(d, lx, y - 10, lx + 26, y + 10, fill=c, outline=(40, 40, 44), width=1)
     text(d, lx + 40, y, t, 16, INK, False, 'lm')
 
-text(d, lx, 410, "Composants", 22, INK, True, 'lm')
+text(d, lx, 410, "Components", 22, INK, True, 'lm')
 comp = [
-    "U1  2 supports femelles 1 x 20 (carte ESP32-S3)",
-    "U2  support 1 x 8, bas (module MAX31865)",
-    "J2  barrette 2 x 4 coudée : SSR et alimentation 5 V",
-    "J3, J4  JST XH 3 broches : capteurs de débit In et Out",
-    "J5  support 2 x 4 : carte d'adaptation FPC",
-    "J7  barrette 1 x 6 coudée : bouton et encodeur (5 V)",
-    "J8  1 x 4 : variateur de pompe (UART / I2C)  ·  J9  1 x 3 : capteur de pression",
-    "Q1 à Q3  commande des SSR ; Q4  rétroéclairage (2N2222A)",
-    "R1 à R4  1 kΩ  ·  R5 à R8  10 kΩ  ·  R9, R10  10 kΩ",
-    "R11 à R16  entrées des capteurs de débit  ·  C3, C4  1 nF",
-    "F1  fusible réarmable 1,1 A  ·  D1  1N5819",
+    "U1  2 female 1 x 20 sockets (ESP32-S3 board)",
+    "U2  low 1 x 8 socket (MAX31865 module)",
+    "J2  right-angle 2 x 4 header: SSRs and 5 V supply",
+    "J3, J4  JST XH 3-pin: flow sensors In and Out",
+    "J5  2 x 4 socket: FPC adapter board",
+    "J7  right-angle 1 x 6 header: button and encoder (5 V)",
+    "J8  1 x 4: pump dimmer (I2C)  ·  J9  1 x 3: pressure sensor",
+    "Q1 to Q3  SSR drive ; Q4  backlight (2N2222A)",
+    "R1 to R4  1 kΩ  ·  R5 to R8  10 kΩ  ·  R9, R10  encoder dividers",
+    "R11 to R16  flow sensor inputs  ·  C3, C4  1 nF",
+    "F1  1.1 A resettable fuse  ·  D1  1N5819",
     "C1  470 µF  ·  C2  100 nF",
 ]
 for i, t in enumerate(comp):
     text(d, lx, 450 + i * 30, t, 15, INK, False, 'lm')
 
-text(d, lx, 810, "Hauteurs (fond du boîtier = 0)", 22, INK, True, 'lm')
+text(d, lx, 810, "Heights (enclosure floor = 0)", 22, INK, True, 'lm')
 hs = [
-    "plots 3 + carte 1,6 = 4,6 mm",
-    "ESP32 sur supports de 8,5 mm : USB-C à 17,9 mm",
-    "carte FPC sur supports de 8,5 mm : 17,7 mm",
-    "MAX31865 sur supports de 3 mm : 22,6 mm",
-    "profondeur utile : 25 mm : marge 2,4 mm",
-    "électrolytique C1 : environ 15,6 mm",
+    "posts 3 + board 1.6 = 4.6 mm",
+    "ESP32 on 8.5 mm sockets: USB-C at 17.9 mm",
+    "FPC board on 8.5 mm sockets: 17.7 mm",
+    "MAX31865 on 3 mm sockets: 22.6 mm",
+    "usable depth: 25 mm: margin 2.4 mm",
+    "electrolytic C1: about 15.6 mm",
 ]
 for i, t in enumerate(hs):
     text(d, lx, 850 + i * 30, t, 15, INK if i != 4 else (20, 110, 60), i == 4, 'lm')
 
-text(d, lx, 1060, "Points à vérifier sur ta carte :", 18, (190, 40, 40), True, 'lm')
+text(d, lx, 1060, "Points to check on your board:", 18, (190, 40, 40), True, 'lm')
 chk = [
-    "un trou de fixation (en haut à droite) passe sous le MAX31865 : vis à tête plate,",
-    "hauteur 1,5 mm au plus, sous les 3 mm du module ;",
-    "positions des 2 trous M2 de la carte FPC ; ordre des broches de J5, J6 et J7.",
+    "one mounting hole (top right) passes under the MAX31865: flat-head screw,",
+    "1.5 mm high at most, under the module's 3 mm;",
+    "positions of the 2 M2 holes of the FPC board; pin order of J5, J6 and J7.",
 ]
 for i, t in enumerate(chk):
     text(d, lx, 1092 + i * 26, t, 15, INK, False, 'lm')
 
 out = base.resize((W, H), Image.LANCZOS).convert('RGB')
-out.save(r'C:/Users/Vivien/AppData/Local/Temp/claude/9a374a450e84f4a0/9b614a51-daa0-4dfd-9a1e-6c27e3b84c8e/scratchpad/carrier_plan.png')
+out.save(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'images', 'carrier_plan.png'))
 print('ok')

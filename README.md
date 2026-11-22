@@ -1,22 +1,22 @@
-# esp32_coffee_screen : conception électronique
+# esp32_coffee_screen: electronics design
 
-Carte porteuse pour migrer la machine à expresso (firmware : [coffee_screen](https://github.com/vivien22/coffee_screen)) de l'Arduino Nano vers un **ESP32-S3 Nano (N16R8)**, dans le boîtier plastique existant.
+Carrier board that moves the espresso machine (firmware: [coffee_screen](https://github.com/vivien22/coffee_screen)) from an Arduino Nano to an **ESP32-S3 Nano (N16R8)**, inside the existing plastic enclosure.
 
-État : **conception de travail, rien n'est fabriqué**. Les positions sont à l'échelle mais le routage reste à faire dans un logiciel de CAO.
+Status: **working design, nothing has been manufactured.** Placement is to scale, but track routing still has to be done in a CAD tool.
 
-## Contenu
-- `docs/carrier_spec.md` : spécification complète (dimensions, connecteurs, brochage, circuits, liste de composants, points à confirmer).
-- `images/carrier_plan.png` : implantation à l'échelle, vue de dessus, dans le boîtier.
-- `images/box_iso3.png` : vue 3D du boîtier avec la carte (les versions `box_iso`, `box_iso2` sont les itérations précédentes).
-- `images/carrier_schema.png` : schéma de principe (à mettre à jour pour les connecteurs J2 2 x 4 et J7 1 x 6).
-- `tools/` : scripts Python (Pillow) qui génèrent les images ; les mesures y sont en tête de fichier.
+## Contents
+- `docs/carrier_spec.md`: full specification (dimensions, connectors, pin assignment, circuits, bill of materials, open points).
+- `images/carrier_plan.png`: to-scale top-view placement inside the enclosure (**current**).
+- `images/box_iso3.png`: 3D view of the enclosure with the board (**outdated**: still shows the old 2 x 8 Dupont block, no J7/J8/J9).
+- `images/carrier_schema.png`: connection schematic (**outdated**: old J2 2 x 8 layout, no J8/J9).
+- `tools/`: Python (Pillow) scripts that generate the images; the measurements are at the top of each file.
 
-## Principes
-- Carte 58 x 68 mm dans l'espace libre de 60 x 70 mm, fixée sur 4 plots de 3 mm (entraxe 45 x 50 mm), profondeur utile 25 mm.
-- Uniquement des composants traversants.
-- ESP32-S3 et module MAX31865 sur supports ; carte d'adaptation FPC (écran déporté) sur support 2 x 4.
-- SSR conservés : commandés par transistors 2N2222A depuis le 5 V externe.
-- Connecteurs : J2 2 x 4 (5 V + 3 SSR), J7 1 x 6 (bouton + encodeur), 2 x JST XH 3 broches (capteurs de débit).
+## Principles
+- 58 x 68 mm board in the 60 x 70 mm free area, on four 3 mm standoffs (45 x 50 mm spacing), 25 mm usable depth.
+- Through-hole parts only (no SMD soldering).
+- ESP32-S3 and MAX31865 module on sockets; FPC adapter board (remote display) on a 2 x 4 socket.
+- SSRs are kept, driven by 2N2222A transistors from the external 5 V supply.
+- Connectors: J2 2 x 4 (5 V + 3 SSRs), J7 1 x 6 (button + encoder, 5 V), J8 1 x 4 (pump dimmer, I2C), J9 1 x 3 (pressure sensor), 2 x JST XH 3-pin (flow sensors).
 
-## À confirmer avant fabrication
-Voir la fin de `docs/carrier_spec.md` : brochage et alimentation de l'écran, ordre des broches de l'encodeur, dimensions réelles de la carte ESP32-S3 et de la carte FPC, type de sortie des capteurs de débit.
+## To confirm before manufacturing
+See the end of `docs/carrier_spec.md`.

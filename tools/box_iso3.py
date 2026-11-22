@@ -1,3 +1,4 @@
+import os
 # -*- coding: utf-8 -*-
 import math
 from PIL import Image, ImageDraw, ImageFont
@@ -48,8 +49,8 @@ BASE_H = 16.0                        # height of the base half (the walls)
 FLOOR = 2.0
 
 PLASTIC = (58, 58, 66)
-text(W / 2, 40, "Projection du boîtier : la carte porteuse avec ses connecteurs (l'écran est déporté)", 30, bold=True, anchor='mm')
-text(W / 2, 80, "Fond du boîtier, couvercle retiré. Dessin de principe à l'échelle : ce n'est pas un plan de la carte.", 20, (110, 110, 116), anchor='mm')
+text(W / 2, 40, "Enclosure view: the carrier board with its connectors (the display is remote)", 30, bold=True, anchor='mm')
+text(W / 2, 80, "Enclosure base, lid removed. Scaled concept drawing: not a board layout. (Outdated: still shows the old 2 x 8 Dupont block.)", 20, (110, 110, 116), anchor='mm')
 
 # ---------------------------------------------------------------- the base (open tray)
 # floor
@@ -147,24 +148,24 @@ def pl(x, y, z, tx, ty, t, color=(20, 20, 26)):
     d.ellipse([px - 4 * SS, py - 4 * SS, px + 4 * SS, py + 4 * SS], fill=color)
     text(tx + (10 if tx >= px / SS else -10), ty, t, 17, color, True, 'lm' if tx >= px / SS else 'rm')
 
-pl(ex + 10, ey + 26, top + 10.2, 330, 470, "ESP32-S3, au-dessus de la carte")
-pl(ex + 10, ey - 0.5, top + 11, 330, 400, "USB-C : ouverture dans la paroi")
-pl(mx + 12, my + 22, top + 4.6, 1230, 240, "MAX31865 (25 x 28, hauteur 15)")
-pl(ax0 + 11, ay0 + 10, top + HDR + 1.6, 1230, 330, "ta carte d'adaptation FPC (sur supports)")
-pl(ax0 + 11, ay0 + 24, top + HDR + 4.2, 1230, 420, "connecteur FPC déjà soudé : aucun CMS à souder")
-pl(ax0 + 11, ay0 + 40, top + HDR + 2, 1230, 510, "nappe vers l'écran déporté")
-pl(CX0 + 13, CY0 + 59.5, top + 2.8, 330, 600, "Dupont 2 x 8 : 5 V, SSR, bouton, enc.")
-pl(CX0 + 9, CY0 + 65, top + 1.6, 330, 690, "3 transistors des SSR")
-pl(CX0 + 31, CY0 + 64, top + 6, 1230, 640, "JST XH 3 : capteurs de débit In et Out")
-pl(sx0, sy0 + 50, FLOOR + 3, 330, 780, "petits plots de 3 mm (45 x 50)")
+pl(ex + 10, ey + 26, top + 10.2, 330, 470, "ESP32-S3, above the board")
+pl(ex + 10, ey - 0.5, top + 11, 330, 400, "USB-C: opening in the wall")
+pl(mx + 12, my + 22, top + 4.6, 1230, 240, "MAX31865 (25 x 28, height 15)")
+pl(ax0 + 11, ay0 + 10, top + HDR + 1.6, 1230, 330, "your FPC adapter board (on sockets)")
+pl(ax0 + 11, ay0 + 24, top + HDR + 4.2, 1230, 420, "FPC connector already soldered: no SMD to solder")
+pl(ax0 + 11, ay0 + 40, top + HDR + 2, 1230, 510, "ribbon to the remote display")
+pl(CX0 + 13, CY0 + 59.5, top + 2.8, 330, 600, "Dupont 2 x 8: 5 V, SSRs, button, enc. (old layout)")
+pl(CX0 + 9, CY0 + 65, top + 1.6, 330, 690, "3 SSR transistors")
+pl(CX0 + 31, CY0 + 64, top + 6, 1230, 640, "JST XH 3: flow sensors In and Out")
+pl(sx0, sy0 + 50, FLOOR + 3, 330, 780, "3 mm small posts (45 x 50)")
 
 # ---------------------------------------------------------------- the stack of heights
-text(1230, 800, "Hauteur utile : 25 mm", 22, (30, 30, 36), True)
-text(1230, 836, "plots 3 + carte 1,6 = 4,6 mm", 18, (60, 60, 66))
-text(1230, 862, "ESP32 (supports 8,5) : USB-C à 17,9 mm", 18, (60, 60, 66))
-text(1230, 888, "carte FPC sur supports 8,5 : 17,7 mm", 18, (60, 60, 66))
-text(1230, 914, "MAX31865 (supports 3) : 22,6 mm, marge 2,4 mm", 18, (20, 110, 60), True)
+text(1230, 800, "Usable height: 25 mm", 22, (30, 30, 36), True)
+text(1230, 836, "posts 3 + board 1.6 = 4.6 mm", 18, (60, 60, 66))
+text(1230, 862, "ESP32 (8.5 sockets): USB-C at 17.9 mm", 18, (60, 60, 66))
+text(1230, 888, "FPC board on 8.5 sockets: 17.7 mm", 18, (60, 60, 66))
+text(1230, 914, "MAX31865 (3 sockets): 22.6 mm, margin 2.4 mm", 18, (20, 110, 60), True)
 
 im = im.resize((W, H), Image.LANCZOS)
-im.save(r'C:/Users/Vivien/AppData/Local/Temp/claude/9a374a450e84f4a0/9b614a51-daa0-4dfd-9a1e-6c27e3b84c8e/scratchpad/box_iso3.png')
+im.save(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'images', 'box_iso3.png'))
 print('ok')
