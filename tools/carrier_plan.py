@@ -42,10 +42,10 @@ rect(d, bx0, by0, bx1, by1, fill=(74, 74, 82, 255))
 # the opening for the USB-C cable in the back wall (y = top)
 rect(d, X(5.5), by0 - 3 * K, X(18.5), by0, fill=(20, 20, 24, 255), outline=(230, 230, 235, 255), width=2)
 text(d, X(12), by0 - 1.5 * K, "USB-C opening", 12, (230, 230, 235), True)
-# the four big posts (lid screws): 8 x 8 mm in the corners of the interior. They leave a plus-shaped usable area:
+# the four big posts (lid screws): round, 8 mm diameter (8 x 8 mm footprint) in the corners of the interior. They leave a plus-shaped usable area:
 # 60 wide over 69 long, and 44 wide over the full 85 length.
 for (xa, xb, ya, yb) in [(-1, 7, -8.5, -0.5), (51, 59, -8.5, -0.5), (-1, 7, 68.5, 76.5), (51, 59, 68.5, 76.5)]:
-    rrect(d, X(xa), Y(ya), X(xb), Y(yb), 8, fill=(30, 30, 34, 255), outline=(120, 120, 128, 255), width=3)
+    circ(d, (X(xa) + X(xb)) / 2, (Y(ya) + Y(yb)) / 2, 4.0 * K, fill=(30, 30, 34, 255), outline=(120, 120, 128, 255), width=3)
     circ(d, (X(xa) + X(xb)) / 2, (Y(ya) + Y(yb)) / 2, 1.6 * K, fill=(70, 70, 78, 255))
 cross = [(-1, -0.5), (7, -0.5), (7, -8.5), (51, -8.5), (51, -0.5), (59, -0.5), (59, 68.5), (51, 68.5), (51, 76.5), (7, 76.5), (7, 68.5), (-1, 68.5)]
 line(d, [(X(a), Y(b)) for a, b in cross + [cross[0]]], (150, 200, 150), 2)

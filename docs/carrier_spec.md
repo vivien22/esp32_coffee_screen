@@ -3,7 +3,7 @@
 All **through-hole** parts (no SMD soldering). Related files: `images/carrier_plan.png` (to-scale placement), `images/box_iso3.png` (3D view), `images/carrier_schema.png` (connection schematic).
 
 ## Dimensions and mounting
-- Enclosure interior (measured): **60 mm wide x 85 mm long**. The four big posts are **8 x 8 mm** in the corners. The small posts (3 mm high) are at **45 x 50 mm**, centred.
+- Enclosure interior (measured): **60 mm wide x 85 mm long**. The four big posts are round, **8 mm in diameter** (8 x 8 mm footprint), in the corners. The small posts (3 mm high) are at **45 x 50 mm**, centred.
 - The posts leave a plus-shaped usable area: **60 x 69 mm** between the posts along the long sides (y from 8 to 77) and **44 mm wide over the full 85 mm length** between the end posts.
 - Board: **58 x 68 mm main body** (0.5 to 1 mm of margin all round) **plus a 42 x 7 mm tab on the cable (front) side**, so the board is 75 mm long at the tab; two layers, ground plane. The tab lets the Dupont housings of J2 / J7 and the JST XH plugs sit on the board up to the front wall; the back extension (same size) is not used.
 - 4 mounting holes on the **3 mm** small posts, **45 x 50 mm** spacing, centred in the interior (board coordinates (6.5, 9), (51.5, 9), (6.5, 59), (51.5, 59)).

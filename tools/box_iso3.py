@@ -32,6 +32,20 @@ def cuboid(x, y, z, w, dp, h, color, outline=(20, 20, 24)):
     poly([(x + w, y, z), (x + w, y + dp, z), (x + w, y + dp, z + h), (x + w, y, z + h)], shade(color, 0.85), outline)
     poly([(x, y + dp, z), (x + w, y + dp, z), (x + w, y + dp, z + h), (x, y + dp, z + h)], shade(color, 0.68), outline)
 
+def cyl(cx, cy, r, z, h, color, outline=(20, 20, 24), n=28):
+    """Vertical cylinder: side quads painted back to front, then the top disc."""
+    angs = [2 * math.pi * k / n for k in range(n)]
+    quads = []
+    for k in range(n):
+        a0, a1 = angs[k], angs[(k + 1) % n]
+        mid = (a0 + a1) / 2
+        quads.append((cx + r * math.cos(mid) + cy + r * math.sin(mid), k, a0, a1))
+    for _, k, a0, a1 in sorted(quads):
+        p = [(cx + r * math.cos(a0), cy + r * math.sin(a0), z), (cx + r * math.cos(a1), cy + r * math.sin(a1), z),
+             (cx + r * math.cos(a1), cy + r * math.sin(a1), z + h), (cx + r * math.cos(a0), cy + r * math.sin(a0), z + h)]
+        poly(p, shade(color, 0.62 + 0.5 * (math.cos((a0 + a1) / 2) + math.sin((a0 + a1) / 2) + 1.4) / 2.4))
+    poly([(cx + r * math.cos(a), cy + r * math.sin(a), z + h) for a in angs], shade(color, 1.25), outline)
+
 def text(x, y, t, size=18, color=(30, 30, 36), bold=False, anchor='lm'):
     d.text((x * SS, y * SS), t, font=F(size, bold), fill=color, anchor=anchor)
 
@@ -66,7 +80,7 @@ poly([(0, 0, BASE_H), (BX, 0, BASE_H), (BX - WALL, WALL, BASE_H), (WALL, WALL, B
 poly([(0, 0, BASE_H), (0, BY, BASE_H), (WALL, BY - WALL, BASE_H), (WALL, WALL, BASE_H)], shade(PLASTIC, 1.2), (20, 20, 24))
 # the big posts (plus-shaped usable area: each corner blocked over 13 x 6 mm); the back ones here, the front ones after the board
 for (px, py) in [(WALL, WALL), (BX - WALL - 8, WALL)]:
-    cuboid(px, py, FLOOR, 8, 8, BASE_H - FLOOR, (40, 40, 46))
+    cyl(px + 4, py + 4, 4, FLOOR, BASE_H - FLOOR, (46, 46, 54))
 
 # ---------------------------------------------------------------- the carrier and what it holds
 CX0, CY0 = WALL + 1.0, WALL + 8.5     # origin of the carrier (58 x 68)
@@ -139,7 +153,7 @@ items.sort(key=lambda t: t[0])
 for _, fn in items:
     fn()
 for (px, py) in [(WALL, BY - WALL - 8), (BX - WALL - 8, BY - WALL - 8)]:
-    cuboid(px, py, FLOOR, 8, 8, BASE_H - FLOOR, (40, 40, 46))
+    cyl(px + 4, py + 4, 4, FLOOR, BASE_H - FLOOR, (46, 46, 54))
 
 # ---------------------------------------------------------------- the front walls of the base (cut low, to see inside)
 FW = 5.0
