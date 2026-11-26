@@ -49,10 +49,10 @@ T(x0 + 370, 288, "row C: J8 pump dimmer, RobotDyn (I2C)", F(14, True), VIO, 'lm'
 T(x0 + 370, 312, "a 2 x 4 housing can be plugged 180 degrees the wrong way:", F(13), GRY, 'lm')
 T(x0 + 370, 330, "mark it, or key the header", F(13), GRY, 'lm')
 
-head(60, 366, "J7 + J9: right-angle 3 x 6 male header")
+head(60, 366, "J7: right-angle 3 x 6 male header (row C spare)")
 j7a = [("button", (90, 90, 96)), ("GND", DK), ("+5 V", RED), ("IN 38", VIO), ("OUT 39", VIO), ("GND", DK)]
 j7b = [("GA", GRN), ("GB", GRN), ("+5 V", RED), ("GND", DK)]
-j7c = [("+5 V", RED), ("GND", DK), ("signal", BLU)]
+j7c = [("spare", (150, 150, 156))] * 3
 for i, (lab, col) in enumerate(j7a):
     pin(60 + i * 88, 396, lab, col, 14)
 for i, (lab, col) in enumerate(j7b):
@@ -61,7 +61,7 @@ for i, (lab, col) in enumerate(j7c):
     pin(60 + i * 88, 488, lab, col, 14)
 T(620, 418, "row A: button (2) + spare I/O (4)", F(14), GRY, 'lm')
 T(620, 464, "row B: encoder (module order)", F(14), GRY, 'lm')
-T(620, 510, "row C: J9 pressure sensor", F(14), GRY, 'lm')
+T(620, 510, "row C: spare, bare", F(14), GRY, 'lm')
 
 # ---- J3 / J4
 head(60, 628, "J3, J4: JST XH 3-pin, flow sensors In and Out", "sensor wire order: often red / yellow / black: check your cable")
@@ -69,6 +69,10 @@ for k, (name, x) in enumerate([("J3  flow In", 60), ("J4  flow Out", 480)]):
     T(x, 690, name, F(15, True), INK, 'lm')
     for i, (lab, col) in enumerate([("+5 V", RED), ("signal", BLU), ("GND", DK)]):
         pin(x + i * 88, 710, lab, col, 14)
+# J9: same JST XH order, pressure sensor (on the tab under J3), drawn under J7 where there is room
+T(60, 552, "J9  pressure sensor (JST XH 3-pin, same order as J3 / J4)", F(15, True), INK, 'lm')
+for i, (lab, col) in enumerate([("+5 V", RED), ("signal", BLU), ("GND", DK)]):
+    pin(60 + i * 88, 566, lab, col, 14)
 
 # ---- J5
 head(60, 790, "J5: 2 x 4 socket for your FPC adapter board (8 pins)", "your board's numbering: top row 1, 3, 5, 7; bottom row 2, 4, 6, 8")

@@ -176,7 +176,7 @@ for c_, lab in enumerate(["+5V", "GND", "P+", "P−"]):
     text(d, X(12.2 + c_ * 2.54), Y(ROWS[0]) - 1.9 * K, lab, 7, SILK, True)
 for c_, lab in enumerate(["5V", "GND", "SDA", "SCL"]):
     text(d, X(12.2 + c_ * 2.54), Y(ROWS[2]) + 1.9 * K, lab, 7, SILK, True)
-# J7 + J9: 3 x 6 right-angle header. Row A: button (2) + spare I/O (4); row B: encoder (GA, GB, VCC, GND); row C: J9, pressure sensor, bare.
+# J7 + J9: 3 x 6 right-angle header. Row A: button (2) + spare I/O (4); row B: encoder (GA, GB, VCC, GND); row C: spare, bare (the pressure sensor is J9, a JST XH under J3).
 for c_ in range(6):
     tpad(22.4 + c_ * 2.54, ROWS[0], square=(c_ == 0), ring=1.7, drill=1.0)
 for c_ in range(4):
@@ -184,11 +184,9 @@ for c_ in range(4):
 for c_ in range(3):
     tpad(22.4 + c_ * 2.54, ROWS[2], ring=1.7, drill=1.0)
 rect(d, X(22.4) - 1.4 * K, Y(ROWS[0]) - 1.4 * K, X(22.4 + 5 * 2.54) + 1.4 * K, Y(ROWS[2]) + 1.4 * K, outline=SILK + (255,), width=2)
-silk(33.2, 55.3, "J7 (A, B) + J9 (C)", 9)
+silk(33.2, 55.3, "J7 (A, B)", 9)
 for c_, lab in enumerate(["BT", "GND", "5V", "IN", "OUT", "GND"]):
     text(d, X(22.4 + c_ * 2.54), Y(ROWS[0]) - 1.9 * K, lab, 7, SILK, True)
-for c_, lab in enumerate(["5V", "GND", "SIG"]):
-    text(d, X(22.4 + c_ * 2.54), Y(ROWS[2]) + 1.9 * K, lab, 7, SILK, True)
 # JP1: 1 x 2 header + shunt in the corridor: +5 V board to the 5V pin of the ESP32 (fitted: normal; removed: the ESP32 on USB only)
 tpad(27.2, 33.0, square=True, ring=1.7, drill=1.0); tpad(27.2, 35.54, ring=1.7, drill=1.0)
 rect(d, X(27.2) - 1.4 * K, Y(33.0) - 1.4 * K, X(27.2) + 1.4 * K, Y(35.54) + 1.4 * K, outline=SILK + (255,), width=2)
@@ -209,6 +207,12 @@ for k, (x0, name) in enumerate([(42.0, "J3 flow In"), (52.5, "J4 flow Out")]):
         tpad(x0 + (i - 1) * 2.5, 65.0, square=(i == 0), ring=1.8, drill=1.0)
     rect(d, X(x0) - 4.95 * K, Y(65.0) - 2.9 * K, X(x0) + 4.95 * K, Y(65.0) + 2.9 * K, outline=SILK + (255,), width=2)
     text(d, X(x0), Y(62.9), name, 8, SILK, True)
+
+# J9: JST XH 3-pin (pressure sensor), vertical, on the tab right under J3 (same x, y 71.5): footprint 9.9 x 5.8, margins 0.7 mm to J3 and 0.6 mm to the tab edge
+for i in range(3):
+    tpad(42.0 + (i - 1) * 2.5, 71.5, square=(i == 0), ring=1.8, drill=1.0)
+rect(d, X(42.0) - 4.95 * K, Y(71.5) - 2.9 * K, X(42.0) + 4.95 * K, Y(71.5) + 2.9 * K, outline=SILK + (255,), width=2)
+text(d, X(42.0), Y(69.55), "J9 pressure", 8, SILK, True)
 
 # ---------------------------------------------------------------- the raised boards, translucent (they hide nothing)
 # ESP32-S3 board ~22 x 54 at x 2.5..56.5, y 3..25 (rotated 90 degrees, USB-C to the left)
@@ -269,9 +273,9 @@ comp = [
     "U1  2 female 1 x 20 sockets (ESP32-S3 board)",
     "U2  low 1 x 8 socket (MAX31865 module)",
     "J2  right-angle 3 x 4 header, rows A, B: 5 V supply and SSRs  ·  row C: J8, pump dimmer (I2C)",
-    "J3, J4  JST XH 3-pin: flow sensors In and Out",
+    "J3, J4  JST XH 3-pin: flow sensors In and Out  ·  J9  JST XH 3-pin: pressure sensor (on the tab, under J3)",
     "J5  2 x 4 socket: FPC adapter board",
-    "J7  right-angle 3 x 6 header, rows A, B: button, encoder, spare I/O  ·  row C: J9, pressure sensor",
+    "J7  right-angle 3 x 6 header, rows A, B: button, encoder, spare I/O  ·  row C: spare, bare",
     "JP1  1 x 2 header + jumper: +5 V to the ESP32 (removed: ESP32 on USB only)",
     "Q1 to Q3  SSR drive ; Q4  backlight (optional)",
     "R1 to R4  1 kΩ  ·  R5 to R8  10 kΩ  ·  R9, R10, R17, R18  5 V input dividers (GA, GB, IN)",
@@ -302,7 +306,9 @@ chk = [
     "USB-C opening in the left wall (y 9 to 19 mm); mounting holes under the antenna: no copper ring;",
     "PT100 wires leave at the front above J7 / J3 / J4, at about 14 mm;",
     "Dupont housings end at the front wall (the board has a 42 x 7 tab there); cable slot in the wall;",
-    "M2 holes and pin-1 orientation of the FPC board; pin order of J5, J6 and J7.",
+    "M2 holes and pin-1 orientation of the FPC board; pin order of J5, J6 and J7;",
+    "J9 (JST XH under J3): 0.7 mm to J3, 0.6 mm to the tab edge;",
+    "check its plug height against the cable of J3 (about 12 mm).",
 ]
 for i, t in enumerate(chk):
     text(d, lx, 1092 + i * 26, t, 15, INK, False, 'lm')

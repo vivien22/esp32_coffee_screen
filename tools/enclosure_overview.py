@@ -160,12 +160,12 @@ cuboid(CX0 + 12.2 - 1.27, CY0 + 57.7, top, 10.16, 7.8, 8.4, BLACK)
 cuboid(CX0 + 12.2 - 1.27 + 0.15, CY0 + 65.6, top + 2.9, 10.0, 8.6, 5.1, WHITE)
 for i in range(4):                                                                       # the bare pins of J8 (row C)
     cuboid(CX0 + 12.2 + i * 2.54 - 0.32, CY0 + 65.5, top + 1.27 - 0.32, 0.64, 6.0, 0.64, GOLD)
-# J7 + J9: 3 x 6 right-angle header (A: button + spare, B: encoder, C: J9, bare)
+# J7: 3 x 6 right-angle header (A: button + spare, B: encoder, C: spare, bare)
 cuboid(CX0 + 22.4 - 1.27, CY0 + 57.7, top, 15.24, 7.8, 8.4, BLACK)
 cuboid(CX0 + 22.4 - 1.27 + 0.15, CY0 + 65.6, top + 2.95, 10.0, 8.6, 2.3, WHITE)
 cuboid(CX0 + 22.4 - 1.27 + 0.15, CY0 + 65.6, top + 5.5, 4.9, 8.6, 2.3, WHITE)
 cuboid(CX0 + 22.4 - 1.27 + 5.23, CY0 + 65.6, top + 5.5, 9.9, 8.6, 2.3, (225, 222, 205))
-for i in range(3):                                                                       # the bare pins of J9 (row C)
+for i in range(3):                                                                       # the bare pins of row C (spare)
     cuboid(CX0 + 22.4 + i * 2.54 - 0.32, CY0 + 65.5, top + 1.27 - 0.32, 0.64, 6.0, 0.64, GOLD)
 # polyfuse, standing diode, electrolytic, 100 nF, and the two JST XH (vertical headers with their plugs)
 cuboid(CX0 + 1.9, CY0 + 64.4, top, 7.2, 3.2, 11.0, (232, 200, 60))
@@ -176,6 +176,9 @@ for k in range(2):
     xb = CX0 + 42.0 + k * 10.5 - 4.95
     cuboid(xb, CY0 + 62.1, top, 9.9, 5.8, 5.8, WHITE)                                     # JST XH header
     cuboid(xb + 0.3, CY0 + 62.4, top + 5.8, 9.3, 5.2, 6.0, CREAM)                         # its plug
+
+# J9: JST XH header (pressure sensor) on the tab under J3, bare: no plug, no cable
+cuboid(CX0 + 42.0 - 4.95, CY0 + 68.6, top, 9.9, 5.8, 5.8, WHITE)
 
 # FPC ribbon: leaves the connector towards the front and runs straight out
 Y_END = CY0 + 97.0
@@ -206,7 +209,7 @@ def run_z(xc, y0, y1, zc, wires, color):
 
 
 def riser_y(xc, yc, z0, z1, wires, color):
-    """Short vertical piece leaving a plug whose pins run along y (J8, J9): width along y."""
+    """Short vertical piece leaving a plug whose pins run along y (J8): width along y."""
     w = wires * WIRE
     cuboid(xc - TH / 2, yc - w / 2, z0, TH, w, z1 - z0, color)
 
@@ -228,7 +231,7 @@ xb, xe, xs = CX0 + 22.4 + 1.27, CX0 + 22.4 + 3.81, CX0 + 22.4 + 8.89
 run_x(xb, Y0, Y_END, top + 6.65, 2, (240, 240, 240)); cable("button", "J7", 2, (240, 240, 240), (xb, Y_END, top + 6.65))
 run_x(xe, Y0, Y_END, top + 4.1, 4, (40, 150, 70)); cable("encoder", "J7", 4, (40, 150, 70), (xe, Y_END, top + 4.1))
 run_x(xs, Y0, Y_END, top + 6.65, 4, (150, 90, 200)); cable("spare I/O", "J7", 4, (150, 90, 200), (xs, Y_END, top + 6.65))
-# J8 (dimmer, row C of J2) and J9 (pressure sensor, row C of J7) are provisioned but not plugged: no cable here
+# J8 (dimmer, row C of J2) and J9 (pressure sensor, JST XH under J3) are provisioned but not plugged: no cable here
 # JST XH: flow sensors (3 wires each), up from the plugs then forward
 c3, c4 = (20, 150, 150), (90, 80, 190)
 riser_x(CX0 + 40.5, CY0 + 65.0, top + 11.8, top + 14.0, 3, c3)
