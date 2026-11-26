@@ -155,11 +155,10 @@ cuboid(CX0 + 27.2 - 1.27, CY0 + 33.0 - 1.27, top, 2.54, 5.08, 2.5, BLACK)
 for yy in (33.0, 35.54):
     cuboid(CX0 + 27.2 - 0.32, CY0 + yy - 0.32, top + 2.5, 0.64, 0.64, 6.0, GOLD)
 cuboid(CX0 + 27.2 - 1.2, CY0 + 33.0 - 1.2, top + 2.5, 2.4, 4.9, 5.5, (40, 40, 44))      # the shunt, in place
-# J2 + J8: 3 x 4 right-angle header (3 rows: A and B = J2, C = J8, the lowest, bare), ONE 2 x 4 housing on rows A and B
+# J2 + J8: 3 x 4 right-angle header (3 rows: A and B = J2, C = J8, the lowest), ONE 2 x 4 housing on rows A and B, one more on row C
 cuboid(CX0 + 12.2 - 1.27, CY0 + 57.7, top, 10.16, 7.8, 8.4, BLACK)
 cuboid(CX0 + 12.2 - 1.27 + 0.15, CY0 + 65.6, top + 2.9, 10.0, 8.6, 5.1, WHITE)
-for i in range(4):                                                                       # the bare pins of J8 (row C)
-    cuboid(CX0 + 12.2 + i * 2.54 - 0.32, CY0 + 65.5, top + 1.27 - 0.32, 0.64, 6.0, 0.64, GOLD)
+cuboid(CX0 + 12.2 - 1.27 + 0.15, CY0 + 65.6, top + 0.1, 10.0, 8.6, 2.3, (225, 222, 205))   # J8 housing (row C, the lowest)
 # J7: 2 x 6 right-angle header (A: button + spare, B: encoder)
 cuboid(CX0 + 22.4 - 1.27, CY0 + 57.7, top, 15.24, 5.3, 8.4, BLACK)
 cuboid(CX0 + 22.4 - 1.27 + 0.15, CY0 + 65.6, top + 2.95, 10.0, 8.6, 2.3, WHITE)
@@ -230,7 +229,9 @@ xb, xe, xs = CX0 + 22.4 + 1.27, CX0 + 22.4 + 3.81, CX0 + 22.4 + 8.89
 run_x(xb, Y0, Y_END, top + 6.65, 2, (240, 240, 240)); cable("button", "J7", 2, (240, 240, 240), (xb, Y_END, top + 6.65))
 run_x(xe, Y0, Y_END, top + 4.1, 4, (40, 150, 70)); cable("encoder", "J7", 4, (40, 150, 70), (xe, Y_END, top + 4.1))
 run_x(xs, Y0, Y_END, top + 6.65, 4, (150, 90, 200)); cable("spare I/O", "J7", 4, (150, 90, 200), (xs, Y_END, top + 6.65))
-# J8 (dimmer, row C of J2) is provisioned but not plugged: no cable here
+# J8: pump dimmer (I2C), 4 wires, lowest row of the J2 header
+c8 = (225, 60, 150)
+run_x(xj2, Y0, Y_END, top + 1.27, 4, c8); cable("pump dimmer (I2C)", "J8", 4, c8, (xj2, Y_END, top + 1.27))
 # JST XH: flow sensors (3 wires each), up from the plugs then forward
 c3, c4 = (20, 150, 150), (90, 80, 190)
 riser_x(CX0 + 40.5, CY0 + 65.0, top + 11.8, top + 14.0, 3, c3)
