@@ -10,12 +10,12 @@ All **through-hole** parts (no SMD soldering). Related files: `images/board_plac
 - Usable depth **25 mm**: posts 3 + board 1.6 = 4.6 mm; ESP32 on 8.5 mm sockets (USB-C at 17.9 mm); FPC adapter board on 8.5 mm sockets (17.7 mm); MAX31865 on low 3 mm sockets (22.6 mm, 2.4 mm margin).
 - **ESP32-S3 rotated 90 degrees** (long side across the board, at the back, y 3 to 25 mm): **USB-C towards the left wall**, with an opening in that wall at y 9 to 19 mm (the connector is then far from the 8 mm corner posts). The antenna end is on the right (x 48.5 to 56.5 mm).
 - **Under the ESP32 (between the two socket rows, 8.5 mm clearance):** vertical axial resistors R1 to R10, then Q1 to Q4 on the right; Q5 (spare output) at the left, next to the USB end. The two small standoffs at the back (6.5, 9) and (51.5, 9) are under the ESP32; the one on the right is under the antenna, so use a **non-plated hole with no copper ring** there.
-- **Connector rows:** J8 is the lowest row of the J2 header; the lowest row of the J7 header is a spare row, bare (3-row right-angle strips; each row has its own Dupont housing, rows are 2.54 mm apart vertically, the housings are not keyed: mind the order). J8 and J9 stay bare for now. The corridor between the FPC board and the MAX31865 holds JP1, C1 and C2.
+- **Connector rows:** J8 is the lowest row of the J2 header; J7 is a 2-row right-angle header (J2 + J8 use a 3-row strip; each row has its own Dupont housing, rows are 2.54 mm apart vertically, the housings are not keyed: mind the order). J8 stays bare for now; J9 has its plug and cable. The corridor between the FPC board and the MAX31865 holds JP1, C1 and C2.
 - **Below the ESP32, side by side:** the FPC adapter board on the **left** (x 1.5 to 23.5 mm, connector towards the front, flow-input parts R11 to R16 and C3, C4 under it), the MAX31865 on the **right** (x 31 to 56.4 mm, rotated 180 degrees: header on its rear edge, pin 1 VIN on the right, PT100 terminal block facing the front), and a corridor between them (x 23.5 to 31 mm) holding J8, J9, C1 and C2.
 - **Front connector row:** right-angle headers with their Dupont housings need about **9 mm in front of the pads** (keep-out, nothing else there); J2 and J7 are on the 42 x 7 mm tab, the vertical JST XH J3 and J4 at the front right, F1 and D1 in the front-left corner. A cable slot is needed in the front wall (housings end about 1 mm from it).
 - **All cables leave through the front** (J2, J7, J3, J4, the PT100 wires and the display ribbon). Only the USB-C cable leaves through the left wall.
 - **Display ribbon:** the FPC adapter board is rotated so that its connector faces the front: the flat ribbon (about 6 mm wide, at about 15.5 mm) runs **straight to the front** between x 7 and 18 mm, above J2's housings (10.5 mm) and F1; no tall part (JST XH plugs reach about 16 mm) may sit in that column. Nothing crosses the MAX31865 any more.
-- **Cables:** small flat ribbons (Dupont wires side by side), about **1.5 mm per wire** (4 wires = 6 mm, 3 wires = 4.5 mm, 2 wires = 3 mm), 1.3 mm thick. In the 3D view the cables are numbered 1 to 9 (J2 x2, J7 x3, J3, J4, PT100 probe, display ribbon); J3 / J4 leave their plugs upwards at about 12 mm and the two thin PT100 wires (0.8 mm, on the two middle terminals of the MAX31865 block) at about 15 mm; all go through the front slot. **J8 (pump dimmer) and J9 (pressure sensor) are provisioned on the board but not plugged for now**: they are shown as bare headers, and their cables (4 wires = 6 mm, 3 wires = 4.5 mm) are not counted in the slot width.
+- **Cables:** small flat ribbons (Dupont wires side by side), about **1.5 mm per wire** (4 wires = 6 mm, 3 wires = 4.5 mm, 2 wires = 3 mm), 1.3 mm thick. In the 3D view the cables are numbered 1 to 10 (J2 x2, J7 x3, J3, J4, J9, PT100 probe, display ribbon); J3 / J4 leave their plugs upwards at about 12 mm and the two thin PT100 wires (0.8 mm, on the two middle terminals of the MAX31865 block) at about 15 mm; all go through the front slot. J9 (pressure sensor, 3 wires = 4.5 mm) leaves its plug upwards at about 14 mm, like J3 / J4. **J8 (pump dimmer) is provisioned on the board but not plugged for now**: it is shown as a bare header, and its cable (4 wires = 6 mm) is not counted in the slot width.
 - The spare-I/O resistors R17 to R21 are flat resistors under the MAX31865 (3 mm clearance, enough for axial 1/4 W parts).
 - No copper and no component under the ESP32 antenna (the end of the ESP32 board opposite the USB-C).
 
@@ -26,7 +26,7 @@ All **through-hole** parts (no SMD soldering). Related files: `images/board_plac
 | J3, J4 | JST XH 3-pin, vertical, rotated (real pitch 2.5 mm) | flow sensors In and Out |
 | J5 | 2 x 4 female socket | FPC adapter board (8 pins, ribbon to the remote display) |
 | J6 | 1 x 8 female socket (low, 3 mm) | MAX31865 module |
-| J7 | rows A and B of a **3 x 6 right-angle male header** | button + encoder (encoder powered from 5 V) + 4 spare I/O pins (+5 V, level-adapted input, level-adapted output, GND) |
+| J7 | a **2 x 6 right-angle male header** (rows A and B) | button + encoder (encoder powered from 5 V) + 4 spare I/O pins (+5 V, level-adapted input, level-adapted output, GND) |
 | J8 | row C (the lowest) of the J2 header, 4 pins | RobotDyn 4 A pump dimmer, **I2C** (powered from 5 V, through an I2C level shifter) |
 | J9 | JST XH 3-pin, vertical, on the tab right under J3 (centre x 42, y 71.5) | pressure sensor 0.5 to 4.5 V, 0 to 12 bar (powered from 5 V) |
 | JP1 | 1 x 2 male header + shunt jumper | +5 V board to the 5V pin of the ESP32 (see Circuits) |
@@ -40,7 +40,7 @@ All **through-hole** parts (no SMD soldering). Related files: `images/board_plac
 
 **One 2 x 4 Dupont housing**, two ribbons of 4 wires (one per row): ribbon 1 = 5 V supply and pump SSR, ribbon 2 = boiler SSR and valve SSR. Warning: an unkeyed 2 x 4 housing can be plugged 180 degrees the wrong way round (+5 V would land on the valve SSR "−" input and so on). Use a **keyed (shrouded) 2 x 4 IDC-style header** with its notch, or at least mark the housing and the header.
 
-### J7 (rows A and B of the 3 x 6 header, right-angle: stacked rows of Dupont housings; row C = spare, bare)
+### J7 (2 x 6 right-angle header: stacked rows of Dupont housings)
 | | 1 | 2 | 3 | 4 | 5 | 6 |
 |---|---|---|---|---|---|---|
 | Row A (upper) | button (GPIO 6) | GND | **+5 V** | **IN (GPIO 38)** | **OUT (GPIO 39)** | **GND** |
@@ -129,7 +129,7 @@ Silkscreen read on the photo, left column from the USB-C end: GND, 5V, G48, BOOT
 | 2 | 1 x 20 female sockets, 8.5 mm | 1 € |
 | 1 | MAX31865 module (owned) + low 1 x 8 socket | 0.3 € |
 | 1 | 8-pin FPC board (owned) + 2 x 4 male header + 2 x 4 female socket | 0.5 € |
-| 1 | 3-row right-angle 2.54 mm male header strip ("courbé" 3 x 40, e.g. Funduino, about 1.7 €): cut one 3 x 4 (J2 + J8) and one 3 x 6 (J7, row C spare) | 1.7 € |
+| 1 | 3-row right-angle 2.54 mm male header strip ("courbé" 3 x 40, e.g. Funduino, about 1.7 €): cut one 3 x 4 (J2 + J8); the 2 x 6 of J7 is cut from the same strip, third row removed | 1.7 € |
 | 1 | 1 x 2 male header + shunt jumper (JP1) | 0.2 € |
 | 3 | JST XH 3-pin headers (J3, J4, J9) | 0.7 € |
 | 4 | 2N2222A transistors (3 SSRs + spare output; backlight stage optional) | 0.6 € |
