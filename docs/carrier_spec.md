@@ -88,7 +88,7 @@ Same order as J3 / J4:
 
 The footprint (9.9 x 5.8 mm, pins along x, plug upwards, real pitch 2.5 mm) is centred at x 42, y 71.5 mm, inside the 42 x 7 mm tab (y 68 to 75): **only 0.7 mm to J3 and 0.6 mm to the tab edge**, and 1.5 mm from the front wall. Check the plug heights against the cable of J3 (about 12 mm); one more 3-wire cable (4.5 mm) goes through the front slot.
 
-G1/4 sensor, 0 to 12 bar, 0.5 to 4.5 V output. The signal goes through a divider, 10 kΩ (series) / 20 kΩ (to GND), which brings 4.5 V down to 3.0 V, plus 100 nF on GPIO 1 (ADC1, 11 dB attenuation). Pressure in bar = (sensor voltage − 0.5) x 3. Average the readings (the ESP32 ADC is noisy and not very linear at the ends). The pump can reach about 19 bar at zero flow, above the sensor's 12 bar range: make sure the machine's pressure relief valve limits the pressure at the sensor tap (and check the sensor's overpressure rating).
+G1/4 sensor, 0 to 12 bar, 0.5 to 4.5 V output. The signal goes through a divider, 10 kΩ (series) / 20 kΩ (to GND), which brings 4.5 V down to 3.0 V, plus 100 nF on GPIO 1 (ADC1, 11 dB attenuation); on the board: R22 (10 kΩ) and R23 (20 kΩ) flat under the MAX31865 below R21, C5 (100 nF) in the corridor below C1. Pressure in bar = (sensor voltage − 0.5) x 3. Average the readings (the ESP32 ADC is noisy and not very linear at the ends). The pump can reach about 19 bar at zero flow, above the sensor's 12 bar range: make sure the machine's pressure relief valve limits the pressure at the sensor tap (and check the sensor's overpressure rating).
 
 ### J3 / J4 (JST XH 3-pin)
 1 = +5 V, 2 = signal, 3 = GND. The exact order comes from the sensor cable (often red / yellow / black).

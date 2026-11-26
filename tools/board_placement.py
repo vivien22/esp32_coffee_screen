@@ -129,6 +129,11 @@ for i, name in enumerate(["R17", "R18", "R19", "R20", "R21"]):
     axial(43.7, 34.2 + i * 2.7, pitch=10.16, label=None)
     text(d, X(49.6), Y(34.2 + i * 2.7), name, 8, SILK, True, 'lm')
 
+# pressure divider (J9 -> GPIO 1): R22 10 k (series) and R23 20 k (to GND) flat under the MAX31865, just below the spare-I/O resistors
+for i, name in enumerate(["R22", "R23"]):
+    axial(43.7, 47.6 + i * 2.7, pitch=10.16, label=None)
+    text(d, X(49.6), Y(47.6 + i * 2.7), name, 8, SILK, True, 'lm')
+
 # keep-out under the antenna (right end of the ESP32 board)
 for k in range(0, 9):
     line(d, [(X(48.5 + k), Y(3.0)), (X(48.5 + k), Y(25.0))], (170, 30, 30, 160), 1)
@@ -199,6 +204,8 @@ text(d, X(6.6), Y(62.6), "D1", 8, SILK, True, 'lm')
 circ(d, X(27.2), Y(46.5), 3.15 * K, fill=None, outline=SILK + (255,), width=2)
 tpad(25.95, 46.5, ring=1.8, drill=0.8); tpad(28.45, 46.5, ring=1.8, drill=0.8); silk(27.2, 46.5, "C1", 9)
 tpad(26.0, 40.0, ring=1.6, drill=0.8); tpad(28.5, 40.0, ring=1.6, drill=0.8); text(d, X(29.8), Y(40.0), "C2", 8, SILK, True, 'lm')
+# C5 100 nF (pressure filter, taller than 3 mm so not under the MAX31865): in the corridor, below C1
+tpad(26.0, 53.5, ring=1.6, drill=0.8); tpad(28.5, 53.5, ring=1.6, drill=0.8); text(d, X(29.8), Y(53.5), "C5", 8, SILK, True, 'lm')
 # JST XH x2: vertical headers, pins along x, the plugs come out upwards: no keep-out towards the front, away from the ribbon path (x 7 to 18)
 for k, (x0, name) in enumerate([(42.0, "J3 flow In"), (52.5, "J4 flow Out")]):
     for i in range(3):
@@ -281,7 +288,7 @@ comp = [
     "I2C level shifter: 2 x 2N7000 + 4 x 10 kΩ (to place at routing)",
     "R11 to R16  flow sensor inputs  ·  C3, C4  1 nF",
     "F1  1.1 A resettable fuse  ·  D1  1N5819",
-    "C1  470 µF  ·  C2  100 nF",
+    "C1  470 µF  ·  C2, C5  100 nF  ·  R22 10 kΩ, R23 20 kΩ, C5  pressure divider (J9, GPIO 1)",
 ]
 for i, t in enumerate(comp):
     text(d, lx, 438 + i * 24, t, 15, INK, False, 'lm')
