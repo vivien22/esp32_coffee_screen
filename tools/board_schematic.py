@@ -31,7 +31,7 @@ def head(x, y, title, sub=None):
     if sub:
         T(x, y + 28, sub, F(15), GRY, 'lm')
 
-# ---- J2 + J8 : 3 x 4 right-angle header (3 stacked rows), J7 : 3 x 6
+# ---- J2 + J8 : 3 x 4 right-angle header (3 stacked rows), J7 : 3 x 4
 head(60, 118, "J2 + J8: right-angle 3 x 4 male header", "rows A and B: J2 (one 2 x 4 housing, two ribbons of 4 wires); row C: J8")
 rowA = [("+5 V", RED), ("GND", DK), ("pump +", BRN), ("pump −", BRN)]
 rowB = [("boiler +", ORG), ("boiler −", ORG), ("valve +", YEL), ("valve −", YEL)]
@@ -49,19 +49,19 @@ T(x0 + 370, 288, "row C: J8 pump dimmer, RobotDyn (I2C)", F(14, True), VIO, 'lm'
 T(x0 + 370, 312, "a 2 x 4 housing can be plugged 180 degrees the wrong way:", F(13), GRY, 'lm')
 T(x0 + 370, 330, "mark it, or key the header", F(13), GRY, 'lm')
 
-head(60, 366, "J7: right-angle 3 x 6 male header (row C: bare pads)")
-j7a = [("button", (90, 90, 96)), ("GND", DK), ("+5 V", RED), ("IN 38", VIO), ("OUT 39", VIO), ("GND", DK)]
+head(60, 366, "J7: right-angle 3 x 4 male header")
+j7a = [("button", (90, 90, 96)), ("GND", DK), ("stream", (90, 90, 96)), ("GND", DK)]
 j7b = [("GA", GRN), ("GB", GRN), ("+5 V", RED), ("GND", DK)]
-j7c = [("spare", (150, 150, 156))] * 3
+j7c = [("+5 V", RED), ("IN 38", VIO), ("OUT 39", VIO), ("GND", DK)]
 for i, (lab, col) in enumerate(j7a):
     pin(60 + i * 88, 396, lab, col, 14)
 for i, (lab, col) in enumerate(j7b):
     pin(60 + i * 88, 442, lab, col, 14)
 for i, (lab, col) in enumerate(j7c):
     pin(60 + i * 88, 488, lab, col, 14)
-T(620, 418, "row A: button (2) + spare I/O (4)", F(14), GRY, 'lm')
-T(620, 464, "row B: encoder (module order)", F(14), GRY, 'lm')
-T(620, 510, "row C: 3 spare pads, bare (not connected)", F(14), GRY, 'lm')
+T(440, 418, "row A: start button (2) + stream button (2)", F(14), GRY, 'lm')
+T(440, 464, "row B: encoder (module order)", F(14), GRY, 'lm')
+T(440, 510, "row C: spare I/O (5 V, level-adapted in / out)", F(14), GRY, 'lm')
 
 # ---- J3 / J4
 head(60, 628, "J3, J4: JST XH 3-pin, flow sensors In and Out", "sensor wire order: often red / yellow / black: check your cable")
@@ -70,9 +70,9 @@ for k, (name, x) in enumerate([("J3  flow In", 60), ("J4  flow Out", 480)]):
     for i, (lab, col) in enumerate([("+5 V", RED), ("signal", BLU), ("GND", DK)]):
         pin(x + i * 88, 710, lab, col, 14)
 # J9: same JST XH order, pressure sensor (on the tab under J3), drawn under J7 where there is room
-T(60, 530, "J9  pressure sensor (JST XH 3-pin, same order as J3 / J4)", F(15, True), INK, 'lm')
+T(60, 546, "J9  pressure sensor (JST XH 3-pin, same order as J3 / J4)", F(15, True), INK, 'lm')
 for i, (lab, col) in enumerate([("+5 V", RED), ("signal", BLU), ("GND", DK)]):
-    pin(60 + i * 88, 546, lab, col, 14)
+    pin(60 + i * 88, 562, lab, col, 14)
 
 # ---- J5
 head(60, 790, "J5: 2 x 4 socket for your FPC adapter board (8 pins)", "your board's numbering: top row 1, 3, 5, 7; bottom row 2, 4, 6, 8")
@@ -96,7 +96,7 @@ T(gx, 118, "ESP32-S3: pins used", F(22, True), INK, 'lm')
 rows = [("5V", "+5 V via JP1 (after diode and fuse)", RED), ("3V3", "display, I2C pull-ups (3.3 V side)", RED),
         ("GPIO 17", "pump SSR drive", BRN), ("GPIO 18", "boiler SSR drive", ORG), ("GPIO 21", "valve SSR drive", YEL),
         ("GPIO 15", "flow In", BLU), ("GPIO 16", "flow Out", BLU), ("GPIO 1", "pressure sensor (ADC)", BLU),
-        ("GPIO 4 / 5", "encoder A / B", GRN), ("GPIO 6", "start button", (90, 90, 96)),
+        ("GPIO 4 / 5", "encoder A / B", GRN), ("GPIO 6 / 41", "start / stream buttons", (90, 90, 96)),
         ("GPIO 47 / 48", "dimmer I2C: SDA / SCL", VIO),
         ("GPIO 11 / 12 / 13", "SPI: MOSI / SCK / MISO", VIO), ("GPIO 10", "display CS", VIO), ("GPIO 9 / 8", "display DC / RST", VIO),
         ("GPIO 14", "display BLK (direct, Q4 optional)", VIO), ("GPIO 7", "MAX31865 CS", VIO), ("GPIO 38", "spare input on J7 (5 V divider)", (150, 150, 156)), ("GPIO 39", "spare output on J7 (to 5 V, inverting)", (150, 150, 156))]
