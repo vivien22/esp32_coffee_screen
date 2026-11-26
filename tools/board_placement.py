@@ -181,12 +181,14 @@ for c_, lab in enumerate(["+5V", "GND", "P+", "P−"]):
     text(d, X(12.2 + c_ * 2.54), Y(ROWS[0]) - 1.9 * K, lab, 7, SILK, True)
 for c_, lab in enumerate(["5V", "GND", "SDA", "SCL"]):
     text(d, X(12.2 + c_ * 2.54), Y(ROWS[2]) + 1.9 * K, lab, 7, SILK, True)
-# J7: 2 x 6 right-angle header. Row A: button (2) + spare I/O (4); row B: encoder (GA, GB, VCC, GND). (The pressure sensor is J9, a JST XH under J3.)
+# J7: 3 x 6 right-angle header. Row A: button (2) + spare I/O (4); row B: encoder (GA, GB, VCC, GND); row C: 3 spare pads, bare, not connected (the pressure sensor is J9, a JST XH under J3).
 for c_ in range(6):
     tpad(22.4 + c_ * 2.54, ROWS[0], square=(c_ == 0), ring=1.7, drill=1.0)
 for c_ in range(4):
     tpad(22.4 + c_ * 2.54, ROWS[1], ring=1.7, drill=1.0)
-rect(d, X(22.4) - 1.4 * K, Y(ROWS[0]) - 1.4 * K, X(22.4 + 5 * 2.54) + 1.4 * K, Y(ROWS[1]) + 1.4 * K, outline=SILK + (255,), width=2)
+for c_ in range(3):
+    tpad(22.4 + c_ * 2.54, ROWS[2], ring=1.7, drill=1.0)
+rect(d, X(22.4) - 1.4 * K, Y(ROWS[0]) - 1.4 * K, X(22.4 + 5 * 2.54) + 1.4 * K, Y(ROWS[2]) + 1.4 * K, outline=SILK + (255,), width=2)
 silk(33.2, 55.3, "J7 (A, B)", 9)
 for c_, lab in enumerate(["BT", "GND", "5V", "IN", "OUT", "GND"]):
     text(d, X(22.4 + c_ * 2.54), Y(ROWS[0]) - 1.9 * K, lab, 7, SILK, True)
@@ -280,7 +282,7 @@ comp = [
     "J2  right-angle 3 x 4 header, rows A, B: 5 V supply and SSRs  ·  row C: J8, pump dimmer (I2C)",
     "J3, J4  JST XH 3-pin: flow sensors In and Out  ·  J9  JST XH 3-pin: pressure sensor (on the tab, under J3)",
     "J5  2 x 4 socket: FPC adapter board",
-    "J7  right-angle 2 x 6 header, rows A, B: button, encoder, spare I/O",
+    "J7  right-angle 3 x 6 header, rows A, B: button, encoder, spare I/O  ·  row C: 3 spare pads, bare",
     "JP1  1 x 2 header + jumper: +5 V to the ESP32 (removed: ESP32 on USB only)",
     "Q1 to Q3  SSR drive ; Q4  backlight (optional)",
     "R1 to R4  1 kΩ  ·  R5 to R8  10 kΩ  ·  R9, R10, R17, R18  5 V input dividers (GA, GB, IN)",

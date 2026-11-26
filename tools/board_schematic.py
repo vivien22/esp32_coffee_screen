@@ -31,7 +31,7 @@ def head(x, y, title, sub=None):
     if sub:
         T(x, y + 28, sub, F(15), GRY, 'lm')
 
-# ---- J2 + J8 : 3 x 4 right-angle header (3 stacked rows), J7 : 2 x 6
+# ---- J2 + J8 : 3 x 4 right-angle header (3 stacked rows), J7 : 3 x 6
 head(60, 118, "J2 + J8: right-angle 3 x 4 male header", "rows A and B: J2 (one 2 x 4 housing, two ribbons of 4 wires); row C: J8")
 rowA = [("+5 V", RED), ("GND", DK), ("pump +", BRN), ("pump −", BRN)]
 rowB = [("boiler +", ORG), ("boiler −", ORG), ("valve +", YEL), ("valve −", YEL)]
@@ -49,15 +49,19 @@ T(x0 + 370, 288, "row C: J8 pump dimmer, RobotDyn (I2C)", F(14, True), VIO, 'lm'
 T(x0 + 370, 312, "a 2 x 4 housing can be plugged 180 degrees the wrong way:", F(13), GRY, 'lm')
 T(x0 + 370, 330, "mark it, or key the header", F(13), GRY, 'lm')
 
-head(60, 366, "J7: right-angle 2 x 6 male header")
+head(60, 366, "J7: right-angle 3 x 6 male header (row C: bare pads)")
 j7a = [("button", (90, 90, 96)), ("GND", DK), ("+5 V", RED), ("IN 38", VIO), ("OUT 39", VIO), ("GND", DK)]
 j7b = [("GA", GRN), ("GB", GRN), ("+5 V", RED), ("GND", DK)]
+j7c = [("spare", (150, 150, 156))] * 3
 for i, (lab, col) in enumerate(j7a):
     pin(60 + i * 88, 396, lab, col, 14)
 for i, (lab, col) in enumerate(j7b):
     pin(60 + i * 88, 442, lab, col, 14)
+for i, (lab, col) in enumerate(j7c):
+    pin(60 + i * 88, 488, lab, col, 14)
 T(620, 418, "row A: button (2) + spare I/O (4)", F(14), GRY, 'lm')
 T(620, 464, "row B: encoder (module order)", F(14), GRY, 'lm')
+T(620, 510, "row C: 3 spare pads, bare (not connected)", F(14), GRY, 'lm')
 
 # ---- J3 / J4
 head(60, 628, "J3, J4: JST XH 3-pin, flow sensors In and Out", "sensor wire order: often red / yellow / black: check your cable")
