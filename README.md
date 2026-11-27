@@ -20,7 +20,7 @@ Status: **working design, nothing has been manufactured.** Placement is to scale
 - `images/`: the three pictures above, all generated from the scripts in `tools/` (Python + Pillow + numpy; measurements are at the top of each file): `board_placement.py`, `enclosure_overview.py`, `board_schematic.py`.
 
 ## Principles
-- 58 x 68 mm board with a 42 x 7 mm tab on the cable side, in the plus-shaped free area of the 60 x 85 mm enclosure (8 x 8 mm corner posts), on four 3 mm standoffs (45 x 50 mm spacing), 25 mm usable depth.
+- 58 x 68 mm board with two 42 x 7 mm tabs (cable side at the front, C1 / C2 / I2C pull-ups at the back), 82 mm long in all, in the plus-shaped free area of the 60 x 85 mm enclosure (8 x 8 mm corner posts), on four 3 mm standoffs (45 x 50 mm spacing), 25 mm usable depth.
 - Through-hole parts only (no SMD soldering).
 - ESP32-S3 (rotated 90 degrees, USB-C to the left) and MAX31865 module on sockets; FPC adapter board (remote display) on a 2 x 4 socket, its ribbon going straight to the front.
 - SSRs are kept, driven by 2N2222A transistors from the external 5 V supply.

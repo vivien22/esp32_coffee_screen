@@ -18,7 +18,7 @@ INK = (30, 30, 36); GRY = (110, 110, 116); RED = (200, 40, 40); BLU = (30, 90, 1
 ORG = (214, 110, 20); BRN = (140, 90, 40); YEL = (200, 160, 0); VIO = (110, 70, 170)
 
 T(W / 2, 36, "ESP32-S3 carrier board: connection schematic (all through-hole, no SMD soldering)", F(30, True))
-T(W / 2, 74, "Concept schematic: validate before manufacturing (display, encoder and dimmer details to confirm).", F(19), GRY)
+T(W / 2, 74, "Concept schematic: validate before manufacturing (display ribbon and dimmer details to confirm).", F(19), GRY)
 
 # ================================================================ 1. connectors
 def pin(x, y, label, fill, size=15, w=84, h=44, txt=(255, 255, 255)):
@@ -212,7 +212,7 @@ notes = [
     "JP1: fitted, the ESP32 takes its 5 V from the board; removed, from its USB port only (never fit it with USB plugged).",
     "The three voltage levels: +5 V board (after fuse and diode), 3.3 V from the ESP32-S3 board, common GND.",
     "The display module has its own backlight transistor: BLK is driven directly by GPIO 14 (stage Q4 optional).",
-    "No regulator on the board: the 3.3 V (display, I2C pull-ups) comes from the ESP32-S3.",
+    "No regulator on the board: the 3.3 V (display, MAX31865, dimmer, encoder) comes from the ESP32-S3.",
     "The pump dimmer stays off the board on the mains side: only its 4-wire I2C cable comes to J8.",
     "All parts are through-hole (TO-92, axial resistors, radial capacitors, DO-41): ordinary soldering iron.",
     "On the board: a ground plane, no copper under the ESP32 antenna, 4 mounting holes (45 x 50 mm).",
