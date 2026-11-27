@@ -121,7 +121,8 @@ Silkscreen read on the photo, left column from the USB-C end: GND, 5V, G48, BOOT
 ## Circuits
 - **Power:** supply **5.1 V, 2 A** (measured by you); after F1 and D1 the rail is about 4.6 to 4.7 V. J2 A1 (+5 V) → 1.1 A resettable fuse → 1N5819 diode (reverse protection) → +5 V rail (470 µF + 100 nF) → **JP1** → 5V pin of the ESP32. The 3.3 V comes from the ESP32 board. **JP1** (1 x 2 header + shunt jumper): **fitted = normal operation**, the ESP32 takes its 5 V from the external supply through the Dupont connector; **removed = the ESP32 is powered by its USB port only** (the rest of the board stays on the external supply). Never fit JP1 while a USB cable is plugged in: the two 5 V sources would be tied together (and the supply could back-feed the computer).
 - **SSR (x3):** GPIO → 1 kΩ → 2N2222A base; 10 kΩ base → GND; SSR "+" input to the +5 V rail, "−" input to the collector; emitter to GND. The SSR input receives about 4.4 V (rail about 4.6 V minus about 0.2 V across the transistor), well above the usual 3 V minimum of a DC-input SSR.
-- **Flow sensor (x2):** signal → 10 kΩ to +5 V; signal → 4.7 kΩ → GPIO; GPIO → 10 kΩ → GND; 1 nF GPIO → GND. Works with a 5 V output (the divider gives about 3.4 V) or with an open collector.
+- **Flow sensor (x2):** signal → **4.7 kΩ to +5 V**; signal → **10 kΩ** → GPIO; GPIO → **22 kΩ** → GND; 1 nF GPIO → GND. With a 5 V push-pull output the GPIO sees 5 x 22 / 32 = 3.4 V; with an open collector the pull-up is loaded by the divider and the GPIO sees 5 x 22 / (4.7 + 10 + 22) = 3.0 V; with a sensor that has its own internal pull-up, between the two. (The former values, 10 kΩ pull-up and 4.7 kΩ / 10 kΩ divider, gave only 2.0 V with an open collector, below the ESP32 input-high threshold of about 2.5 V.) The low level (0.5 V max at the sensor) gives under 0.35 V.
+- **Flow In sensor (J3): USN-HS06PD** (Hall sensor, 6 mm tube, 0.1 to 1.5 l/min, F (Hz) = 200 x Q (l/min), i.e. 12,000 pulses per litre, 300 Hz max; supply 5 to 24 V, under 10 mA; output high at least 4.5 V and low at most 0.5 V at 5 V; duty cycle 50 ± 10 %; -20 to 60 °C; **working pressure under 0.8 MPa (8 bar)**, so it must stay on the low-pressure side, between the tank and the pump; XH 2.54 plug, wire order varies by batch: check it). Its lower limit, 0.1 l/min = 1.7 ml/s, is below the pump flow during an extraction (about 4 ml/s measured at the inlet), so it works in range.
 - **Display backlight:** BLK ← GPIO 14 directly (the display module has its own transistor). Optional stage Q4: GPIO 14 → 1 kΩ → 2N2222A base, not fitted by default.
 - **Encoder / buttons:** see "Encoder and 5 V input protection". **No RC filter on GA / GB:** the encoder library's interrupt routine expects every rising and falling edge, bounces included, and debounces in software; the two buttons are debounced in the firmware too.
 
@@ -136,7 +137,7 @@ Silkscreen read on the photo, left column from the USB-C end: GND, 5V, G48, BOOT
 | 1 | 1 x 2 male header + shunt jumper (JP1) | 0.2 € |
 | 3 | JST XH 3-pin headers (J3, J4, J9) | 0.7 € |
 | 4 | 2N2222A transistors (3 SSRs + spare output; backlight stage optional) | 0.6 € |
-| 27 | axial resistors R1 to R27 (1 kΩ, 4.7 kΩ, 10 kΩ, 15 kΩ; R4 with Q4 optional) | 1.5 € |
+| 27 | axial resistors R1 to R27 (1 kΩ, 4.7 kΩ, 10 kΩ, 15 kΩ, 22 kΩ; R4 with Q4 optional) | 1.5 € |
 | 1 | 1.1 A resettable fuse (radial) | 0.5 € |
 | 1 | 1N5819 diode | 0.2 € |
 | 1 | 470 µF 10 V radial capacitor (105 °C); 2 x 100 nF (C2, C5); 2 x 1 nF (C3, C4) | 1 € |
@@ -149,7 +150,7 @@ Silkscreen read on the photo, left column from the USB-C end: GND, 5V, G48, BOOT
 2. Encoder: pin order GA, GB, VCC, GND confirmed (Funduino data sheet); pull-ups measured, 6.6 kΩ to VCC (3.3 kΩ resistors); the two end components on the module are not identified (capacitor or push resistor).
 3. Pin spacing (rows and pitch) and true width of your ESP32-S3 board.
 4. Dimensions of your FPC adapter board (about 22 x 26 mm estimated) and position of its mounting holes.
-5. Flow sensor output type (5 V or open collector): the planned circuit suits both.
+5. Flow sensors: the In sensor is a USN-HS06PD (5 V output, high at least 4.5 V); the circuit (4.7 kΩ pull-up, 10 kΩ / 22 kΩ divider) suits 5 V outputs, open collectors and internal pull-ups; check the wire order of the XH plug (it varies by batch).
 6. MAX31865 module (Adafruit, measured from the manufacturer's drawing): 25.4 x 27.9 mm, mounting holes 0.9" apart and 0.1" from the terminal-block edge, 1 x 8 header at 0.1" pitch on the short edge.
 7. Pump dimmer: one-time switch from UART to I2C (see J8); behaviour with the vibration pump to test; powered from 3.3 V, no level shifter; pull-ups of the module, if any; its 3.3 V consumption.
 8. Pressure sensor: confirm 3 wires (+5 V, GND, signal) and the G1/4 fitting on the hydraulic circuit.

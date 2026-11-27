@@ -300,7 +300,7 @@ comp = [
     "R1 to R4  1 kΩ  ·  R5 to R8  10 kΩ  ·  R9, R10 1 kΩ: GA, GB series (encoder at 3.3 V)  ·  R17, R18: IN divider",
     "Q5, R19 to R21  spare output stage (3.3 V to 5 V)",
     "R24, R25  4.7 kΩ I2C pull-ups to 3V3 (dimmer at 3.3 V, no level shifter)",
-    "R11 to R16  flow sensor inputs  ·  C3, C4  1 nF",
+    "R11 to R16  flow inputs (4.7 k pull-up, 10 k / 22 k divider)  ·  C3, C4  1 nF",
     "F1  1.1 A resettable fuse  ·  D1  1N5819",
     "C1  470 µF, C2  100 nF: on the back tab  ·  C5  100 nF  ·  R22 10 kΩ, R23 15 kΩ: pressure (J9)",
     "R26 10 kΩ, R27 15 kΩ: 5 V rail measure on GPIO 2 (pressure sensor is ratiometric)",
