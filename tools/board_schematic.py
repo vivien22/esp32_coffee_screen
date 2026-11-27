@@ -94,7 +94,7 @@ for i, (lab, col) in enumerate(mx):
 # ================================================================ 2. GPIO table
 gx = 860
 T(gx, 118, "ESP32-S3: pins used", F(22, True), INK, 'lm')
-rows = [("5V", "+5 V via D2 (after fuse and D1)", RED), ("3V3", "display, MAX31865, dimmer, encoder", RED),
+rows = [("5V", "+5 V via D2 (after the fuse)", RED), ("3V3", "display, MAX31865, dimmer, encoder", RED),
         ("GPIO 17", "pump SSR drive", BRN), ("GPIO 18", "boiler SSR drive", ORG), ("GPIO 21", "valve SSR drive", YEL),
         ("GPIO 15", "flow In", BLU), ("GPIO 16", "flow Out", BLU), ("GPIO 1", "pressure sensor (ADC)", BLU), ("GPIO 2", "5 V rail measure (ADC)", RED),
         ("GPIO 4 / 5", "encoder A / B", GRN), ("GPIO 6 / 41", "start / steam buttons (10 k pull-ups)", (90, 90, 96)),
@@ -128,8 +128,8 @@ def chain(x, y, title, src, res, end, shunts, col):
         shunt(x + sx, y, lab)
 cy = 866
 chain(gx, cy, "Spare IN 38: 5 V to 3.3 V (encoder: 3.3 V, 1 k series)", "5 V in", "4.7 k", "GPIO 38", [(270, "10 k")], GRN)
-chain(gx, cy + 120, "Pressure input: 4.5 V to 2.7 V", "sensor", "10 k", "GPIO 1", [(250, "15 k"), (320, "100 nF")], BLU)
-chain(gx, cy + 240, "5 V rail measure (same ratio: pressure = signal / rail)", "+5 V rail", "10 k", "GPIO 2", [(250, "15 k"), (320, "100 nF")], RED)
+chain(gx, cy + 120, "Pressure input: 4.5 V to 2.45 V", "sensor", "10 k", "GPIO 1", [(250, "12 k"), (320, "100 nF")], BLU)
+chain(gx, cy + 240, "5 V rail measure (same ratio: pressure = signal / rail)", "+5 V rail", "10 k", "GPIO 2", [(250, "12 k"), (320, "100 nF")], RED)
 T(gx, cy + 352, "Dimmer I2C: module powered from 3.3 V, no level shifter", F(14, True), VIO, 'lm')
 T(gx, cy + 374, "4.7 k pull-ups to 3V3 (R24, R25); SDA 47, SCL 42, 100 kHz", F(13), GRY, 'lm')
 T(gx, cy + 394, "ships in UART mode: switch it to I2C once", F(13), GRY, 'lm')
@@ -142,9 +142,7 @@ T(cx0, 118, "Circuits on the board", F(22, True), INK, 'lm')
 T(cx0, 160, "Power", F(17, True), RED, 'lm')
 L([(cx0, 200), (cx0 + 40, 200)], RED, 3); T(cx0 - 6, 200, "PWR +", F(13, True), RED, 'rm')
 RR(cx0 + 40, 188, cx0 + 118, 212, 4, fill=(250, 250, 240), outline=INK, width=2); T(cx0 + 79, 200, "fuse 1.1 A", F(11, True))
-L([(cx0 + 118, 200), (cx0 + 150, 200)], RED, 3)
-d.polygon([((cx0 + 150) * S, 188 * S), ((cx0 + 150) * S, 212 * S), ((cx0 + 180) * S, 200 * S)], fill=(250, 250, 240), outline=INK)
-L([(cx0 + 180, 186), (cx0 + 180, 214)], INK, 3); T(cx0 + 165, 232, "1N5819", F(11, True))
+L([(cx0 + 118, 200), (cx0 + 180, 200)], RED, 3); T(cx0 + 150, 186, "D1: link", F(11, True))
 L([(cx0 + 180, 200), (cx0 + 270, 200)], RED, 3)
 T(cx0 + 300, 200, "+5 V board", F(14, True), RED, 'lm')
 L([(cx0 + 215, 200), (cx0 + 215, 232)], RED, 2)
@@ -171,7 +169,7 @@ L([(cx0 - 20, 500), (cx0 + 20, 500)], BRN, 3); T(cx0 - 28, 500, "GPIO", F(12, Tr
 L([(cx0 + 100, 500), (cx0 + 100, 540)], INK, 2)
 RR(cx0 + 88, 540, cx0 + 112, 575, 3, fill=(250, 250, 240), outline=INK, width=2); T(cx0 + 100, 557, "10k", F(11, True))
 L([(cx0 + 100, 575), (cx0 + 100, 590)], INK, 2); T(cx0 + 100, 604, "GND", F(12, True))
-T(cx0 + 20, 640, "2N2222A (TO-92): the SSR input receives about 4.4 V", F(13), GRY, 'lm')
+T(cx0 + 20, 640, "2N2222A (TO-92): the SSR input receives about 4.8 V", F(13), GRY, 'lm')
 
 # flow input
 T(cx0, 700, "Flow sensor input (x2)", F(17, True), BLU, 'lm')
@@ -210,7 +208,7 @@ T(cx0 + 20, 1310, "GPIO high -> OUT low; GPIO low -> OUT 5 V (invert in firmware
 T(60, 1140, "Design notes", F(22, True), INK, 'lm')
 notes = [
     "D2 (former JP1): the ESP32 is fed by the board or by its USB port, the two 5 V sources never tied together.",
-    "The three voltage levels: +5 V board (after fuse and diode), 3.3 V from the ESP32-S3 board, common GND.",
+    "The three voltage levels: +5 V board (after the fuse, about 5.0 V), 3.3 V from the ESP32-S3 board, common GND.",
     "The display module has its own backlight transistor: BLK is driven directly by GPIO 14 (stage Q4 optional).",
     "No regulator on the board: the 3.3 V (display, MAX31865, dimmer, encoder) comes from the ESP32-S3.",
     "The pump dimmer stays off the board on the mains side: only its 4-wire I2C cable comes to J8.",

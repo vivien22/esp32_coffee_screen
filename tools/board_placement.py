@@ -137,12 +137,12 @@ for i, name in enumerate(["R17", "R18", "R19", "R20", "R21"]):
     axial(43.7, 34.2 + i * 2.7, pitch=10.16, label=None)
     text(d, X(49.6), Y(34.2 + i * 2.7), name, 8, SILK, True, 'lm')
 
-# pressure divider (J9 -> GPIO 1): R22 10 k (series) and R23 15 k (to GND) flat under the MAX31865, just below the spare-I/O resistors
+# pressure divider (J9 -> GPIO 1): R22 10 k (series) and R23 12 k (to GND) flat under the MAX31865, just below the spare-I/O resistors
 for i, name in enumerate(["R22", "R23"]):
     axial(43.7, 47.6 + i * 2.7, pitch=10.16, label=None)
     text(d, X(49.6), Y(47.6 + i * 2.7), name, 8, SILK, True, 'lm')
 
-# 5 V rail measure (GPIO 2), same 10 k / 15 k ratio as the pressure divider: R26 (series) and R27 (to GND), below R23
+# 5 V rail measure (GPIO 2), same 10 k / 12 k ratio as the pressure divider: R26 (series) and R27 (to GND), below R23
 for i, name in enumerate(["R26", "R27"]):
     axial(43.7, 53.0 + i * 2.7, pitch=10.16, label=None)
     text(d, X(49.6), Y(53.0 + i * 2.7), name, 8, SILK, True, 'lm')
@@ -209,11 +209,11 @@ tpad(27.2, 33.0, ring=1.7, drill=1.0); tpad(27.2, 35.54, square=True, ring=1.7, 
 circ(d, X(27.2), Y(33.0), 1.5 * K, fill=None, outline=SILK + (255,), width=2)
 silk(27.2, 31.1, "D2  1N5819", 8)
 text(d, X(28.7), Y(33.0), "+5V", 7, SILK, True, 'lm'); text(d, X(28.7), Y(35.54), "ESP", 7, SILK, True, 'lm')
-# F1 polyfuse (radial, pitch 5) and D1 1N5819 (standing) in the front-left corner, in front of the mounting hole
+# F1 polyfuse (radial, pitch 5) and D1 (wire link, 0 ohm: the 1N5819 footprint is kept but not fitted) in the front-left corner, in front of the mounting hole
 tpad(3.0, 66.0, ring=1.8, drill=0.9); tpad(8.0, 66.0, ring=1.8, drill=0.9)
 rrect(d, X(1.9), Y(64.4), X(9.1), Y(67.6), 6, outline=SILK + (255,), width=2); text(d, X(10.4), Y(66.0), "F1", 8, SILK, True, 'lm')
 tpad(2.5, 62.6, ring=1.8, drill=0.8); tpad(5.04, 62.6, ring=1.8, drill=0.8)
-text(d, X(6.6), Y(62.6), "D1", 8, SILK, True, 'lm')
+text(d, X(6.6), Y(62.6), "D1 link", 8, SILK, True, 'lm')
 # PWR: the 5 V supply wires are soldered here, at the left end of the tab (+ square), towards a JST SM 2-pin plug; left of the J2 housings
 tpad(9.4, 70.6, square=True, ring=1.8, drill=1.0); tpad(9.4, 73.14, ring=1.8, drill=1.0)
 text(d, X(9.4), Y(69.25), "PWR", 6, SILK, True)
@@ -318,9 +318,9 @@ comp = [
     "Q5, R19 to R21  spare output stage (3.3 V to 5 V)",
     "R24, R25  4.7 kΩ I2C pull-ups  ·  R30, R31  10 kΩ button pull-ups (3V3, back tab)",
     "R11 to R16  flow inputs (4.7 k pull-up, 10 k / 22 k divider)  ·  C3, C4  1 nF",
-    "F1  1.1 A fuse  ·  D1  1N5819  ·  R28, R29  33 Ω: display SPI series (20 cm ribbon)",
-    "C1  470 µF, C2  100 nF: back tab  ·  C5, C6  100 nF: ADC filters  ·  R22 10 kΩ, R23 15 kΩ: pressure",
-    "R26 10 kΩ, R27 15 kΩ: 5 V rail measure on GPIO 2 (pressure sensor is ratiometric)",
+    "F1  1.1 A fuse  ·  D1  wire link (0 Ω)  ·  R28, R29  33 Ω: display SPI series (20 cm ribbon)",
+    "C1  470 µF, C2  100 nF: back tab  ·  C5, C6  100 nF: ADC filters  ·  R22 10 kΩ, R23 12 kΩ: pressure",
+    "R26 10 kΩ, R27 12 kΩ: 5 V rail measure on GPIO 2 (pressure sensor is ratiometric)",
     "TP1, TP2, TP3  test points +5 V, 3V3, GND (corridor)",
 ]
 for i, t in enumerate(comp):
