@@ -60,9 +60,9 @@ rect(d, X(8) + 6, Y(PL) + 4, X(50) + 6, Y(75) + 8, fill=(0, 0, 0, 90))
 rect(d, X(8), Y(PL) - 5, X(50), Y(75), fill=MASK + (255,))
 line(d, [(X(8), Y(PL)), (X(8), Y(75)), (X(50), Y(75)), (X(50), Y(PL))], (8, 60, 36, 255), 3)
 # back tab of the board (42 x 7) behind the ESP32: C1 and C2
-rect(d, X(8) + 6, Y(-7) + 4, X(50) + 6, Y(0) + 8, fill=(0, 0, 0, 90))
-rect(d, X(8), Y(-7), X(50), Y(0) + 5, fill=MASK + (255,))
-line(d, [(X(8), Y(0)), (X(8), Y(-7)), (X(50), Y(-7)), (X(50), Y(0))], (8, 60, 36, 255), 3)
+rect(d, X(50), Y(-7) + 6, X(50) + 6, Y(0), fill=(0, 0, 0, 90))                      # shadow on the right side only
+rect(d, X(8), Y(-7), X(50), Y(1.0), fill=MASK + (255,))                                # overlaps the board edge: no seam
+line(d, [(X(8), Y(1.0)), (X(8), Y(-7)), (X(50), Y(-7)), (X(50), Y(1.0))], (8, 60, 36, 255), 3)
 
 def hole(cx, cy, dia, ring):
     circ(d, X(cx), Y(cy), ring / 2 * K, fill=PAD + (255,), outline=(120, 120, 126, 255), width=1)
@@ -206,7 +206,7 @@ tpad(2.5, 62.6, ring=1.8, drill=0.8); tpad(5.04, 62.6, ring=1.8, drill=0.8)
 text(d, X(6.6), Y(62.6), "D1", 8, SILK, True, 'lm')
 # C1 470 uF (radial 6.3 mm) and C2 100 nF, on the back tab (y -7 to 0), behind the ESP32
 circ(d, X(22.0), Y(-3.5), 3.15 * K, fill=None, outline=SILK + (255,), width=2)
-tpad(20.75, -3.5, ring=1.8, drill=0.8); tpad(23.25, -3.5, ring=1.8, drill=0.8); silk(22.0, -3.5, "C1", 9)
+tpad(20.75, -3.5, ring=1.8, drill=0.8); tpad(23.25, -3.5, ring=1.8, drill=0.8); text(d, X(17.9), Y(-3.5), "C1", 9, SILK, True, 'rm')
 tpad(30.0, -3.5, ring=1.6, drill=0.8); tpad(32.5, -3.5, ring=1.6, drill=0.8); text(d, X(33.8), Y(-3.5), "C2", 8, SILK, True, 'lm')
 # C5 100 nF (pressure filter, taller than 3 mm so not under the MAX31865): in the corridor, below JP1
 tpad(26.0, 53.5, ring=1.6, drill=0.8); tpad(28.5, 53.5, ring=1.6, drill=0.8); text(d, X(29.8), Y(53.5), "C5", 8, SILK, True, 'lm')
