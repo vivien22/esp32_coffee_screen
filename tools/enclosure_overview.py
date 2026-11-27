@@ -127,6 +127,7 @@ for (ax, ay) in [(sx0, sy0), (sx0 + 45, sy0), (sx0, sy0 + 50), (sx0 + 45, sy0 + 
     cuboid(ax - 2.4, ay - 2.4, FLOOR, 4.8, 4.8, 3.0, (36, 36, 42))
 cuboid(CX0, CY0, PCB_Z, 58, 68, PCBT, (22, 110, 66))
 cuboid(CX0 + 8, CY0 + 68, PCB_Z, 42, 7, PCBT, (22, 110, 66))          # front tab (cable side)
+cuboid(CX0 + 8, CY0 - 7, PCB_Z, 42, 7, PCBT, (22, 110, 66))           # back tab (C1, C2)
 
 # ESP32-S3 (~22 x 54) rotated 90 degrees on sockets of 8.5 mm: USB-C towards the left wall
 ex, ey = CX0 + 2.5, CY0 + 3
@@ -168,8 +169,8 @@ cuboid(CX0 + 22.4 - 1.27 + 0.15, CY0 + 65.6, top + 0.1, 10.0, 8.6, 2.3, (225, 22
 # polyfuse, standing diode, electrolytic, 100 nF, and the two JST XH (vertical headers with their plugs)
 cuboid(CX0 + 1.9, CY0 + 64.4, top, 7.2, 3.2, 11.0, (232, 200, 60))
 cuboid(CX0 + 1.2, CY0 + 61.2, top, 2.7, 2.7, 5.2, BLACK)
-cyl(CX0 + 27.2, CY0 + 46.5, 3.15, top, 12.0, (30, 40, 90))                                # 470 uF electrolytic
-cuboid(CX0 + 25.5, CY0 + 39.2, top, 4.0, 1.6, 4.2, (200, 120, 40))                        # 100 nF
+cyl(CX0 + 22.0, CY0 - 3.5, 3.15, top, 12.0, (30, 40, 90))                                # 470 uF electrolytic
+cuboid(CX0 + 29.25, CY0 - 4.3, top, 4.0, 1.6, 4.2, (200, 120, 40))                        # 100 nF (back tab)
 for k in range(2):
     xb = CX0 + 38.5 + k * 10.5 - 4.95
     cuboid(xb, CY0 + 61.6, top, 9.9, 5.8, 5.8, WHITE)                                     # JST XH header

@@ -49,7 +49,6 @@ for (xa, xb, ya, yb) in [(-1, 7, -8.5, -0.5), (51, 59, -8.5, -0.5), (-1, 7, 68.5
     circ(d, (X(xa) + X(xb)) / 2, (Y(ya) + Y(yb)) / 2, 1.6 * K, fill=(70, 70, 78, 255))
 cross = [(-1, -0.5), (7, -0.5), (7, -8.5), (51, -8.5), (51, -0.5), (59, -0.5), (59, 68.5), (51, 68.5), (51, 76.5), (7, 76.5), (7, 68.5), (-1, 68.5)]
 line(d, [(X(a), Y(b)) for a, b in cross + [cross[0]]], (150, 200, 150), 2)
-text(d, X(29), Y(-4.5), "back extension (not used)", 10, (150, 220, 150), True)
 
 # ---------------------------------------------------------------- the board 58 x 68
 PW, PL = 58.0, 68.0
@@ -60,6 +59,10 @@ rect(d, X(0.8), Y(0.8), X(PW - 0.8), Y(PL - 0.8), outline=MASK2 + (255,), width=
 rect(d, X(8) + 6, Y(PL) + 4, X(50) + 6, Y(75) + 8, fill=(0, 0, 0, 90))
 rect(d, X(8), Y(PL) - 5, X(50), Y(75), fill=MASK + (255,))
 line(d, [(X(8), Y(PL)), (X(8), Y(75)), (X(50), Y(75)), (X(50), Y(PL))], (8, 60, 36, 255), 3)
+# back tab of the board (42 x 7) behind the ESP32: C1 and C2
+rect(d, X(8) + 6, Y(-7) + 4, X(50) + 6, Y(0) + 8, fill=(0, 0, 0, 90))
+rect(d, X(8), Y(-7), X(50), Y(0) + 5, fill=MASK + (255,))
+line(d, [(X(8), Y(0)), (X(8), Y(-7)), (X(50), Y(-7)), (X(50), Y(0))], (8, 60, 36, 255), 3)
 
 def hole(cx, cy, dia, ring):
     circ(d, X(cx), Y(cy), ring / 2 * K, fill=PAD + (255,), outline=(120, 120, 126, 255), width=1)
@@ -201,11 +204,11 @@ tpad(3.0, 66.0, ring=1.8, drill=0.9); tpad(8.0, 66.0, ring=1.8, drill=0.9)
 rrect(d, X(1.9), Y(64.4), X(9.1), Y(67.6), 6, outline=SILK + (255,), width=2); text(d, X(10.4), Y(66.0), "F1", 8, SILK, True, 'lm')
 tpad(2.5, 62.6, ring=1.8, drill=0.8); tpad(5.04, 62.6, ring=1.8, drill=0.8)
 text(d, X(6.6), Y(62.6), "D1", 8, SILK, True, 'lm')
-# C1 470 uF (radial 6.3 mm) and C2 100 nF, in the corridor
-circ(d, X(27.2), Y(46.5), 3.15 * K, fill=None, outline=SILK + (255,), width=2)
-tpad(25.95, 46.5, ring=1.8, drill=0.8); tpad(28.45, 46.5, ring=1.8, drill=0.8); silk(27.2, 46.5, "C1", 9)
-tpad(26.0, 40.0, ring=1.6, drill=0.8); tpad(28.5, 40.0, ring=1.6, drill=0.8); text(d, X(29.8), Y(40.0), "C2", 8, SILK, True, 'lm')
-# C5 100 nF (pressure filter, taller than 3 mm so not under the MAX31865): in the corridor, below C1
+# C1 470 uF (radial 6.3 mm) and C2 100 nF, on the back tab (y -7 to 0), behind the ESP32
+circ(d, X(22.0), Y(-3.5), 3.15 * K, fill=None, outline=SILK + (255,), width=2)
+tpad(20.75, -3.5, ring=1.8, drill=0.8); tpad(23.25, -3.5, ring=1.8, drill=0.8); silk(22.0, -3.5, "C1", 9)
+tpad(30.0, -3.5, ring=1.6, drill=0.8); tpad(32.5, -3.5, ring=1.6, drill=0.8); text(d, X(33.8), Y(-3.5), "C2", 8, SILK, True, 'lm')
+# C5 100 nF (pressure filter, taller than 3 mm so not under the MAX31865): in the corridor, below JP1
 tpad(26.0, 53.5, ring=1.6, drill=0.8); tpad(28.5, 53.5, ring=1.6, drill=0.8); text(d, X(29.8), Y(53.5), "C5", 8, SILK, True, 'lm')
 # JST XH x2: vertical headers, pins along x, the plugs come out upwards: no keep-out towards the front, away from the ribbon path (x 7 to 18)
 for k, (x0, name) in enumerate([(38.5, "J3 flow In"), (49.0, "J4 flow Out")]):
@@ -289,7 +292,7 @@ comp = [
     "I2C level shifter: 2 x 2N7000 + 4 x 10 kΩ (to place at routing)",
     "R11 to R16  flow sensor inputs  ·  C3, C4  1 nF",
     "F1  1.1 A resettable fuse  ·  D1  1N5819",
-    "C1  470 µF  ·  C2, C5  100 nF  ·  R22 10 kΩ, R23 20 kΩ, C5  pressure divider (J9, GPIO 1)",
+    "C1  470 µF, C2  100 nF: on the back tab  ·  C5  100 nF  ·  R22 10 kΩ, R23 20 kΩ: pressure divider (J9)",
 ]
 for i, t in enumerate(comp):
     text(d, lx, 438 + i * 24, t, 15, INK, False, 'lm')
