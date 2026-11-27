@@ -171,13 +171,13 @@ cuboid(CX0 + 1.2, CY0 + 61.2, top, 2.7, 2.7, 5.2, BLACK)
 cyl(CX0 + 27.2, CY0 + 46.5, 3.15, top, 12.0, (30, 40, 90))                                # 470 uF electrolytic
 cuboid(CX0 + 25.5, CY0 + 39.2, top, 4.0, 1.6, 4.2, (200, 120, 40))                        # 100 nF
 for k in range(2):
-    xb = CX0 + 42.0 + k * 10.5 - 4.95
-    cuboid(xb, CY0 + 62.1, top, 9.9, 5.8, 5.8, WHITE)                                     # JST XH header
-    cuboid(xb + 0.3, CY0 + 62.4, top + 5.8, 9.3, 5.2, 6.0, CREAM)                         # its plug
+    xb = CX0 + 38.5 + k * 10.5 - 4.95
+    cuboid(xb, CY0 + 61.6, top, 9.9, 5.8, 5.8, WHITE)                                     # JST XH header
+    cuboid(xb + 0.3, CY0 + 61.9, top + 5.8, 9.3, 5.2, 6.0, CREAM)                         # its plug
 
 # J9: JST XH header (pressure sensor) on the tab under J3, with its plug (the cable is drawn with the other cables)
-cuboid(CX0 + 42.0 - 4.95, CY0 + 68.6, top, 9.9, 5.8, 5.8, WHITE)
-cuboid(CX0 + 42.0 - 4.95 + 0.3, CY0 + 68.6 + 0.3, top + 5.8, 9.3, 5.2, 6.0, CREAM)           # its plug
+cuboid(CX0 + 38.5 - 4.95, CY0 + 68.6, top, 9.9, 5.8, 5.8, WHITE)
+cuboid(CX0 + 38.5 - 4.95 + 0.3, CY0 + 68.6 + 0.3, top + 5.8, 9.3, 5.2, 6.0, CREAM)           # its plug
 
 # FPC ribbon: leaves the connector towards the front and runs straight out
 Y_END = CY0 + 97.0
@@ -236,17 +236,17 @@ c8 = (225, 60, 150)
 run_x(xj2, Y0, Y_END, top + 1.27, 4, c8); cable("pump dimmer (I2C)", "J8", 4, c8, (xj2, Y_END, top + 1.27))
 # JST XH: flow sensors (3 wires each), up from the plugs then forward
 c3, c4 = (20, 150, 150), (90, 80, 190)
-riser_x(CX0 + 40.5, CY0 + 65.0, top + 11.8, top + 14.0, 3, c3)
-cuboid(CX0 + 40.5 - 2.25, CY0 + 65.0 - 0.65, top + 14.0, 4.5, Y_END - (CY0 + 65.0 - 0.65), TH, c3)
-cable("flow sensor In", "J3", 3, c3, (CX0 + 40.5, Y_END, top + 14.0))
-riser_x(CX0 + 52.5, CY0 + 65.0, top + 11.8, top + 14.0, 3, c4)
-cuboid(CX0 + 52.5 - 2.25, CY0 + 65.0 - 0.65, top + 14.0, 4.5, Y_END - (CY0 + 65.0 - 0.65), TH, c4)
-cable("flow sensor Out", "J4", 3, c4, (CX0 + 52.5, Y_END, top + 14.0))
+riser_x(CX0 + 37.0, CY0 + 64.5, top + 11.8, top + 14.0, 3, c3)
+cuboid(CX0 + 37.0 - 2.25, CY0 + 64.5 - 0.65, top + 14.0, 4.5, Y_END - (CY0 + 64.5 - 0.65), TH, c3)
+cable("flow sensor In", "J3", 3, c3, (CX0 + 37.0, Y_END, top + 14.0))
+riser_x(CX0 + 49.0, CY0 + 64.5, top + 11.8, top + 14.0, 3, c4)
+cuboid(CX0 + 49.0 - 2.25, CY0 + 64.5 - 0.65, top + 14.0, 4.5, Y_END - (CY0 + 64.5 - 0.65), TH, c4)
+cable("flow sensor Out", "J4", 3, c4, (CX0 + 49.0, Y_END, top + 14.0))
 # J9 pressure sensor: JST XH under J3, 3 wires up from its plug (x 45, so beside the cable of J3 and clear of J4), then forward to the slot
 c9 = (200, 120, 40)
-riser_x(CX0 + 45.0, CY0 + 71.5, top + 11.8, top + 14.0, 3, c9)
-cuboid(CX0 + 45.0 - 2.25, CY0 + 71.5 - 0.65, top + 14.0, 4.5, Y_END - (CY0 + 71.5 - 0.65), TH, c9)
-cable("pressure sensor", "J9", 3, c9, (CX0 + 45.0, Y_END, top + 14.0))
+riser_x(CX0 + 41.5, CY0 + 71.5, top + 11.8, top + 14.0, 3, c9)
+cuboid(CX0 + 41.5 - 2.25, CY0 + 71.5 - 0.65, top + 14.0, 4.5, Y_END - (CY0 + 71.5 - 0.65), TH, c9)
+cable("pressure sensor", "J9", 3, c9, (CX0 + 41.5, Y_END, top + 14.0))
 # PT100 probe: two very thin wires (0.8 mm) screwed on the two middle terminals of the MAX31865 block (RTD+ and RTD-, 3.5 mm apart),
 # straight out of the block, up in front of it, then forward over J3 and out through the slot
 DW = 0.8

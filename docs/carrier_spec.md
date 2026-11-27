@@ -28,7 +28,7 @@ All **through-hole** parts (no SMD soldering). Related files: `images/board_plac
 | J6 | 1 x 8 female socket (low, 3 mm) | MAX31865 module |
 | J7 | a **3 x 4 right-angle male header** | row A: start button + steam-mode button; row B: encoder (powered from 5 V); row C: 4 spare I/O pins (+5 V, level-adapted input, level-adapted output, GND) |
 | J8 | row C (the lowest) of the J2 header, 4 pins | RobotDyn 4 A pump dimmer, **I2C** (powered from 5 V, through an I2C level shifter) |
-| J9 | JST XH 3-pin, vertical, on the tab right under J3 (centre x 42, y 71.5) | pressure sensor 0.5 to 4.5 V, 0 to 12 bar (powered from 5 V) |
+| J9 | JST XH 3-pin, vertical, on the tab right under J3 (centre x 38.5, y 71.5) | pressure sensor 0.5 to 4.5 V, 0 to 12 bar (powered from 5 V) |
 | JP1 | 1 x 2 male header + shunt jumper | +5 V board to the 5V pin of the ESP32 (see Circuits) |
 | ESP | 2 x 1 x 20 female sockets | ESP32-S3 board (about 22 x 54 mm from the photo; row spacing to be measured) |
 
@@ -87,7 +87,7 @@ Same order as J3 / J4:
 |---|---|---|
 | +5 V | signal | GND |
 
-The footprint (9.9 x 5.8 mm, pins along x, plug upwards, real pitch 2.5 mm) is centred at x 42, y 71.5 mm, inside the 42 x 7 mm tab (y 68 to 75): **only 0.7 mm to J3 and 0.6 mm to the tab edge**, and 1.5 mm from the front wall. Check the plug heights against the cable of J3 (about 12 mm); one more 3-wire cable (4.5 mm) goes through the front slot.
+The footprint (9.9 x 5.8 mm, pins along x, plug upwards, real pitch 2.5 mm) is centred at x 38.5, y 71.5 mm (J3 at x 38.5 and J4 at x 49, both at y 64.5), inside the 42 x 7 mm tab (y 68 to 75): **only 1.2 mm to J3 and 0.6 mm to the tab edge**, and 1.5 mm from the front wall. Check the plug heights against the cable of J3 (about 12 mm); one more 3-wire cable (4.5 mm) goes through the front slot.
 
 G1/4 sensor, 0 to 12 bar, 0.5 to 4.5 V output. The signal goes through a divider, 10 kΩ (series) / 20 kΩ (to GND), which brings 4.5 V down to 3.0 V, plus 100 nF on GPIO 1 (ADC1, 11 dB attenuation); on the board: R22 (10 kΩ) and R23 (20 kΩ) flat under the MAX31865 below R21, C5 (100 nF) in the corridor below C1. Pressure in bar = (sensor voltage − 0.5) x 3. Average the readings (the ESP32 ADC is noisy and not very linear at the ends). The pump can reach about 19 bar at zero flow, above the sensor's 12 bar range: make sure the machine's pressure relief valve limits the pressure at the sensor tap (and check the sensor's overpressure rating).
 

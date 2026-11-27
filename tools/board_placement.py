@@ -208,17 +208,17 @@ tpad(26.0, 40.0, ring=1.6, drill=0.8); tpad(28.5, 40.0, ring=1.6, drill=0.8); te
 # C5 100 nF (pressure filter, taller than 3 mm so not under the MAX31865): in the corridor, below C1
 tpad(26.0, 53.5, ring=1.6, drill=0.8); tpad(28.5, 53.5, ring=1.6, drill=0.8); text(d, X(29.8), Y(53.5), "C5", 8, SILK, True, 'lm')
 # JST XH x2: vertical headers, pins along x, the plugs come out upwards: no keep-out towards the front, away from the ribbon path (x 7 to 18)
-for k, (x0, name) in enumerate([(42.0, "J3 flow In"), (52.5, "J4 flow Out")]):
+for k, (x0, name) in enumerate([(38.5, "J3 flow In"), (49.0, "J4 flow Out")]):
     for i in range(3):
-        tpad(x0 + (i - 1) * 2.5, 65.0, square=(i == 0), ring=1.8, drill=1.0)
-    rect(d, X(x0) - 4.95 * K, Y(65.0) - 2.9 * K, X(x0) + 4.95 * K, Y(65.0) + 2.9 * K, outline=SILK + (255,), width=2)
-    text(d, X(x0), Y(62.9), name, 8, SILK, True)
+        tpad(x0 + (i - 1) * 2.5, 64.5, square=(i == 0), ring=1.8, drill=1.0)
+    rect(d, X(x0) - 4.95 * K, Y(64.5) - 2.9 * K, X(x0) + 4.95 * K, Y(64.5) + 2.9 * K, outline=SILK + (255,), width=2)
+    text(d, X(x0), Y(62.4), name, 8, SILK, True)
 
-# J9: JST XH 3-pin (pressure sensor), vertical, on the tab right under J3 (same x, y 71.5): footprint 9.9 x 5.8, margins 0.7 mm to J3 and 0.6 mm to the tab edge
+# J9: JST XH 3-pin (pressure sensor), vertical, on the tab right under J3 (same x, y 71.5): footprint 9.9 x 5.8, margins 1.2 mm to J3 and 0.6 mm to the tab edge
 for i in range(3):
-    tpad(42.0 + (i - 1) * 2.5, 71.5, square=(i == 0), ring=1.8, drill=1.0)
-rect(d, X(42.0) - 4.95 * K, Y(71.5) - 2.9 * K, X(42.0) + 4.95 * K, Y(71.5) + 2.9 * K, outline=SILK + (255,), width=2)
-text(d, X(42.0), Y(69.55), "J9 pressure", 8, SILK, True)
+    tpad(38.5 + (i - 1) * 2.5, 71.5, square=(i == 0), ring=1.8, drill=1.0)
+rect(d, X(38.5) - 4.95 * K, Y(71.5) - 2.9 * K, X(38.5) + 4.95 * K, Y(71.5) + 2.9 * K, outline=SILK + (255,), width=2)
+text(d, X(38.5), Y(69.55), "J9 pressure", 8, SILK, True)
 
 # ---------------------------------------------------------------- the raised boards, translucent (they hide nothing)
 # ESP32-S3 board ~22 x 54 at x 2.5..56.5, y 3..25 (rotated 90 degrees, USB-C to the left)
@@ -313,7 +313,7 @@ chk = [
     "PT100 wires leave at the front above J7 / J3 / J4, at about 14 mm;",
     "Dupont housings end at the front wall (the board has a 42 x 7 tab there); cable slot in the wall;",
     "M2 holes and pin-1 orientation of the FPC board; pin order of J5, J6 and J7;",
-    "J9 (JST XH under J3): 0.7 mm to J3, 0.6 mm to the tab edge;",
+    "J9 (JST XH under J3): 1.2 mm to J3, 0.6 mm to the tab edge;",
     "check its plug height against the cable of J3 (about 12 mm).",
 ]
 for i, t in enumerate(chk):
