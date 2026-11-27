@@ -125,8 +125,9 @@ to92(6.5, 16.2, "Q5")                                           # spare output s
 # R1..R10 (vertical, between the two socket rows) then Q1..Q4 (SSR drivers, backlight, spare output)
 for i, name in enumerate(["R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9", "R10"]):
     axial_v(10.6 + i * 2.4, 14.0, label=name)
-for i, name in enumerate(["Q1", "Q2", "Q3", "Q4"]):
-    to92(35.2 + i * 3.7, 14.0, name)
+# Q1..Q4: TO-92 bodies are 4.8 mm wide, so two rows of two (pitch 5.4 mm), clear of R10 and of the antenna zone
+for name, (qx, qy) in zip(["Q1", "Q2", "Q3", "Q4"], [(36.0, 10.0), (41.4, 10.0), (36.0, 17.5), (41.4, 17.5)]):
+    to92(qx, qy, name)
 # spare I/O conditioning, flat resistors under the MAX31865 (3 mm clearance): R17 4.7 k + R18 10 k (input divider), R19 1 k base, R20 4.7 k pull-up to 5 V, R21 10 k base to GND
 for i, name in enumerate(["R17", "R18", "R19", "R20", "R21"]):
     axial(43.7, 34.2 + i * 2.7, pitch=10.16, label=None)
