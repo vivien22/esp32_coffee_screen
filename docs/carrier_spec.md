@@ -153,7 +153,7 @@ Silkscreen read on the photo, left column from the USB-C end: GND, 5V, G48, BOOT
 | 1 | 470 µF 10 V radial capacitor (105 °C); 3 x 100 nF (C2, C5, C6); 2 x 1 nF (C3, C4) | 1 € |
 | | Dupont female housings + crimp contacts: one 2 x 4 (J2), 1 x 4 x 3 (J8, J7 rows B and C), 1 x 2 x 2 (J7 row A); JST XH 3-pin housings + crimps for the sensors that do not come with an XH plug (Digmesa, pressure sensor) | 2 € |
 | 4 | 3 mm standoffs (existing) + M2.5 screws, **one of them nylon** (the hole under the antenna) | 0.2 € |
-| | **Total parts** | **about 6 to 9 €** |
+| | **Total parts** (without the ESP32, the MAX31865 module and the FPC adapter) | **about 11 €** (unit prices; more if bought in packs) |
 | 5 | bare boards, 58 x 68 mm + two 42 x 7 mm tabs (front and back), 2 layers (shipping included) | 10 to 20 € |
 
 ## Points to confirm before manufacturing
