@@ -51,7 +51,7 @@ T(x0 + 370, 330, "mark it (paint dot on +5 V): no keyed header on a 3-row strip"
 
 head(60, 366, "J7: right-angle 3 x 4 male header")
 j7a = [("button", (90, 90, 96)), ("GND", DK), ("steam", (90, 90, 96)), ("GND", DK)]
-j7b = [("GA", GRN), ("GB", GRN), ("+5 V", RED), ("GND", DK)]
+j7b = [("GA", GRN), ("GB", GRN), ("+3.3 V", RED), ("GND", DK)]
 j7c = [("+5 V", RED), ("IN 38", VIO), ("OUT 39", VIO), ("GND", DK)]
 for i, (lab, col) in enumerate(j7a):
     pin(60 + i * 88, 396, lab, col, 14)
@@ -126,11 +126,11 @@ def chain(x, y, title, src, res, end, shunts, col):
         L([(x + sx, y), (x + sx, y)], col, 2)
         shunt(x + sx, y, lab)
 cy = 866
-chain(gx, cy, "Encoder GA, GB, spare IN 38 (x3): 5 V to 3.3 V", "module out", "4.7 k", "GPIO", [(270, "10 k")], GRN)
+chain(gx, cy, "Spare IN 38: 5 V to 3.3 V (encoder: 3.3 V, 1 k series)", "5 V in", "4.7 k", "GPIO 38", [(270, "10 k")], GRN)
 chain(gx, cy + 120, "Pressure input: 4.5 V to 2.7 V", "sensor", "10 k", "GPIO 1", [(250, "15 k"), (320, "100 nF")], BLU)
 chain(gx, cy + 240, "5 V rail measure (same ratio: pressure = signal / rail)", "+5 V rail", "10 k", "GPIO 2", [(250, "15 k")], RED)
 T(gx, cy + 352, "Dimmer I2C: module powered from 3.3 V, no level shifter", F(14, True), VIO, 'lm')
-T(gx, cy + 374, "4.7 k pull-ups to 3V3 (R26, R27); SDA 47, SCL 42, 100 kHz", F(13), GRY, 'lm')
+T(gx, cy + 374, "4.7 k pull-ups to 3V3 (R24, R25); SDA 47, SCL 42, 100 kHz", F(13), GRY, 'lm')
 T(gx, cy + 394, "ships in UART mode: switch it to I2C once", F(13), GRY, 'lm')
 
 # ================================================================ 3. circuits

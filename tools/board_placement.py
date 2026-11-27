@@ -138,8 +138,8 @@ for i, name in enumerate(["R22", "R23"]):
     axial(43.7, 47.6 + i * 2.7, pitch=10.16, label=None)
     text(d, X(49.6), Y(47.6 + i * 2.7), name, 8, SILK, True, 'lm')
 
-# 5 V rail measure (GPIO 2), same 10 k / 15 k ratio as the pressure divider: R28 (series) and R29 (to GND), below R23
-for i, name in enumerate(["R28", "R29"]):
+# 5 V rail measure (GPIO 2), same 10 k / 15 k ratio as the pressure divider: R26 (series) and R27 (to GND), below R23
+for i, name in enumerate(["R26", "R27"]):
     axial(43.7, 53.0 + i * 2.7, pitch=10.16, label=None)
     text(d, X(49.6), Y(53.0 + i * 2.7), name, 8, SILK, True, 'lm')
 
@@ -214,11 +214,8 @@ text(d, X(6.6), Y(62.6), "D1", 8, SILK, True, 'lm')
 circ(d, X(22.0), Y(-3.5), 3.15 * K, fill=None, outline=SILK + (255,), width=2)
 tpad(20.75, -3.5, ring=1.8, drill=0.8); tpad(23.25, -3.5, ring=1.8, drill=0.8); text(d, X(25.4), Y(-3.5), "C1", 9, SILK, True, 'lm')
 tpad(30.0, -3.5, ring=1.6, drill=0.8); tpad(32.5, -3.5, ring=1.6, drill=0.8); text(d, X(33.8), Y(-3.5), "C2", 8, SILK, True, 'lm')
-# corridor, below JP1: R24, R25 (10 k, GA / GB dividers to GND), vertical
+# back tab: R24 / R25, 4.7 k I2C pull-ups to 3V3 (dimmer powered from 3.3 V: no level shifter), left of C1
 for i, name in enumerate(["R24", "R25"]):
-    axial_v(24.6 + i * 2.4, 44.1, label=name)
-# back tab: R26 / R27, 4.7 k I2C pull-ups to 3V3 (dimmer powered from 3.3 V: no level shifter), left of C1
-for i, name in enumerate(["R26", "R27"]):
     axial(13.0, -5.4 + i * 3.8, pitch=7.62, label=None)
     text(d, X(13.0), Y(-5.4 + i * 3.8), name, 7, INK, True)
 # C5 100 nF (pressure filter, taller than 3 mm so not under the MAX31865): in the corridor, below JP1
@@ -300,13 +297,13 @@ comp = [
     "J7  right-angle 3 x 4 header: A start + steam buttons, B encoder, C spare I/O",
     "JP1  1 x 2 header + jumper: +5 V to the ESP32 (removed: ESP32 on USB only)",
     "Q1 to Q3  SSR drive ; Q4  backlight (optional)",
-    "R1 to R4  1 kΩ  ·  R5 to R8  10 kΩ  ·  R9, R10 4.7 kΩ + R24, R25 10 kΩ: GA, GB dividers  ·  R17, R18: IN",
+    "R1 to R4  1 kΩ  ·  R5 to R8  10 kΩ  ·  R9, R10 1 kΩ: GA, GB series (encoder at 3.3 V)  ·  R17, R18: IN divider",
     "Q5, R19 to R21  spare output stage (3.3 V to 5 V)",
-    "R26, R27  4.7 kΩ I2C pull-ups to 3V3 (dimmer at 3.3 V, no level shifter)",
+    "R24, R25  4.7 kΩ I2C pull-ups to 3V3 (dimmer at 3.3 V, no level shifter)",
     "R11 to R16  flow sensor inputs  ·  C3, C4  1 nF",
     "F1  1.1 A resettable fuse  ·  D1  1N5819",
     "C1  470 µF, C2  100 nF: on the back tab  ·  C5  100 nF  ·  R22 10 kΩ, R23 15 kΩ: pressure (J9)",
-    "R28 10 kΩ, R29 15 kΩ: 5 V rail measure on GPIO 2 (pressure sensor is ratiometric)",
+    "R26 10 kΩ, R27 15 kΩ: 5 V rail measure on GPIO 2 (pressure sensor is ratiometric)",
 ]
 for i, t in enumerate(comp):
     text(d, lx, 438 + i * 24, t, 15, INK, False, 'lm')
