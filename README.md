@@ -17,6 +17,9 @@ Status: **working design, nothing has been manufactured.** Placement is to scale
 
 ## Contents
 - `docs/carrier_spec.md`: full specification (dimensions, connectors, pin assignment, circuits, bill of materials, open points).
+- `docs/decisions.md`: why each design choice was made, and what was considered and rejected.
+- `docs/order_farnell.md`: parts list with Farnell order codes (quick-paste ready).
+- `CLAUDE.md`: working notes for Claude Code sessions on this repository.
 - `images/`: the three pictures above, all generated from the scripts in `tools/` (Python + Pillow + numpy; measurements are at the top of each file): `board_placement.py`, `enclosure_overview.py`, `board_schematic.py`.
 
 ## Principles
