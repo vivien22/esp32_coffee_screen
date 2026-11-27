@@ -97,7 +97,7 @@ rows = [("5V", "+5 V via JP1 (after diode and fuse)", RED), ("3V3", "display, di
         ("GPIO 17", "pump SSR drive", BRN), ("GPIO 18", "boiler SSR drive", ORG), ("GPIO 21", "valve SSR drive", YEL),
         ("GPIO 15", "flow In", BLU), ("GPIO 16", "flow Out", BLU), ("GPIO 1", "pressure sensor (ADC)", BLU), ("GPIO 2", "5 V rail measure (ADC)", RED),
         ("GPIO 4 / 5", "encoder A / B", GRN), ("GPIO 6 / 41", "start / steam buttons", (90, 90, 96)),
-        ("GPIO 47 / 48", "dimmer I2C: SDA / SCL", VIO),
+        ("GPIO 47 / 42", "dimmer I2C: SDA / SCL", VIO),
         ("GPIO 11 / 12 / 13", "SPI: MOSI / SCK / MISO", VIO), ("GPIO 10", "display CS", VIO), ("GPIO 9 / 8", "display DC / RST", VIO),
         ("GPIO 14", "display BLK (direct, Q4 optional)", VIO), ("GPIO 7", "MAX31865 CS", VIO), ("GPIO 38", "spare input on J7 (5 V divider)", (150, 150, 156)), ("GPIO 39", "spare output on J7 (to 5 V, inverting)", (150, 150, 156))]
 for i, (a, b, col) in enumerate(rows):
@@ -105,7 +105,7 @@ for i, (a, b, col) in enumerate(rows):
     RR(gx, y, gx + 180, y + 28, 5, fill=col, outline=(20, 20, 24), width=1)
     T(gx + 90, y + 14, a, F(14, True), (255, 255, 255))
     T(gx + 192, y + 14, b, F(15), INK, 'lm')
-T(gx, 806, "Avoided: 0, 3, 45, 46 (strapping), 19 and 20 (USB), 35 to 37 (PSRAM).", F(15), GRY, 'lm')
+T(gx, 806, "Avoided: 0, 3, 45, 46 (strapping), 19, 20 (USB), 35-37 (PSRAM), 48 (LED).", F(14), GRY, 'lm')
 
 # ================================================================ 2b. input circuits (chains)
 def box(x, y, w, h, label, fill=(250, 250, 240), col=INK, size=12):
@@ -130,7 +130,7 @@ chain(gx, cy, "Encoder GA, GB, spare IN 38 (x3): 5 V to 3.3 V", "module out", "4
 chain(gx, cy + 120, "Pressure input: 4.5 V to 2.7 V", "sensor", "10 k", "GPIO 1", [(250, "15 k"), (320, "100 nF")], BLU)
 chain(gx, cy + 240, "5 V rail measure (same ratio: pressure = signal / rail)", "+5 V rail", "10 k", "GPIO 2", [(250, "15 k")], RED)
 T(gx, cy + 352, "Dimmer I2C: module powered from 3.3 V, no level shifter", F(14, True), VIO, 'lm')
-T(gx, cy + 374, "4.7 k pull-ups to 3V3 (R26, R27); SDA 47, SCL 48, 100 kHz", F(13), GRY, 'lm')
+T(gx, cy + 374, "4.7 k pull-ups to 3V3 (R26, R27); SDA 47, SCL 42, 100 kHz", F(13), GRY, 'lm')
 T(gx, cy + 394, "ships in UART mode: switch it to I2C once", F(13), GRY, 'lm')
 
 # ================================================================ 3. circuits
