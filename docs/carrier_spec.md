@@ -13,7 +13,7 @@ All **through-hole** parts (no SMD soldering). Related files: `images/board_plac
 - **Connector rows:** J8 is the lowest row of the J2 header; J7 is also a 3 x 4 right-angle strip (row A: start and steam buttons, row B: encoder, row C: spare I/O); each row has its own Dupont housing, rows are 2.54 mm apart vertically, the housings are not keyed: mind the order. J8 and J9 both have their plug and cable. The corridor between the FPC board and the MAX31865 holds JP1 and C5.
 - **Below the ESP32, side by side:** the FPC adapter board on the **left** (x 1.5 to 23.5 mm, connector towards the front, flow-input parts R11 to R16 and C3, C4 under it), the MAX31865 on the **right** (x 31 to 56.4 mm, rotated 180 degrees: header on its rear edge, pin 1 VIN on the right, PT100 terminal block facing the front), and a corridor between them (x 23.5 to 31 mm) holding JP1 and C5.
 - **Front connector row:** right-angle headers with their Dupont housings need about **9 mm in front of the pads** (keep-out, nothing else there); J2 and J7 are on the 42 x 7 mm tab, the vertical JST XH J3 and J4 at the front right, F1 and D1 in the front-left corner. A cable slot is needed in the front wall (housings end about 1 mm from it).
-- **All cables leave through the front** (J2, J7, J3, J4, the PT100 wires and the display ribbon). Only the USB-C cable leaves through the left wall.
+- **All cables leave through the front** (J2, J7, J8, J3, J4, J9, the PT100 wires and the display ribbon). Only the USB-C cable leaves through the left wall.
 - **Display ribbon:** the FPC adapter board is rotated so that its connector faces the front: the flat ribbon (about 6 mm wide, at about 15.5 mm) runs **straight to the front** between x 7 and 18 mm, above J2's housings (10.5 mm) and F1; no tall part (JST XH plugs reach about 16 mm) may sit in that column. Nothing crosses the MAX31865 any more.
 - **Cables:** small flat ribbons (Dupont wires side by side), about **1.5 mm per wire** (4 wires = 6 mm, 3 wires = 4.5 mm, 2 wires = 3 mm), 1.3 mm thick. In the 3D view the cables are numbered 1 to 12 (J2 x2, J7 x4, J8, J3, J4, J9, PT100 probe, display ribbon); J3 / J4 leave their plugs upwards at about 12 mm and the two thin PT100 wires (0.8 mm, on the two middle terminals of the MAX31865 block) at about 15 mm; all go through the front slot. J9 (pressure sensor, 3 wires = 4.5 mm) leaves its plug upwards at about 14 mm, like J3 / J4. J8 (pump dimmer, 4 wires = 6 mm) comes out of the lowest housing of the J2 header, under the two J2 ribbons.
 - The spare-I/O resistors R17 to R21 are flat resistors under the MAX31865 (3 mm clearance, enough for axial 1/4 W parts).
@@ -56,7 +56,7 @@ Housings: row A = two 2-pin (start button, steam-mode button: dry contacts to GN
 The two GPIO numbers (38 and 39) are provisional free GPIOs of the ESP32-S3 chip (neither strapping, PSRAM, flash nor USB); check them against the real pin table of your board, which does not necessarily expose every GPIO of the chip.
 
 ### 5 V inputs protection (encoder)
-The ESP32-S3 only accepts 3.3 V. Since the encoder module is powered from 5 V, its outputs (A, B, button) can reach 5 V if the module has pull-ups to 5 V. GA, GB and the spare GPIO 38 therefore each go through a divider: 4.7 kΩ in series to the GPIO, then 10 kΩ from the GPIO to GND (5 V becomes 3.4 V). The start button (J7 row A, "button") is a dry contact to GND: it needs no divider, only the ESP32 internal pull-up and 100 nF against bounce. **To check:** if your module is a bare encoder without pull-up resistors, 10 kΩ pull-ups to 5 V are needed (provide optional footprints).
+The ESP32-S3 only accepts 3.3 V. Since the encoder module is powered from 5 V, its outputs (A, B, button) can reach 5 V if the module has pull-ups to 5 V. GA, GB and the spare GPIO 38 therefore each go through a divider: 4.7 kΩ in series to the GPIO, then 10 kΩ from the GPIO to GND (5 V becomes 3.4 V). The start button (J7 row A, "button") is a dry contact to GND: it needs no divider, only the ESP32 internal pull-up; bounce is handled in the firmware (no capacitor). **To check:** if your module is a bare encoder without pull-up resistors, 10 kΩ pull-ups to 5 V are needed (provide optional footprints).
 
 ### J8 (pump dimmer, row C of the J2 header, 4 pins in the module's order)
 | 1 | 2 | 3 | 4 |
@@ -114,14 +114,14 @@ VIN (**+5 V**: the Adafruit board has its own 3.3 V regulator), 3Vo (unused), GN
 Silkscreen read on the photo, left column from the USB-C end: GND, 5V, G48, BOOT, 48, 47, 38, 39, 40, 21, GND, 18, 17, 16, 15, 41, 42, 45, 46. Right column: GND, 3V3, PWR, RST, 14, 13, 12, 11, 10, 09, 08, 07, GND, 06, 05, 04, 03, 02, 01. Every GPIO used in this design (1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 21, 38, 39, 47, 48) is broken out on this board, and the strapping pins to avoid (0 = BOOT, 3, 45, 46) are the ones marked. Still free: 2 (right), 40, 41, 42 (left). To confirm by you: exact board size (the photo suggests about 22 x 54 mm plus about 1.5 mm of USB-C overhang), pin count per side (about 20), and row spacing.
 
 ## ESP32-S3 pins
-5V, 3V3, GND; GPIO 17 (pump SSR), 18 (boiler SSR), 21 (valve SSR); 15 (flow In), 16 (flow Out); 4 / 5 (encoder); 6 (start button); 41 (steam button); 11 / 12 / 13 (SPI MOSI / SCK / MISO); 10 (display CS); 9 / 8 (display DC / RST); 14 (backlight); 7 (MAX31865 CS); 47 / 48 (dimmer, I2C SDA / SCL); 1 (pressure, ADC); 38 (spare, on J7). Avoided: 0, 3, 45, 46, 19, 20, 35 to 37 (not broken out on this board).
+5V, 3V3, GND; GPIO 17 (pump SSR), 18 (boiler SSR), 21 (valve SSR); 15 (flow In), 16 (flow Out); 4 / 5 (encoder); 6 (start button); 41 (steam button); 11 / 12 / 13 (SPI MOSI / SCK / MISO); 10 (display CS); 9 / 8 (display DC / RST); 14 (backlight); 7 (MAX31865 CS); 47 / 48 (dimmer, I2C SDA / SCL); 1 (pressure, ADC); 38 / 39 (spare IN / OUT, on J7). Avoided: 0, 3, 45, 46, 19, 20, 35 to 37 (not broken out on this board).
 
 ## Circuits
-- **Power:** J2 A1 (+5 V) → 1.1 A resettable fuse → 1N5819 diode (reverse protection) → +5 V rail (470 µF + 100 nF) → **JP1** → 5V pin of the ESP32. The 3.3 V comes from the ESP32 board. **JP1** (1 x 2 header + shunt jumper): **fitted = normal operation**, the ESP32 takes its 5 V from the external supply through the Dupont connector; **removed = the ESP32 is powered by its USB port only** (the rest of the board stays on the external supply). Never fit JP1 while a USB cable is plugged in: the two 5 V sources would be tied together (and the supply could back-feed the computer).
-- **SSR (x3):** GPIO → 1 kΩ → 2N2222A base; 10 kΩ base → GND; SSR "+" input to the +5 V rail, "−" input to the collector; emitter to GND. The SSR input receives about 4.8 V.
+- **Power:** supply **5.1 V, 2 A** (measured by you); after F1 and D1 the rail is about 4.6 to 4.7 V. J2 A1 (+5 V) → 1.1 A resettable fuse → 1N5819 diode (reverse protection) → +5 V rail (470 µF + 100 nF) → **JP1** → 5V pin of the ESP32. The 3.3 V comes from the ESP32 board. **JP1** (1 x 2 header + shunt jumper): **fitted = normal operation**, the ESP32 takes its 5 V from the external supply through the Dupont connector; **removed = the ESP32 is powered by its USB port only** (the rest of the board stays on the external supply). Never fit JP1 while a USB cable is plugged in: the two 5 V sources would be tied together (and the supply could back-feed the computer).
+- **SSR (x3):** GPIO → 1 kΩ → 2N2222A base; 10 kΩ base → GND; SSR "+" input to the +5 V rail, "−" input to the collector; emitter to GND. The SSR input receives about 4.4 V (rail about 4.6 V minus about 0.2 V across the transistor), well above the usual 3 V minimum of a DC-input SSR.
 - **Flow sensor (x2):** signal → 10 kΩ to +5 V; signal → 4.7 kΩ → GPIO; GPIO → 10 kΩ → GND; 1 nF GPIO → GND. Works with a 5 V output (the divider gives about 3.4 V) or with an open collector.
 - **Display backlight:** BLK ← GPIO 14 directly (the display module has its own transistor). Optional stage Q4: GPIO 14 → 1 kΩ → 2N2222A base, not fitted by default.
-- **Encoder / button:** see "5 V inputs protection"; 100 nF against bounce.
+- **Encoder / buttons:** see "5 V inputs protection". **No RC filter on GA / GB:** the encoder library's interrupt routine expects every rising and falling edge, bounces included, and debounces in software; the two buttons are debounced in the firmware too.
 
 ## Bill of materials (through-hole)
 | Qty | Part | Indicative price |
@@ -138,7 +138,7 @@ Silkscreen read on the photo, left column from the USB-C end: GND, 5V, G48, BOOT
 | ~20 | axial resistors (1 kΩ, 10 kΩ, 4.7 kΩ, 20 kΩ; to be recounted at routing) | 1 € |
 | 1 | 1.1 A resettable fuse (radial) | 0.5 € |
 | 1 | 1N5819 diode | 0.2 € |
-| 1 | 470 µF 10 V radial capacitor; 4 x 100 nF; 2 x 1 nF | 1 € |
+| 1 | 470 µF 10 V radial capacitor (105 °C); 2 x 100 nF (C2, C5); 2 x 1 nF (C3, C4) | 1 € |
 | 4 | 3 mm standoffs (existing) + M2.5 screws | 0 |
 | | **Total parts** | **about 6 to 9 €** |
 | 5 | bare boards, 58 x 68 mm + two 42 x 7 mm tabs (front and back), 2 layers (shipping included) | 10 to 20 € |
@@ -154,5 +154,5 @@ Silkscreen read on the photo, left column from the USB-C end: GND, 5V, G48, BOOT
 8. Pressure sensor: confirm 3 wires (+5 V, GND, signal) and the G1/4 fitting on the hydraulic circuit.
 9. USB-C opening in the left wall (y 9 to 19 mm) and the USB cable bend outside the box.
 10. Display ribbon: length, thickness and pin-1 orientation of your FPC adapter board; the column x 7 to 18 mm in front of it must stay free of tall parts.
-10. MAX31865 at 5 V: high level of SDO (3.3 V or 5 V).
-11. Rotary knob (CJMCU-111, photo: pins GA, GB, VCC, GND): the push is on the GA line through a 3 kΩ resistor; the firmware's encoder library handles it from the GA / GB edges (as on the Nano). Check the module's pull-ups on GA and GB (value, to VCC). Optional alternative from the library note: bridge the 3 kΩ with 330 Ω and read GA as an analog level (GPIO 4 is ADC-capable and the 4.7 kΩ / 10 kΩ divider keeps the information).
+11. MAX31865 at 5 V: high level of SDO (3.3 V or 5 V).
+12. Rotary knob (CJMCU-111, photo: pins GA, GB, VCC, GND): the push is on the GA line through a 3 kΩ resistor; the firmware's encoder library handles it from the GA / GB edges (as on the Nano). Check the module's pull-ups on GA and GB (value, to VCC). Optional alternative from the library note: bridge the 3 kΩ with 330 Ω and read GA as an analog level (GPIO 4 is ADC-capable and the 4.7 kΩ / 10 kΩ divider keeps the information). On the ESP32, `analogRead()` must not be called inside an interrupt routine (the ADC driver takes a lock): with this option, the ISR only flags the event and the analog read is done in the loop or a task. The simple 0 Ω hack has no such constraint.
