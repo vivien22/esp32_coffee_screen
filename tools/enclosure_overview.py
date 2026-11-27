@@ -167,7 +167,6 @@ cuboid(CX0 + 22.4 - 1.27 + 0.15, CY0 + 65.6, top + 2.95, 10.0, 8.6, 2.3, WHITE)
 cuboid(CX0 + 22.4 - 1.27 + 0.15, CY0 + 65.6, top + 0.1, 10.0, 8.6, 2.3, (225, 222, 205))
 # polyfuse, standing diode, electrolytic, 100 nF, and the two JST XH (vertical headers with their plugs)
 cuboid(CX0 + 1.9, CY0 + 64.4, top, 7.2, 3.2, 11.0, (232, 200, 60))
-cuboid(CX0 + 2.5 - 0.3, CY0 + 62.6 - 0.3, top, 2.54 + 0.6, 0.6, 0.6, (200, 200, 205))       # D1: wire link (diode not fitted)
 cyl(CX0 + 22.0, CY0 - 3.5, 3.15, top, 12.0, (30, 40, 90))                                # 470 uF electrolytic (back tab)
 cuboid(CX0 + 29.25, CY0 - 4.3, top, 4.0, 1.6, 4.2, (200, 120, 40))                        # 100 nF (back tab)
 for k in range(2):
