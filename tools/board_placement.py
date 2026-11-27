@@ -79,9 +79,11 @@ def silk(x, y, s, sz=12, a='mm'):
     text(d, X(x), Y(y), s, sz, SILK, True, a)
 
 # mounting holes on the four small standoffs: 45 x 50, centered
-MH = [(6.5, 9.0), (51.5, 9.0), (6.5, 59.0), (51.5, 59.0)]
-for (cx, cy) in MH:
-    hole(cx, cy, 2.7, 5.6)
+# copper ring: 5.6 mm at the front; 4.6 mm at (6.5, 9), whose 5.6 mm ring came within 0.26 mm of a pad of the back socket row;
+# none at (51.5, 9), a non-plated hole under the antenna (nylon screw)
+MH = [(6.5, 9.0, 4.6), (51.5, 9.0, 2.7), (6.5, 59.0, 5.6), (51.5, 59.0, 5.6)]
+for (cx, cy, rg) in MH:
+    hole(cx, cy, 2.7, rg)
     circ(d, X(cx), Y(cy), 4.4 * K / 2 + 3, outline=SILK + (255,), width=2)
 
 # ---------------------------------------------------------------- U1: ESP32-S3 sockets (2 x 1x20, pitch 2.54, rows 17.78 apart), board rotated 90 degrees, USB-C to the left
@@ -112,9 +114,10 @@ def axial_v(cx, cy, pitch=10.16, label=None):
         text(d, X(cx), Y(cy), label, 7, INK, True)
 
 def to92(cx, cy, label):
-    # three pads at 1.27 pitch, flat face down
-    for k in (-1, 0, 1):
-        tpad(cx + k * 1.27, cy, ring=1.4, drill=0.8)
+    # triangular TO-92 footprint, flat face down: outer legs 2.54 mm apart, middle leg bent 2.54 mm back into the dome
+    # (three round pads in line at 1.27 mm would overlap and short the legs)
+    for (dx, dy) in ((-1.27, 0.0), (0.0, -2.54), (1.27, 0.0)):
+        tpad(cx + dx, cy + dy, ring=1.6, drill=0.8)
     # silkscreen D shape
     line(d, [(X(cx - 2.4), Y(cy - 0.9)), (X(cx + 2.4), Y(cy - 0.9))], SILK + (255,), 2)
     ang = [(cx + 2.4 * __import__('math').cos(__import__('math').radians(t)), cy - 0.9 - 2.4 * __import__('math').sin(__import__('math').radians(t))) for t in range(0, 181, 15)]
