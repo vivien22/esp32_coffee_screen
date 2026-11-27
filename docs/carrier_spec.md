@@ -130,6 +130,10 @@ Silkscreen read on the photo, left column from the USB-C end: GND, 5V, G48, BOOT
 - **Test points:** TP1 +5 V, TP2 3.3 V, TP3 GND, bare pads (1 mm holes) in the corridor below R28 / R29, for a multimeter probe or a wire loop; SDA / SCL can be probed on the pads of R24 / R25 (back tab).
 - **Encoder / buttons:** see "Encoder and 5 V input protection". **No RC filter on GA / GB:** the encoder library's interrupt routine expects every rising and falling edge, bounces included, and debounces in software; the two buttons are debounced in the firmware too.
 
+## Firmware notes
+- **Flow sensors: use the ESP32-S3 hardware pulse counter (PCNT)**, not GPIO interrupts. The S3 has 4 PCNT units (2 channels each), any GPIO can be routed to them. One unit per sensor: flow In on GPIO 15, flow Out on GPIO 16, counting rising edges only (falling edge: hold), with the hardware glitch filter at about 10 µs (`max_glitch_ns = 10000`; the filter goes up to about 12 µs). No pulse is lost while the display (SPI / DMA) or the Bluetooth keep the CPU busy. The counter is 16-bit (±32,767): enable `accum_count` with a watch point at the limit, or read and accumulate it regularly (32,767 pulses = about 2.7 l on the USN-HS06PD at 12,000 pulses per litre, about 1.05 l on the Digmesa at 31,100 pulses per litre). The PCNT does not see the direction of the Digmesa turbine: keep the "pump stopped" filter in software (store the count when the pump stops, ignore what comes after). ESP-IDF 5 driver `driver/pulse_cnt.h` (`pcnt_new_unit`, `pcnt_new_channel`, `pcnt_channel_set_edge_action`, `pcnt_unit_get_count`), available in Arduino-ESP32 3.x.
+- **Encoder: keep the interrupt-based encoder library, not the PCNT.** The PCNT can decode a quadrature encoder, but the knob's push is carried by the GA line (0 Ω hack): the PCNT would see a push as a quarter step back and forth and could not tell it apart; the library's state machine recognises it. The encoder turns slowly, interrupts are enough.
+
 ## Bill of materials (through-hole)
 | Qty | Part | Indicative price |
 |---|---|---|
