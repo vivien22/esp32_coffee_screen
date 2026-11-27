@@ -82,7 +82,8 @@ for i, (n, sg) in enumerate(fpc_top):
     pin(60 + i * 96, 850, "%s  %s" % (n, sg), (60, 110, 170), 14, 90)
 for i, (n, sg) in enumerate(fpc_bot):
     pin(60 + i * 96, 900, "%s  %s" % (n, sg), (60, 110, 170), 14, 90)
-T(60, 966, "Display module order BLK, CS, DC, RES, SDA, SCL, VCC, GND (photo); straight ribbon assumed.", F(14), RED, 'lm')
+T(60, 950, "Display module order BLK, CS, DC, RES, SDA, SCL, VCC, GND (photo); straight ribbon assumed.", F(14), RED, 'lm')
+T(60, 972, "SDA (GPIO 11) and SCL (GPIO 12) through 33 Ω (R28, R29) on the J5 branch only: 20 cm ribbon.", F(14), BLU, 'lm')
 
 # ---- J6
 head(60, 1000, "J6: 1 x 8 socket for the MAX31865 module", "Adafruit order; VIN = +3.3 V (accepts 3 to 5 V): all levels 3.3 V; 3Vo, RDY unused")

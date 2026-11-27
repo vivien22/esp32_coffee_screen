@@ -214,6 +214,9 @@ text(d, X(6.6), Y(62.6), "D1", 8, SILK, True, 'lm')
 circ(d, X(22.0), Y(-3.5), 3.15 * K, fill=None, outline=SILK + (255,), width=2)
 tpad(20.75, -3.5, ring=1.8, drill=0.8); tpad(23.25, -3.5, ring=1.8, drill=0.8); text(d, X(25.4), Y(-3.5), "C1", 9, SILK, True, 'lm')
 tpad(30.0, -3.5, ring=1.6, drill=0.8); tpad(32.5, -3.5, ring=1.6, drill=0.8); text(d, X(33.8), Y(-3.5), "C2", 8, SILK, True, 'lm')
+# corridor, below JP1: R28 / R29, 33 ohm series on the display SCK / MOSI (J5 branch only, 20 cm ribbon), vertical
+for i, name in enumerate(["R28", "R29"]):
+    axial_v(25.8 + i * 2.4, 44.1, label=name)
 # back tab: R24 / R25, 4.7 k I2C pull-ups to 3V3 (dimmer powered from 3.3 V: no level shifter), left of C1
 for i, name in enumerate(["R24", "R25"]):
     axial(13.0, -5.4 + i * 3.8, pitch=7.62, label=None)
@@ -301,7 +304,7 @@ comp = [
     "Q5, R19 to R21  spare output stage (3.3 V to 5 V)",
     "R24, R25  4.7 kΩ I2C pull-ups to 3V3 (dimmer at 3.3 V, no level shifter)",
     "R11 to R16  flow inputs (4.7 k pull-up, 10 k / 22 k divider)  ·  C3, C4  1 nF",
-    "F1  1.1 A resettable fuse  ·  D1  1N5819",
+    "F1  1.1 A fuse  ·  D1  1N5819  ·  R28, R29  33 Ω: display SPI series (20 cm ribbon)",
     "C1  470 µF, C2  100 nF: on the back tab  ·  C5  100 nF  ·  R22 10 kΩ, R23 15 kΩ: pressure (J9)",
     "R26 10 kΩ, R27 15 kΩ: 5 V rail measure on GPIO 2 (pressure sensor is ratiometric)",
 ]
