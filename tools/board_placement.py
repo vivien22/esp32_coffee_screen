@@ -128,15 +128,21 @@ for i, name in enumerate(["R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9", 
 # Q1..Q4: TO-92 bodies are 4.8 mm wide, so two rows of two (pitch 5.4 mm), clear of R10 and of the antenna zone
 for name, (qx, qy) in zip(["Q1", "Q2", "Q3", "Q4"], [(36.0, 10.0), (41.4, 10.0), (36.0, 17.5), (41.4, 17.5)]):
     to92(qx, qy, name)
+axial_v(45.4, 14.0, label="R29")                                # I2C pull-up to +5 V (SCL side), right of Q2 / Q4, clear of the antenna zone
 # spare I/O conditioning, flat resistors under the MAX31865 (3 mm clearance): R17 4.7 k + R18 10 k (input divider), R19 1 k base, R20 4.7 k pull-up to 5 V, R21 10 k base to GND
 for i, name in enumerate(["R17", "R18", "R19", "R20", "R21"]):
     axial(43.7, 34.2 + i * 2.7, pitch=10.16, label=None)
     text(d, X(49.6), Y(34.2 + i * 2.7), name, 8, SILK, True, 'lm')
 
-# pressure divider (J9 -> GPIO 1): R22 10 k (series) and R23 20 k (to GND) flat under the MAX31865, just below the spare-I/O resistors
+# pressure divider (J9 -> GPIO 1): R22 10 k (series) and R23 15 k (to GND) flat under the MAX31865, just below the spare-I/O resistors
 for i, name in enumerate(["R22", "R23"]):
     axial(43.7, 47.6 + i * 2.7, pitch=10.16, label=None)
     text(d, X(49.6), Y(47.6 + i * 2.7), name, 8, SILK, True, 'lm')
+
+# 5 V rail measure (GPIO 2), same 10 k / 15 k ratio as the pressure divider: R30 (series) and R31 (to GND), below R23
+for i, name in enumerate(["R30", "R31"]):
+    axial(43.7, 53.0 + i * 2.7, pitch=10.16, label=None)
+    text(d, X(49.6), Y(53.0 + i * 2.7), name, 8, SILK, True, 'lm')
 
 # keep-out under the antenna (right end of the ESP32 board)
 for k in range(0, 9):
@@ -207,8 +213,16 @@ tpad(2.5, 62.6, ring=1.8, drill=0.8); tpad(5.04, 62.6, ring=1.8, drill=0.8)
 text(d, X(6.6), Y(62.6), "D1", 8, SILK, True, 'lm')
 # C1 470 uF (radial 6.3 mm) and C2 100 nF, on the back tab (y -7 to 0), behind the ESP32
 circ(d, X(22.0), Y(-3.5), 3.15 * K, fill=None, outline=SILK + (255,), width=2)
-tpad(20.75, -3.5, ring=1.8, drill=0.8); tpad(23.25, -3.5, ring=1.8, drill=0.8); text(d, X(17.9), Y(-3.5), "C1", 9, SILK, True, 'rm')
+tpad(20.75, -3.5, ring=1.8, drill=0.8); tpad(23.25, -3.5, ring=1.8, drill=0.8); text(d, X(25.4), Y(-3.5), "C1", 9, SILK, True, 'lm')
 tpad(30.0, -3.5, ring=1.6, drill=0.8); tpad(32.5, -3.5, ring=1.6, drill=0.8); text(d, X(33.8), Y(-3.5), "C2", 8, SILK, True, 'lm')
+# corridor, below JP1: R24, R25 (10 k, GA / GB dividers to GND) and R28 (I2C pull-up to +5 V, SDA side), vertical
+for i, name in enumerate(["R24", "R25", "R28"]):
+    axial_v(24.6 + i * 2.4, 44.1, label=name)
+# back tab: I2C level shifter, Q6 / Q7 2N7000 (SDA / SCL) and R26 / R27 (10 k pull-ups to 3V3), left of C1
+for i, name in enumerate(["R26", "R27"]):
+    axial(13.0, -5.4 + i * 3.8, pitch=7.62, label=None)
+    text(d, X(13.0), Y(-5.4 + i * 3.8), name, 7, INK, True)
+to92(39.0, -3.5, "Q6"); to92(44.4, -3.5, "Q7")
 # C5 100 nF (pressure filter, taller than 3 mm so not under the MAX31865): in the corridor, below JP1
 tpad(26.0, 53.5, ring=1.6, drill=0.8); tpad(28.5, 53.5, ring=1.6, drill=0.8); text(d, X(29.8), Y(53.5), "C5", 8, SILK, True, 'lm')
 # JST XH x2: vertical headers, pins along x, the plugs come out upwards: no keep-out towards the front, away from the ribbon path (x 7 to 18)
@@ -288,12 +302,13 @@ comp = [
     "J7  right-angle 3 x 4 header: A start + steam buttons, B encoder, C spare I/O",
     "JP1  1 x 2 header + jumper: +5 V to the ESP32 (removed: ESP32 on USB only)",
     "Q1 to Q3  SSR drive ; Q4  backlight (optional)",
-    "R1 to R4  1 kΩ  ·  R5 to R8  10 kΩ  ·  R9, R10, R17, R18  5 V input dividers (GA, GB, IN)",
+    "R1 to R4  1 kΩ  ·  R5 to R8  10 kΩ  ·  R9, R10 4.7 kΩ + R24, R25 10 kΩ: GA, GB dividers  ·  R17, R18: IN",
     "Q5, R19 to R21  spare output stage (3.3 V to 5 V)",
-    "I2C level shifter: 2 x 2N7000 + 4 x 10 kΩ (to place at routing)",
+    "Q6, Q7  2N7000 I2C level shifter  ·  R26, R27  10 kΩ to 3V3  ·  R28, R29  10 kΩ to +5 V",
     "R11 to R16  flow sensor inputs  ·  C3, C4  1 nF",
     "F1  1.1 A resettable fuse  ·  D1  1N5819",
-    "C1  470 µF, C2  100 nF: on the back tab  ·  C5  100 nF  ·  R22 10 kΩ, R23 20 kΩ: pressure divider (J9)",
+    "C1  470 µF, C2  100 nF: on the back tab  ·  C5  100 nF  ·  R22 10 kΩ, R23 15 kΩ: pressure (J9)",
+    "R30 10 kΩ, R31 15 kΩ: 5 V rail measure on GPIO 2 (pressure sensor is ratiometric)",
 ]
 for i, t in enumerate(comp):
     text(d, lx, 438 + i * 24, t, 15, INK, False, 'lm')

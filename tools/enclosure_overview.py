@@ -169,7 +169,9 @@ cuboid(CX0 + 22.4 - 1.27 + 0.15, CY0 + 65.6, top + 0.1, 10.0, 8.6, 2.3, (225, 22
 # polyfuse, standing diode, electrolytic, 100 nF, and the two JST XH (vertical headers with their plugs)
 cuboid(CX0 + 1.9, CY0 + 64.4, top, 7.2, 3.2, 11.0, (232, 200, 60))
 cuboid(CX0 + 1.2, CY0 + 61.2, top, 2.7, 2.7, 5.2, BLACK)
-cyl(CX0 + 22.0, CY0 - 3.5, 3.15, top, 12.0, (30, 40, 90))                                # 470 uF electrolytic
+cyl(CX0 + 22.0, CY0 - 3.5, 3.15, top, 12.0, (30, 40, 90))
+for qx in (39.0, 44.4):                                                                   # Q6 / Q7, 2N7000 (I2C level shifter), back tab
+    cuboid(CX0 + qx - 2.4, CY0 - 3.5 - 1.9, top, 4.8, 3.8, 5.0, (25, 25, 28))                                # 470 uF electrolytic
 cuboid(CX0 + 29.25, CY0 - 4.3, top, 4.0, 1.6, 4.2, (200, 120, 40))                        # 100 nF (back tab)
 for k in range(2):
     xb = CX0 + 38.5 + k * 10.5 - 4.95

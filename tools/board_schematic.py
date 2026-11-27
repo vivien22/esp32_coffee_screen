@@ -47,7 +47,7 @@ T(x0 + 370, 196, "row A: 5 V supply + pump SSR (ribbon 1)", F(14, True), RED, 'l
 T(x0 + 370, 242, "row B: boiler SSR + valve SSR (ribbon 2)", F(14, True), ORG, 'lm')
 T(x0 + 370, 288, "row C: J8 pump dimmer, RobotDyn (I2C)", F(14, True), VIO, 'lm')
 T(x0 + 370, 312, "a 2 x 4 housing can be plugged 180 degrees the wrong way:", F(13), GRY, 'lm')
-T(x0 + 370, 330, "mark it, or key the header", F(13), GRY, 'lm')
+T(x0 + 370, 330, "mark it (paint dot on +5 V): no keyed header on a 3-row strip", F(13), GRY, 'lm')
 
 head(60, 366, "J7: right-angle 3 x 4 male header")
 j7a = [("button", (90, 90, 96)), ("GND", DK), ("steam", (90, 90, 96)), ("GND", DK)]
@@ -95,7 +95,7 @@ gx = 860
 T(gx, 118, "ESP32-S3: pins used", F(22, True), INK, 'lm')
 rows = [("5V", "+5 V via JP1 (after diode and fuse)", RED), ("3V3", "display, I2C pull-ups (3.3 V side)", RED),
         ("GPIO 17", "pump SSR drive", BRN), ("GPIO 18", "boiler SSR drive", ORG), ("GPIO 21", "valve SSR drive", YEL),
-        ("GPIO 15", "flow In", BLU), ("GPIO 16", "flow Out", BLU), ("GPIO 1", "pressure sensor (ADC)", BLU),
+        ("GPIO 15", "flow In", BLU), ("GPIO 16", "flow Out", BLU), ("GPIO 1", "pressure sensor (ADC)", BLU), ("GPIO 2", "5 V rail measure (ADC)", RED),
         ("GPIO 4 / 5", "encoder A / B", GRN), ("GPIO 6 / 41", "start / steam buttons", (90, 90, 96)),
         ("GPIO 47 / 48", "dimmer I2C: SDA / SCL", VIO),
         ("GPIO 11 / 12 / 13", "SPI: MOSI / SCK / MISO", VIO), ("GPIO 10", "display CS", VIO), ("GPIO 9 / 8", "display DC / RST", VIO),
@@ -105,7 +105,7 @@ for i, (a, b, col) in enumerate(rows):
     RR(gx, y, gx + 180, y + 28, 5, fill=col, outline=(20, 20, 24), width=1)
     T(gx + 90, y + 14, a, F(14, True), (255, 255, 255))
     T(gx + 192, y + 14, b, F(15), INK, 'lm')
-T(gx, 786, "Avoided: 0, 3, 45, 46 (strapping), 19 and 20 (USB), 35 to 37 (PSRAM).", F(15), GRY, 'lm')
+T(gx, 806, "Avoided: 0, 3, 45, 46 (strapping), 19 and 20 (USB), 35 to 37 (PSRAM).", F(15), GRY, 'lm')
 
 # ================================================================ 2b. input circuits (chains)
 def box(x, y, w, h, label, fill=(250, 250, 240), col=INK, size=12):
@@ -125,11 +125,13 @@ def chain(x, y, title, src, res, end, shunts, col):
     for sx, lab in shunts:
         L([(x + sx, y), (x + sx, y)], col, 2)
         shunt(x + sx, y, lab)
-cy = 850
+cy = 866
 chain(gx, cy, "Encoder GA, GB, spare IN 38 (x3): 5 V to 3.3 V", "module out", "4.7 k", "GPIO", [(270, "10 k")], GRN)
-chain(gx, cy + 120, "Pressure input: 4.5 V to 3.0 V", "sensor", "10 k", "GPIO 1", [(250, "20 k"), (320, "100 nF")], BLU)
-T(gx, cy + 262, "Dimmer I2C (5 V module): 2 x 2N7000 level shifter, 10 k pull-ups to 3V3 and to +5 V", F(14, True), VIO, 'lm')
-T(gx, cy + 286, "(SDA = GPIO 47, SCL = GPIO 48, 100 kHz; the module ships in UART mode: switch it to I2C once)", F(13), GRY, 'lm')
+chain(gx, cy + 120, "Pressure input: 4.5 V to 2.7 V", "sensor", "10 k", "GPIO 1", [(250, "15 k"), (320, "100 nF")], BLU)
+chain(gx, cy + 240, "5 V rail measure (same ratio: pressure = signal / rail)", "+5 V rail", "10 k", "GPIO 2", [(250, "15 k")], RED)
+T(gx, cy + 352, "Dimmer I2C: Q6, Q7 2N7000 level shifter", F(14, True), VIO, 'lm')
+T(gx, cy + 374, "10 k pull-ups to 3V3 and to +5 V; SDA 47, SCL 48, 100 kHz", F(13), GRY, 'lm')
+T(gx, cy + 394, "ships in UART mode: switch it to I2C once", F(13), GRY, 'lm')
 
 # ================================================================ 3. circuits
 cx0 = 1370
@@ -168,7 +170,7 @@ L([(cx0 - 20, 500), (cx0 + 20, 500)], BRN, 3); T(cx0 - 28, 500, "GPIO", F(12, Tr
 L([(cx0 + 100, 500), (cx0 + 100, 540)], INK, 2)
 RR(cx0 + 88, 540, cx0 + 112, 575, 3, fill=(250, 250, 240), outline=INK, width=2); T(cx0 + 100, 557, "10k", F(11, True))
 L([(cx0 + 100, 575), (cx0 + 100, 590)], INK, 2); T(cx0 + 100, 604, "GND", F(12, True))
-T(cx0 + 20, 640, "2N2222A (TO-92): the SSR input receives almost the full 5 V", F(13), GRY, 'lm')
+T(cx0 + 20, 640, "2N2222A (TO-92): the SSR input receives about 4.4 V", F(13), GRY, 'lm')
 
 # flow input
 T(cx0, 700, "Flow sensor input (x2)", F(17, True), BLU, 'lm')
@@ -209,7 +211,7 @@ notes = [
     "JP1: fitted, the ESP32 takes its 5 V from the board; removed, from its USB port only (never fit it with USB plugged).",
     "The three voltage levels: +5 V board (after fuse and diode), 3.3 V from the ESP32-S3 board, common GND.",
     "The display module has its own backlight transistor: BLK is driven directly by GPIO 14 (stage Q4 optional).",
-    "No regulator on the board: the ESP32-S3 provides the 3.3 V, which now only feeds the display and the I2C pull-ups.",
+    "No regulator on the board: the 3.3 V (display, I2C pull-ups) comes from the ESP32-S3.",
     "The pump dimmer stays off the board on the mains side: only its 4-wire I2C cable comes to J8.",
     "All parts are through-hole (TO-92, axial resistors, radial capacitors, DO-41): ordinary soldering iron.",
     "On the board: a ground plane, no copper under the ESP32 antenna, 4 mounting holes (45 x 50 mm).",
