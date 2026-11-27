@@ -129,11 +129,11 @@ cuboid(CX0, CY0, PCB_Z, 58, 68, PCBT, (22, 110, 66))
 cuboid(CX0 + 8, CY0 + 68, PCB_Z, 42, 7, PCBT, (22, 110, 66))          # front tab (cable side)
 cuboid(CX0 + 8, CY0 - 7, PCB_Z, 42, 7, PCBT, (22, 110, 66))           # back tab (C1, C2)
 
-# ESP32-S3 (~22 x 54) rotated 90 degrees on sockets of 8.5 mm: USB-C towards the left wall
-ex, ey = CX0 + 2.5, CY0 + 3
+# ESP32-S3 (21 x ~54) rotated 90 degrees on sockets of 8.5 mm: USB-C towards the left wall
+ex, ey = CX0 + 2.5, CY0 + 3.5
 cuboid(CX0 + 3.1, CY0 + 5.11 - 1.2, top, 50.8, 2.4, 8.5, BLACK)
 cuboid(CX0 + 3.1, CY0 + 22.89 - 1.2, top, 50.8, 2.4, 8.5, BLACK)
-cuboid(ex, ey, top + 8.5, 54, 22, 1.6, (236, 236, 242))
+cuboid(ex, ey, top + 8.5, 54, 21, 1.6, (236, 236, 242))
 cuboid(CX0 + 1.0, CY0 + 9.9, top + 8.5 + 1.6, 7.5, 8.2, 3.2, (190, 194, 200))        # USB-C
 cuboid(CX0 + 22, CY0 + 9.5, top + 8.5 + 1.6, 9, 9, 1.0, BLACK)                        # the module (shield)
 cuboid(CX0 + 48.5, CY0 + 6, top + 8.5 + 1.6, 7.5, 16, 0.8, (236, 226, 196))           # antenna

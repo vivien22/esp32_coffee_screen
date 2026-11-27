@@ -23,14 +23,14 @@ All **through-hole** parts (no SMD soldering). Related files: `images/board_plac
 | Ref | Type | Role |
 |---|---|---|
 | J2 | rows A and B of a **3 x 4 right-angle male header** (one 2 x 4 female Dupont housing, two ribbons of 4 wires) | 5 V supply + 3 SSRs |
-| J3, J4 | JST XH 3-pin, vertical, rotated (real pitch 2.5 mm) | flow sensors In and Out |
+| J3, J4 | JST XH 3-pin, vertical, rotated (real pitch 2.5 mm) | flow sensors In (USN-HS06PD) and Out (Digmesa Nano) |
 | J5 | 2 x 4 female socket | FPC adapter board (8 pins, ribbon to the remote display) |
 | J6 | 1 x 8 female socket (low, 3 mm) | MAX31865 module |
 | J7 | a **3 x 4 right-angle male header** | row A: start button + steam-mode button; row B: encoder (powered from **3.3 V**); row C: 4 spare I/O pins (+5 V, level-adapted input, level-adapted output, GND) |
 | J8 | row C (the lowest) of the J2 header, 4 pins | RobotDyn 4 A pump dimmer, **I2C** (powered from **3.3 V**, no level shifter) |
 | J9 | JST XH 3-pin, vertical, on the tab right under J3 (centre x 38.5, y 71.5) | pressure sensor 0.5 to 4.5 V, 0 to 12 bar (powered from 5 V) |
 | JP1 | 1 x 2 male header + shunt jumper | +5 V board to the 5V pin of the ESP32 (see Circuits) |
-| ESP | 2 x 1 x 20 female sockets | ESP32-S3 board (about 22 x 54 mm from the photo; row spacing to be measured) |
+| ESP | 2 x 1 x 20 female sockets | ESP32-S3 board (21 mm wide, measured; about 54 mm long; 2 x 20 pins, rows 17.78 mm apart, confirmed) |
 
 ### J2 (rows A and B of the 3 x 4 header: row A at the back, row B below it, row C = J8 at the bottom; pin 1 on the left)
 | | 1 | 2 | 3 | 4 |
@@ -123,6 +123,7 @@ Silkscreen read on the photo, left column from the USB-C end: GND, 5V, G48, BOOT
 - **SSR (x3):** GPIO → 1 kΩ → 2N2222A base; 10 kΩ base → GND; SSR "+" input to the +5 V rail, "−" input to the collector; emitter to GND. The SSR input receives about 4.4 V (rail about 4.6 V minus about 0.2 V across the transistor), well above the usual 3 V minimum of a DC-input SSR.
 - **Flow sensor (x2):** signal → **4.7 kΩ to +5 V**; signal → **10 kΩ** → GPIO; GPIO → **22 kΩ** → GND; 1 nF GPIO → GND. With a 5 V push-pull output the GPIO sees 5 x 22 / 32 = 3.4 V; with an open collector the pull-up is loaded by the divider and the GPIO sees 5 x 22 / (4.7 + 10 + 22) = 3.0 V; with a sensor that has its own internal pull-up, between the two. (The former values, 10 kΩ pull-up and 4.7 kΩ / 10 kΩ divider, gave only 2.0 V with an open collector, below the ESP32 input-high threshold of about 2.5 V.) The low level (0.5 V max at the sensor) gives under 0.35 V.
 - **Flow In sensor (J3): USN-HS06PD** (Hall sensor, 6 mm tube, 0.1 to 1.5 l/min, F (Hz) = 200 x Q (l/min), i.e. 12,000 pulses per litre, 300 Hz max; supply 5 to 24 V, under 10 mA; output high at least 4.5 V and low at most 0.5 V at 5 V; duty cycle 50 ± 10 %; -20 to 60 °C; **working pressure under 0.8 MPa (8 bar)**, so it must stay on the low-pressure side, between the tank and the pump; XH 2.54 plug, wire order varies by batch: check it). Its lower limit, 0.1 l/min = 1.7 ml/s, is below the pump flow during an extraction (about 4 ml/s measured at the inlet), so it works in range.
+- **Flow Out sensor (J4): Digmesa Nano** (brass, 1.2 mm nozzle; 31,100 pulses per litre, linear 0.83 to 8.3 ml/s, so 258 Hz max; ±2 %; 0 to 100 °C; 20 bar), on the boiler side. Its turbine counts in both flow directions: the firmware ignores its pulses while the pump is stopped. Its output type does not matter, the input circuit above suits it.
 - **Display backlight:** BLK ← GPIO 14 directly (the display module has its own transistor). Optional stage Q4: GPIO 14 → 1 kΩ → 2N2222A base, not fitted by default.
 - **Encoder / buttons:** see "Encoder and 5 V input protection". **No RC filter on GA / GB:** the encoder library's interrupt routine expects every rising and falling edge, bounces included, and debounces in software; the two buttons are debounced in the firmware too.
 
@@ -148,7 +149,7 @@ Silkscreen read on the photo, left column from the USB-C end: GND, 5V, G48, BOOT
 ## Points to confirm before manufacturing
 1. Display ribbon (J5): the pinout of the module is known (BLK, CS, DC, RES, SDA, SCL, VCC, GND); still to confirm the ribbon type (straight or reversed contacts) and the adapter's FPC-pin-to-header mapping, and the backlight polarity of BLK.
 2. Encoder: pin order GA, GB, VCC, GND confirmed (Funduino data sheet); pull-ups measured, 6.6 kΩ to VCC (3.3 kΩ resistors); the two end components on the module are not identified (capacitor or push resistor).
-3. Pin spacing (rows and pitch) and true width of your ESP32-S3 board.
+3. ESP32-S3 board: **confirmed**, 2 x 20 pins, rows 17.78 mm apart, 21 mm wide.
 4. Dimensions of your FPC adapter board (about 22 x 26 mm estimated) and position of its mounting holes.
 5. Flow sensors: the In sensor is a USN-HS06PD (5 V output, high at least 4.5 V); the circuit (4.7 kΩ pull-up, 10 kΩ / 22 kΩ divider) suits 5 V outputs, open collectors and internal pull-ups; check the wire order of the XH plug (it varies by batch).
 6. MAX31865 module (Adafruit, measured from the manufacturer's drawing): 25.4 x 27.9 mm, mounting holes 0.9" apart and 0.1" from the terminal-block edge, 1 x 8 header at 0.1" pitch on the short edge.
@@ -157,4 +158,4 @@ Silkscreen read on the photo, left column from the USB-C end: GND, 5V, G48, BOOT
 9. USB-C opening in the left wall (y 9 to 19 mm) and the USB cable bend outside the box.
 10. Display ribbon: length, thickness and pin-1 orientation of your FPC adapter board; the column x 7 to 18 mm in front of it must stay free of tall parts.
 11. MAX31865: powered from 3.3 V, so SDO is 3.3 V (settled).
-12. Rotary knob (CJMCU-111, photo: pins GA, GB, VCC, GND): the push is on the GA line through a 3 kΩ resistor; the firmware's encoder library handles it from the GA / GB edges (as on the Nano). Pull-ups measured: 6.6 kΩ from GA / GB to VCC. Optional alternative from the library note: bridge the 3 kΩ with 330 Ω and read GA as an analog level (GPIO 4 is ADC-capable and the 4.7 kΩ / 10 kΩ divider keeps the information). On the ESP32, `analogRead()` must not be called inside an interrupt routine (the ADC driver takes a lock): with this option, the ISR only flags the event and the analog read is done in the loop or a task. The simple 0 Ω hack has no such constraint.
+12. Rotary knob (CJMCU-111, photo: pins GA, GB, VCC, GND): the push is on the GA line through a 3 kΩ resistor; the firmware's encoder library handles it from the GA / GB edges (as on the Nano). Pull-ups measured: 6.6 kΩ from GA / GB to VCC. **Done: the 0 Ω hack** (push resistor bridged, pins 4 and 1), required with the encoder at 3.3 V. The library's analog alternative (330 Ω and an analog read of GA) is not kept: with the 3.3 kΩ pull-up at 3.3 V a push would give only about 0.3 V against 0 V for a rotation step, too close to tell apart reliably on the ESP32 ADC (and `analogRead()` must not be called inside an interrupt routine on the ESP32).

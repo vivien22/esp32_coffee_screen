@@ -234,10 +234,10 @@ rect(d, X(38.5) - 4.95 * K, Y(71.5) - 2.9 * K, X(38.5) + 4.95 * K, Y(71.5) + 2.9
 text(d, X(38.5), Y(69.55), "J9 pressure", 8, SILK, True)
 
 # ---------------------------------------------------------------- the raised boards, translucent (they hide nothing)
-# ESP32-S3 board ~22 x 54 at x 2.5..56.5, y 3..25 (rotated 90 degrees, USB-C to the left)
-rrect(o, px(X(2.5)) / SS, px(Y(3.0)) / SS, px(X(56.5)) / SS, px(Y(25.0)) / SS, 6, fill=(240, 240, 248, 120), outline=(240, 240, 248, 255), width=3)
+# ESP32-S3 board 21 x ~54 (width and row spacing measured) at x 2.5..56.5, y 3.5..24.5 (rotated 90 degrees, USB-C to the left)
+rrect(o, px(X(2.5)) / SS, px(Y(3.5)) / SS, px(X(56.5)) / SS, px(Y(24.5)) / SS, 6, fill=(240, 240, 248, 120), outline=(240, 240, 248, 255), width=3)
 rect(o, px(X(1.0)) / SS, px(Y(9.9)) / SS, px(X(8.5)) / SS, px(Y(18.1)) / SS, fill=(190, 194, 200, 200), outline=(120, 124, 130, 255), width=2)
-text(o, X(30.0), Y(7.8), "ESP32-S3   ~22 x 54  (at 8.5 mm)", 11, (60, 60, 70), True)
+text(o, X(30.0), Y(7.8), "ESP32-S3   21 x ~54  (at 8.5 mm)", 11, (60, 60, 70), True)
 text(o, X(52.5), Y(13.0), "antenna zone:", 10, (150, 30, 30), True)
 text(o, X(52.5), Y(15.0), "nothing below", 10, (150, 30, 30), True)
 text(o, X(4.8), Y(14.0), "USB-C", 9, (60, 60, 70), True)
@@ -268,7 +268,7 @@ def dim_v(x, y0, y1, label):
     for yy in (y0, y1):
         line(d, [(X(x) - 8, Y(yy)), (X(x) + 8, Y(yy))], (60, 60, 66), 2)
     d.text((px(X(x) - 14), px(Y((y0 + y1) / 2))), label, font=F(13, True), fill=(50, 50, 56), anchor='rm')
-dim_h(0, 58, 82.6, "58 mm (tab 42 x 7 at the front)")
+dim_h(0, 58, 82.6, "58 mm (tabs 42 x 7 at the front and back)")
 dim_v(-7.2, 0, 68, "68 mm")
 
 # ---------------------------------------------------------------- legend, to the right
