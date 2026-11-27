@@ -85,7 +85,7 @@ for i, (n, sg) in enumerate(fpc_bot):
 T(60, 966, "Display module order BLK, CS, DC, RES, SDA, SCL, VCC, GND (photo); straight ribbon assumed.", F(14), RED, 'lm')
 
 # ---- J6
-head(60, 1000, "J6: 1 x 8 socket for the MAX31865 module", "Adafruit order; powered from 5 V (own regulator); 3Vo and RDY unused")
+head(60, 1000, "J6: 1 x 8 socket for the MAX31865 module", "Adafruit order; VIN = +3.3 V (accepts 3 to 5 V): all levels 3.3 V; 3Vo, RDY unused")
 mx = [("VIN", RED), ("3Vo", LG), ("GND", DK), ("CLK", VIO), ("SDO", VIO), ("SDI", VIO), ("CS", VIO), ("RDY", LG)]
 for i, (lab, col) in enumerate(mx):
     pin(60 + i * 88, 1060, lab, col, 14)
@@ -93,7 +93,7 @@ for i, (lab, col) in enumerate(mx):
 # ================================================================ 2. GPIO table
 gx = 860
 T(gx, 118, "ESP32-S3: pins used", F(22, True), INK, 'lm')
-rows = [("5V", "+5 V via JP1 (after diode and fuse)", RED), ("3V3", "display, dimmer (J8), I2C pull-ups", RED),
+rows = [("5V", "+5 V via JP1 (after diode and fuse)", RED), ("3V3", "display, MAX31865, dimmer, encoder", RED),
         ("GPIO 17", "pump SSR drive", BRN), ("GPIO 18", "boiler SSR drive", ORG), ("GPIO 21", "valve SSR drive", YEL),
         ("GPIO 15", "flow In", BLU), ("GPIO 16", "flow Out", BLU), ("GPIO 1", "pressure sensor (ADC)", BLU), ("GPIO 2", "5 V rail measure (ADC)", RED),
         ("GPIO 4 / 5", "encoder A / B", GRN), ("GPIO 6 / 41", "start / steam buttons", (90, 90, 96)),
