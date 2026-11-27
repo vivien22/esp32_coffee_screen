@@ -128,6 +128,10 @@ for i, name in enumerate(["R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9", 
 # Q1..Q4: TO-92 bodies are 4.8 mm wide, so two rows of two (pitch 5.4 mm), clear of R10 and of the antenna zone
 for name, (qx, qy) in zip(["Q1", "Q2", "Q3", "Q4"], [(36.0, 10.0), (41.4, 10.0), (36.0, 17.5), (41.4, 17.5)]):
     to92(qx, qy, name)
+# C5 / C6 100 nF (filters of the ADC inputs GPIO 1 / GPIO 2), standing right of Q2 / Q4, next to the GPIO 1 / 2 pins, just outside the antenna keep-out
+for yc in (9.85, 18.15):
+    tpad(46.4, yc - 1.25, ring=1.6, drill=0.8); tpad(46.4, yc + 1.25, ring=1.6, drill=0.8)
+text(d, X(46.4), Y(7.0), "C5", 7, SILK, True); text(d, X(46.4), Y(21.0), "C6", 7, SILK, True)
 # spare I/O conditioning, flat resistors under the MAX31865 (3 mm clearance): R17 4.7 k + R18 10 k (input divider), R19 1 k base, R20 4.7 k pull-up to 5 V, R21 10 k base to GND
 for i, name in enumerate(["R17", "R18", "R19", "R20", "R21"]):
     axial(43.7, 34.2 + i * 2.7, pitch=10.16, label=None)
@@ -179,14 +183,14 @@ for i, (name, xa) in enumerate([("C3", 7.0), ("C4", 14.0)]):
 # ---------------------------------------------------------------- front strip: J2 (2x4), J7 (1x6), polyfuse, diode, electrolytic, XH x2
 # Front edge: every right-angle header has its Dupont housings plugged in towards the front (about 9 mm of keep-out in front of the pads).
 # J2 + J8: 3 x 4 right-angle header (three stacked rows of Dupont housings, "courbe" 3 x 40 strip cut to length). From the back of the
-# board: row A (+5 V, GND, pump) and row B (boiler, valve) are J2; row C, the lowest one, is J8 (pump dimmer, I2C), bare for now.
+# board: row A (pump; A1, A2 not connected: the 5 V supply comes on the PWR pads) and row B (boiler, valve) are J2; row C, the lowest one, is J8 (pump dimmer, I2C), bare for now.
 ROWS = [58.5, 61.04, 63.58]
 for r_ in range(3):
     for c_ in range(4):
         tpad(12.2 + c_ * 2.54, ROWS[r_], square=(r_ == 0 and c_ == 0), ring=1.7, drill=1.0)
 rect(d, X(12.2) - 1.4 * K, Y(ROWS[0]) - 1.4 * K, X(12.2 + 3 * 2.54) + 1.4 * K, Y(ROWS[2]) + 1.4 * K, outline=SILK + (255,), width=2)
 silk(17.3, 55.3, "J2 (A, B) + J8 (C)", 9)
-for c_, lab in enumerate(["+5V", "GND", "P+", "P−"]):
+for c_, lab in enumerate(["NC", "NC", "P+", "P−"]):
     text(d, X(12.2 + c_ * 2.54), Y(ROWS[0]) - 1.9 * K, lab, 7, SILK, True)
 for c_, lab in enumerate(["3V3", "GND", "SDA", "SCL"]):
     text(d, X(12.2 + c_ * 2.54), Y(ROWS[2]) + 1.9 * K, lab, 7, SILK, True)
@@ -200,29 +204,39 @@ for c_, lab in enumerate(["BT", "GND", "BT2", "GND"]):
     text(d, X(22.4 + c_ * 2.54), Y(ROWS[0]) - 1.9 * K, lab, 7, SILK, True)
 for c_, lab in enumerate(["5V", "IN", "OUT", "GND"]):
     text(d, X(22.4 + c_ * 2.54), Y(ROWS[2]) + 1.9 * K, lab, 7, SILK, True)
-# JP1: 1 x 2 header + shunt in the corridor: +5 V board to the 5V pin of the ESP32 (fitted: normal; removed: the ESP32 on USB only)
-tpad(27.2, 33.0, square=True, ring=1.7, drill=1.0); tpad(27.2, 35.54, ring=1.7, drill=1.0)
-rect(d, X(27.2) - 1.4 * K, Y(33.0) - 1.4 * K, X(27.2) + 1.4 * K, Y(35.54) + 1.4 * K, outline=SILK + (255,), width=2)
-silk(27.2, 31.1, "JP1  ESP 5V", 8)
+# D2: 1N5819 standing in the former JP1 pads (corridor): +5 V board -> 5V pin of the ESP32 (cathode, square pad); keeps USB and board supply apart
+tpad(27.2, 33.0, ring=1.7, drill=1.0); tpad(27.2, 35.54, square=True, ring=1.7, drill=1.0)
+circ(d, X(27.2), Y(33.0), 1.5 * K, fill=None, outline=SILK + (255,), width=2)
+silk(27.2, 31.1, "D2  1N5819", 8)
 text(d, X(28.7), Y(33.0), "+5V", 7, SILK, True, 'lm'); text(d, X(28.7), Y(35.54), "ESP", 7, SILK, True, 'lm')
 # F1 polyfuse (radial, pitch 5) and D1 1N5819 (standing) in the front-left corner, in front of the mounting hole
 tpad(3.0, 66.0, ring=1.8, drill=0.9); tpad(8.0, 66.0, ring=1.8, drill=0.9)
 rrect(d, X(1.9), Y(64.4), X(9.1), Y(67.6), 6, outline=SILK + (255,), width=2); text(d, X(10.4), Y(66.0), "F1", 8, SILK, True, 'lm')
 tpad(2.5, 62.6, ring=1.8, drill=0.8); tpad(5.04, 62.6, ring=1.8, drill=0.8)
 text(d, X(6.6), Y(62.6), "D1", 8, SILK, True, 'lm')
+# PWR: the 5 V supply wires are soldered here, at the left end of the tab (+ square), towards a JST SM 2-pin plug; left of the J2 housings
+tpad(9.4, 70.6, square=True, ring=1.8, drill=1.0); tpad(9.4, 73.14, ring=1.8, drill=1.0)
+text(d, X(9.4), Y(69.25), "PWR", 6, SILK, True)
+text(d, X(10.5), Y(70.6), "+", 8, SILK, True, 'lm'); text(d, X(10.5), Y(73.14), "−", 8, SILK, True, 'lm')
 # C1 470 uF (radial 6.3 mm) and C2 100 nF, on the back tab (y -7 to 0), behind the ESP32
 circ(d, X(22.0), Y(-3.5), 3.15 * K, fill=None, outline=SILK + (255,), width=2)
 tpad(20.75, -3.5, ring=1.8, drill=0.8); tpad(23.25, -3.5, ring=1.8, drill=0.8); text(d, X(25.4), Y(-3.5), "C1", 9, SILK, True, 'lm')
 tpad(30.0, -3.5, ring=1.6, drill=0.8); tpad(32.5, -3.5, ring=1.6, drill=0.8); text(d, X(33.8), Y(-3.5), "C2", 8, SILK, True, 'lm')
-# corridor, below JP1: R28 / R29, 33 ohm series on the display SCK / MOSI (J5 branch only, 20 cm ribbon), vertical
+# corridor, below D2: R28 / R29, 33 ohm series on the display SCK / MOSI (J5 branch only, 20 cm ribbon), vertical
 for i, name in enumerate(["R28", "R29"]):
     axial_v(25.8 + i * 2.4, 44.1, label=name)
 # back tab: R24 / R25, 4.7 k I2C pull-ups to 3V3 (dimmer powered from 3.3 V: no level shifter), left of C1
 for i, name in enumerate(["R24", "R25"]):
     axial(13.0, -5.4 + i * 3.8, pitch=7.62, label=None)
     text(d, X(13.0), Y(-5.4 + i * 3.8), name, 7, INK, True)
-# C5 100 nF (pressure filter, taller than 3 mm so not under the MAX31865): in the corridor, below JP1
-tpad(26.0, 53.5, ring=1.6, drill=0.8); tpad(28.5, 53.5, ring=1.6, drill=0.8); text(d, X(29.8), Y(53.5), "C5", 8, SILK, True, 'lm')
+# test points in the corridor, below R28 / R29: TP1 +5 V, TP2 3V3, TP3 GND (bare pads, 1 mm holes)
+for i, lab in enumerate(["5V", "3V3", "GND"]):
+    tpad(24.6 + i * 2.4, 52.3, ring=1.6, drill=1.0)
+    text(d, X(24.6 + i * 2.4), Y(54.0), lab, 6, SILK, True)
+# back tab: R30 / R31, 10 k pull-ups to 3V3 for the start / steam buttons (GPIO 6 / 41), right of C2
+for i, name in enumerate(["R30", "R31"]):
+    axial(41.6, -5.4 + i * 3.8, pitch=7.62, label=None)
+    text(d, X(41.6), Y(-5.4 + i * 3.8), name, 7, INK, True)
 # JST XH x2: vertical headers, pins along x, the plugs come out upwards: no keep-out towards the front, away from the ribbon path (x 7 to 18)
 for k, (x0, name) in enumerate([(38.5, "J3 flow In"), (49.0, "J4 flow Out")]):
     for i in range(3):
@@ -294,24 +308,25 @@ text(d, lx, 410, "Components", 22, INK, True, 'lm')
 comp = [
     "U1  2 female 1 x 20 sockets (ESP32-S3 board)",
     "U2  low 1 x 8 socket (MAX31865 module)",
-    "J2  right-angle 3 x 4 header, rows A, B: 5 V supply and SSRs  ·  row C: J8, pump dimmer (I2C)",
+    "J2  right-angle 3 x 4 header, rows A, B: SSRs (A1, A2 not connected)  ·  row C: J8, pump dimmer (I2C)",
     "J3, J4  JST XH 3-pin: flow sensors In and Out  ·  J9  JST XH 3-pin: pressure sensor (on the tab, under J3)",
     "J5  2 x 4 socket: FPC adapter board",
     "J7  right-angle 3 x 4 header: A start + steam buttons, B encoder, C spare I/O",
-    "JP1  1 x 2 header + jumper: +5 V to the ESP32 (removed: ESP32 on USB only)",
+    "PWR  2 pads: 5 V supply wires (JST SM 2-pin)  ·  D2  1N5819: +5 V to the ESP32 (USB-safe)",
     "Q1 to Q3  SSR drive ; Q4  backlight (optional)",
     "R1 to R4  1 kΩ  ·  R5 to R8  10 kΩ  ·  R9, R10 1 kΩ: GA, GB series (encoder at 3.3 V)  ·  R17, R18: IN divider",
     "Q5, R19 to R21  spare output stage (3.3 V to 5 V)",
-    "R24, R25  4.7 kΩ I2C pull-ups to 3V3 (dimmer at 3.3 V, no level shifter)",
+    "R24, R25  4.7 kΩ I2C pull-ups  ·  R30, R31  10 kΩ button pull-ups (3V3, back tab)",
     "R11 to R16  flow inputs (4.7 k pull-up, 10 k / 22 k divider)  ·  C3, C4  1 nF",
     "F1  1.1 A fuse  ·  D1  1N5819  ·  R28, R29  33 Ω: display SPI series (20 cm ribbon)",
-    "C1  470 µF, C2  100 nF: on the back tab  ·  C5  100 nF  ·  R22 10 kΩ, R23 15 kΩ: pressure (J9)",
+    "C1  470 µF, C2  100 nF: back tab  ·  C5, C6  100 nF: ADC filters  ·  R22 10 kΩ, R23 15 kΩ: pressure",
     "R26 10 kΩ, R27 15 kΩ: 5 V rail measure on GPIO 2 (pressure sensor is ratiometric)",
+    "TP1, TP2, TP3  test points +5 V, 3V3, GND (corridor)",
 ]
 for i, t in enumerate(comp):
     text(d, lx, 438 + i * 24, t, 15, INK, False, 'lm')
 
-text(d, lx, 810, "Heights (enclosure floor = 0)", 22, INK, True, 'lm')
+text(d, lx, 834, "Heights (enclosure floor = 0)", 22, INK, True, 'lm')
 hs = [
     "posts 3 + board 1.6 = 4.6 mm",
     "ESP32 on 8.5 mm sockets: USB-C at 17.9 mm",
@@ -321,7 +336,7 @@ hs = [
     "electrolytic C1: about 15.6 mm",
 ]
 for i, t in enumerate(hs):
-    text(d, lx, 850 + i * 30, t, 15, INK if i != 4 else (20, 110, 60), i == 4, 'lm')
+    text(d, lx, 870 + i * 28, t, 15, INK if i != 4 else (20, 110, 60), i == 4, 'lm')
 
 text(d, lx, 1060, "Points to check on your board:", 18, (190, 40, 40), True, 'lm')
 chk = [

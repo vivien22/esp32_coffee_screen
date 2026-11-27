@@ -32,8 +32,8 @@ def head(x, y, title, sub=None):
         T(x, y + 28, sub, F(15), GRY, 'lm')
 
 # ---- J2 + J8 : 3 x 4 right-angle header (3 stacked rows), J7 : 3 x 4
-head(60, 118, "J2 + J8: right-angle 3 x 4 male header", "rows A and B: J2 (one 2 x 4 housing, two ribbons of 4 wires); row C: J8")
-rowA = [("+5 V", RED), ("GND", DK), ("pump +", BRN), ("pump −", BRN)]
+head(60, 118, "J2 + J8: right-angle 3 x 4 male header", "rows A and B: J2 (one 2 x 4 housing; A1, A2 not connected); row C: J8")
+rowA = [("NC", LG), ("NC", LG), ("pump +", BRN), ("pump −", BRN)]
 rowB = [("boiler +", ORG), ("boiler −", ORG), ("valve +", YEL), ("valve −", YEL)]
 rowC = [("+3.3 V", RED), ("GND", DK), ("SDA", VIO), ("SCL", VIO)]
 x0, yA, yB, yC = 60, 186, 232, 278
@@ -43,11 +43,11 @@ for i, (lab, col) in enumerate(rowB):
     pin(x0 + i * 88, yB, lab, col, 14)
 for i, (lab, col) in enumerate(rowC):
     pin(x0 + i * 88, yC, lab, col, 14)
-T(x0 + 370, 196, "row A: 5 V supply + pump SSR (ribbon 1)", F(14, True), RED, 'lm')
+T(x0 + 370, 196, "row A: pump SSR (ribbon 1, 2 wires)", F(14, True), BRN, 'lm')
 T(x0 + 370, 242, "row B: boiler SSR + valve SSR (ribbon 2)", F(14, True), ORG, 'lm')
 T(x0 + 370, 288, "row C: J8 pump dimmer, RobotDyn (I2C)", F(14, True), VIO, 'lm')
-T(x0 + 370, 312, "a 2 x 4 housing can be plugged 180 degrees the wrong way:", F(13), GRY, 'lm')
-T(x0 + 370, 330, "mark it (paint dot on +5 V): no keyed header on a 3-row strip", F(13), GRY, 'lm')
+T(x0 + 370, 312, "5 V supply: 2 wires soldered on the PWR pads (JST SM 2-pin)", F(13, True), RED, 'lm')
+T(x0 + 370, 330, "mark the 2 x 4 housing (paint dot on A1): never one row too low", F(13), GRY, 'lm')
 
 head(60, 366, "J7: right-angle 3 x 4 male header")
 j7a = [("button", (90, 90, 96)), ("GND", DK), ("steam", (90, 90, 96)), ("GND", DK)]
@@ -59,7 +59,7 @@ for i, (lab, col) in enumerate(j7b):
     pin(60 + i * 88, 442, lab, col, 14)
 for i, (lab, col) in enumerate(j7c):
     pin(60 + i * 88, 488, lab, col, 14)
-T(440, 418, "row A: start button (2) + steam button (2)", F(14), GRY, 'lm')
+T(440, 418, "row A: start + steam buttons (10 k pull-ups on the board)", F(14), GRY, 'lm')
 T(440, 464, "row B: encoder (module order)", F(14), GRY, 'lm')
 T(440, 510, "row C: spare I/O (5 V, level-adapted in / out)", F(14), GRY, 'lm')
 
@@ -94,10 +94,10 @@ for i, (lab, col) in enumerate(mx):
 # ================================================================ 2. GPIO table
 gx = 860
 T(gx, 118, "ESP32-S3: pins used", F(22, True), INK, 'lm')
-rows = [("5V", "+5 V via JP1 (after diode and fuse)", RED), ("3V3", "display, MAX31865, dimmer, encoder", RED),
+rows = [("5V", "+5 V via D2 (after fuse and D1)", RED), ("3V3", "display, MAX31865, dimmer, encoder", RED),
         ("GPIO 17", "pump SSR drive", BRN), ("GPIO 18", "boiler SSR drive", ORG), ("GPIO 21", "valve SSR drive", YEL),
         ("GPIO 15", "flow In", BLU), ("GPIO 16", "flow Out", BLU), ("GPIO 1", "pressure sensor (ADC)", BLU), ("GPIO 2", "5 V rail measure (ADC)", RED),
-        ("GPIO 4 / 5", "encoder A / B", GRN), ("GPIO 6 / 41", "start / steam buttons", (90, 90, 96)),
+        ("GPIO 4 / 5", "encoder A / B", GRN), ("GPIO 6 / 41", "start / steam buttons (10 k pull-ups)", (90, 90, 96)),
         ("GPIO 47 / 42", "dimmer I2C: SDA / SCL", VIO),
         ("GPIO 11 / 12 / 13", "SPI: MOSI / SCK / MISO", VIO), ("GPIO 10", "display CS", VIO), ("GPIO 9 / 8", "display DC / RST", VIO),
         ("GPIO 14", "display BLK (direct, Q4 optional)", VIO), ("GPIO 7", "MAX31865 CS", VIO), ("GPIO 38", "spare input on J7 (5 V divider)", (150, 150, 156)), ("GPIO 39", "spare output on J7 (to 5 V, inverting)", (150, 150, 156))]
@@ -129,7 +129,7 @@ def chain(x, y, title, src, res, end, shunts, col):
 cy = 866
 chain(gx, cy, "Spare IN 38: 5 V to 3.3 V (encoder: 3.3 V, 1 k series)", "5 V in", "4.7 k", "GPIO 38", [(270, "10 k")], GRN)
 chain(gx, cy + 120, "Pressure input: 4.5 V to 2.7 V", "sensor", "10 k", "GPIO 1", [(250, "15 k"), (320, "100 nF")], BLU)
-chain(gx, cy + 240, "5 V rail measure (same ratio: pressure = signal / rail)", "+5 V rail", "10 k", "GPIO 2", [(250, "15 k")], RED)
+chain(gx, cy + 240, "5 V rail measure (same ratio: pressure = signal / rail)", "+5 V rail", "10 k", "GPIO 2", [(250, "15 k"), (320, "100 nF")], RED)
 T(gx, cy + 352, "Dimmer I2C: module powered from 3.3 V, no level shifter", F(14, True), VIO, 'lm')
 T(gx, cy + 374, "4.7 k pull-ups to 3V3 (R24, R25); SDA 47, SCL 42, 100 kHz", F(13), GRY, 'lm')
 T(gx, cy + 394, "ships in UART mode: switch it to I2C once", F(13), GRY, 'lm')
@@ -140,7 +140,7 @@ T(cx0, 118, "Circuits on the board", F(22, True), INK, 'lm')
 
 # power
 T(cx0, 160, "Power", F(17, True), RED, 'lm')
-L([(cx0, 200), (cx0 + 40, 200)], RED, 3); T(cx0 - 6, 200, "A1", F(13, True), RED, 'rm')
+L([(cx0, 200), (cx0 + 40, 200)], RED, 3); T(cx0 - 6, 200, "PWR +", F(13, True), RED, 'rm')
 RR(cx0 + 40, 188, cx0 + 118, 212, 4, fill=(250, 250, 240), outline=INK, width=2); T(cx0 + 79, 200, "fuse 1.1 A", F(11, True))
 L([(cx0 + 118, 200), (cx0 + 150, 200)], RED, 3)
 d.polygon([((cx0 + 150) * S, 188 * S), ((cx0 + 150) * S, 212 * S), ((cx0 + 180) * S, 200 * S)], fill=(250, 250, 240), outline=INK)
@@ -151,8 +151,8 @@ L([(cx0 + 215, 200), (cx0 + 215, 232)], RED, 2)
 L([(cx0 + 205, 232), (cx0 + 225, 232)], INK, 3); L([(cx0 + 205, 240), (cx0 + 225, 240)], INK, 3)
 L([(cx0 + 215, 240), (cx0 + 215, 262)], INK, 2); T(cx0 + 215, 276, "470 µF + 100 nF", F(11, True))
 
-T(cx0, 292, "JP1 (1 x 2 header + jumper): +5 V board -> ESP32 5V pin", F(12, True), RED, 'lm')
-T(cx0, 306, "fitted: normal; removed: the ESP32 is powered by its USB port", F(12), GRY, 'lm')
+T(cx0, 292, "D2 (1N5819, former JP1): +5 V board -> ESP32 5V pin", F(12, True), RED, 'lm')
+T(cx0, 306, "USB and board supply kept apart: USB can stay plugged", F(12), GRY, 'lm')
 
 # SSR driver
 T(cx0, 330, "SSR drive (x3)", F(17, True), BRN, 'lm')
@@ -209,7 +209,7 @@ T(cx0 + 20, 1310, "GPIO high -> OUT low; GPIO low -> OUT 5 V (invert in firmware
 # ================================================================ 4. notes
 T(60, 1140, "Design notes", F(22, True), INK, 'lm')
 notes = [
-    "JP1: fitted, the ESP32 takes its 5 V from the board; removed, from its USB port only (never fit it with USB plugged).",
+    "D2 (former JP1): the ESP32 is fed by the board or by its USB port, the two 5 V sources never tied together.",
     "The three voltage levels: +5 V board (after fuse and diode), 3.3 V from the ESP32-S3 board, common GND.",
     "The display module has its own backlight transistor: BLK is driven directly by GPIO 14 (stage Q4 optional).",
     "No regulator on the board: the 3.3 V (display, MAX31865, dimmer, encoder) comes from the ESP32-S3.",
@@ -217,6 +217,7 @@ notes = [
     "All parts are through-hole (TO-92, axial resistors, radial capacitors, DO-41): ordinary soldering iron.",
     "On the board: a ground plane, no copper under the ESP32 antenna, 4 mounting holes (45 x 50 mm).",
     "Silkscreen: name of each connector, pin 1 mark, and the signal of each pin (+5 V, GND, SSR +, SSR −, signal...).",
+    "Test points TP1 +5 V, TP2 3.3 V, TP3 GND in the corridor; buttons: 10 k pull-ups to 3.3 V (R30, R31).",
 ]
 for i, t in enumerate(notes):
     T(60, 1176 + i * 30, "• " + t, F(16), INK, 'lm')

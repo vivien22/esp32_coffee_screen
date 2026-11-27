@@ -151,11 +151,10 @@ cuboid(ax0, ay0, top + HDR, 22, 26.5, 1.6, (22, 130, 70))
 cuboid(ax0 + 6, ay0 + 19.0, top + HDR + 1.6, 10, 5.5, 2.6, WHITE)                      # its FPC connector
 cuboid(ax0 + 1.0, ay0 + 3.1, top, 3.5, 3.5, HDR, (110, 110, 118))
 cuboid(ax0 + 17.5, ay0 + 3.1, top, 3.5, 3.5, HDR, (110, 110, 118))
-# JP1: 1 x 2 header with its shunt in the corridor (+5 V board to the 5V pin of the ESP32)
-cuboid(CX0 + 27.2 - 1.27, CY0 + 33.0 - 1.27, top, 2.54, 5.08, 2.5, BLACK)
-for yy in (33.0, 35.54):
-    cuboid(CX0 + 27.2 - 0.32, CY0 + yy - 0.32, top + 2.5, 0.64, 0.64, 6.0, GOLD)
-cuboid(CX0 + 27.2 - 1.2, CY0 + 33.0 - 1.2, top + 2.5, 2.4, 4.9, 5.5, (40, 40, 44))      # the shunt, in place
+# D2: 1N5819 standing in the former JP1 pads (corridor): +5 V board to the 5V pin of the ESP32
+cyl(CX0 + 27.2, CY0 + 33.0, 1.35, top, 5.2, (30, 30, 34))
+cuboid(CX0 + 27.2 - 0.3, CY0 + 33.0 - 0.3, top + 5.2, 0.6, 2.54 + 0.6, 0.6, (200, 200, 205))   # lead bent over to the second pad
+cuboid(CX0 + 27.2 - 0.3, CY0 + 35.54 - 0.3, top, 0.6, 0.6, 5.8, (200, 200, 205))
 # J2 + J8: 3 x 4 right-angle header (3 rows: A and B = J2, C = J8, the lowest), ONE 2 x 4 housing on rows A and B, one more on row C
 cuboid(CX0 + 12.2 - 1.27, CY0 + 57.7, top, 10.16, 7.8, 8.4, BLACK)
 cuboid(CX0 + 12.2 - 1.27 + 0.15, CY0 + 65.6, top + 2.9, 10.0, 8.6, 5.1, WHITE)
@@ -221,10 +220,14 @@ def riser_x(xc, yc, z0, z1, wires, color):
 
 
 Y0 = CY0 + 74.2
-# J2: one 2 x 4 housing, two ribbons of 4 wires (row A on top: 5 V, GND, pump; row B below: boiler, valve)
+# 5 V supply: two wires soldered on the PWR pads (left end of the tab), forward through the slot to a JST SM 2-pin plug
+cP = (205, 35, 35)
+run_x(CX0 + 9.4, CY0 + 71.9, Y_END, top + 1.0, 2, cP); cable("5 V supply (JST SM 2-pin)", "PWR", 2, cP, (CX0 + 9.4, Y_END, top + 1.0))
+# J2: one 2 x 4 housing (row A on top: pump, A1 / A2 empty; row B below: boiler, valve)
 xj2 = CX0 + 12.2 + 1.5 * 2.54
-cA, cB = (205, 35, 35), (232, 130, 30)
-run_x(xj2, Y0, Y_END, top + 2.9 + 3.82, 4, cA); cable("row A: 5 V, GND, pump", "J2", 4, cA, (xj2, Y_END, top + 2.9 + 3.82))
+xa = CX0 + 12.2 + 2.5 * 2.54
+cA, cB = (150, 90, 40), (232, 130, 30)
+run_x(xa, Y0, Y_END, top + 2.9 + 3.82, 2, cA); cable("row A: pump", "J2", 2, cA, (xa, Y_END, top + 2.9 + 3.82))
 run_x(xj2, Y0, Y_END, top + 2.9 + 1.28, 4, cB); cable("row B: boiler, valve", "J2", 4, cB, (xj2, Y_END, top + 2.9 + 1.28))
 # J7: start button (2 wires), steam button (2 wires), encoder (4 wires, middle row), spare I/O (4 wires, lowest row)
 xb, xb2, xe, xs = CX0 + 22.4 + 1.27, CX0 + 22.4 + 6.35, CX0 + 22.4 + 3.81, CX0 + 22.4 + 3.81
@@ -309,7 +312,7 @@ pl(ax0 + 11, ay0 + 22, top + HDR + 4.2, 330, 520, "FPC connector pre-soldered")
 pl(sx0, sy0 + 50, FLOOR + 3, 330, 640, "3 mm small posts (45 x 50)")
 pl(BX - WALL - 4, BY - WALL - 4, BASE_H, 1560, 520, "8 mm round corner posts")
 pl(CX0 + 30, BY, FW, 1560, 640, "slot to cut in the front wall (cables)")
-pl(CX0 + 27.2, CY0 + 34, top + 8.5, 330, 740, "JP1: jumper, +5 V to the ESP32")
+pl(CX0 + 27.2, CY0 + 34, top + 5.5, 330, 740, "D2: diode, +5 V to the ESP32")
 
 # numbered tags at the cable ends, staggered so that they do not overlap
 ends = []
