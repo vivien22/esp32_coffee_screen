@@ -24,7 +24,7 @@ Status: **working design, nothing has been manufactured.** Placement is to scale
 - Through-hole parts only (no SMD soldering).
 - ESP32-S3 (rotated 90 degrees, USB-C to the left) and MAX31865 module on sockets; FPC adapter board (remote display) on a 2 x 4 socket, its ribbon going straight to the front.
 - SSRs are kept, driven by 2N2222A transistors from the external 5 V supply.
-- Connectors: J2 2 x 4 (5 V + 3 SSRs), J7 3 x 4 right-angle (start + steam buttons, encoder, spare I/O), J8 1 x 4 (pump dimmer, I2C), 3 x JST XH 3-pin (J3, J4 flow sensors In and Out; J9 pressure sensor, on the tab under J3).
+- Connectors: J2 2 x 4 (5 V + 3 SSRs), J7 3 x 4 right-angle (start + steam buttons, encoder, spare I/O), J8 1 x 4 (pump dimmer, I2C, 3.3 V), 3 x JST XH 3-pin (J3, J4 flow sensors In and Out; J9 pressure sensor, on the tab under J3).
 
 ## To confirm before manufacturing
 See the end of `docs/carrier_spec.md`.

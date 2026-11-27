@@ -35,7 +35,7 @@ def head(x, y, title, sub=None):
 head(60, 118, "J2 + J8: right-angle 3 x 4 male header", "rows A and B: J2 (one 2 x 4 housing, two ribbons of 4 wires); row C: J8")
 rowA = [("+5 V", RED), ("GND", DK), ("pump +", BRN), ("pump −", BRN)]
 rowB = [("boiler +", ORG), ("boiler −", ORG), ("valve +", YEL), ("valve −", YEL)]
-rowC = [("+5 V", RED), ("GND", DK), ("SDA", VIO), ("SCL", VIO)]
+rowC = [("+3.3 V", RED), ("GND", DK), ("SDA", VIO), ("SCL", VIO)]
 x0, yA, yB, yC = 60, 186, 232, 278
 for i, (lab, col) in enumerate(rowA):
     pin(x0 + i * 88, yA, lab, col, 14)
@@ -93,7 +93,7 @@ for i, (lab, col) in enumerate(mx):
 # ================================================================ 2. GPIO table
 gx = 860
 T(gx, 118, "ESP32-S3: pins used", F(22, True), INK, 'lm')
-rows = [("5V", "+5 V via JP1 (after diode and fuse)", RED), ("3V3", "display, I2C pull-ups (3.3 V side)", RED),
+rows = [("5V", "+5 V via JP1 (after diode and fuse)", RED), ("3V3", "display, dimmer (J8), I2C pull-ups", RED),
         ("GPIO 17", "pump SSR drive", BRN), ("GPIO 18", "boiler SSR drive", ORG), ("GPIO 21", "valve SSR drive", YEL),
         ("GPIO 15", "flow In", BLU), ("GPIO 16", "flow Out", BLU), ("GPIO 1", "pressure sensor (ADC)", BLU), ("GPIO 2", "5 V rail measure (ADC)", RED),
         ("GPIO 4 / 5", "encoder A / B", GRN), ("GPIO 6 / 41", "start / steam buttons", (90, 90, 96)),
@@ -129,8 +129,8 @@ cy = 866
 chain(gx, cy, "Encoder GA, GB, spare IN 38 (x3): 5 V to 3.3 V", "module out", "4.7 k", "GPIO", [(270, "10 k")], GRN)
 chain(gx, cy + 120, "Pressure input: 4.5 V to 2.7 V", "sensor", "10 k", "GPIO 1", [(250, "15 k"), (320, "100 nF")], BLU)
 chain(gx, cy + 240, "5 V rail measure (same ratio: pressure = signal / rail)", "+5 V rail", "10 k", "GPIO 2", [(250, "15 k")], RED)
-T(gx, cy + 352, "Dimmer I2C: Q6, Q7 2N7000 level shifter", F(14, True), VIO, 'lm')
-T(gx, cy + 374, "10 k pull-ups to 3V3 and to +5 V; SDA 47, SCL 48, 100 kHz", F(13), GRY, 'lm')
+T(gx, cy + 352, "Dimmer I2C: module powered from 3.3 V, no level shifter", F(14, True), VIO, 'lm')
+T(gx, cy + 374, "4.7 k pull-ups to 3V3 (R26, R27); SDA 47, SCL 48, 100 kHz", F(13), GRY, 'lm')
 T(gx, cy + 394, "ships in UART mode: switch it to I2C once", F(13), GRY, 'lm')
 
 # ================================================================ 3. circuits

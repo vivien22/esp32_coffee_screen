@@ -128,7 +128,6 @@ for i, name in enumerate(["R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9", 
 # Q1..Q4: TO-92 bodies are 4.8 mm wide, so two rows of two (pitch 5.4 mm), clear of R10 and of the antenna zone
 for name, (qx, qy) in zip(["Q1", "Q2", "Q3", "Q4"], [(36.0, 10.0), (41.4, 10.0), (36.0, 17.5), (41.4, 17.5)]):
     to92(qx, qy, name)
-axial_v(45.4, 14.0, label="R29")                                # I2C pull-up to +5 V (SCL side), right of Q2 / Q4, clear of the antenna zone
 # spare I/O conditioning, flat resistors under the MAX31865 (3 mm clearance): R17 4.7 k + R18 10 k (input divider), R19 1 k base, R20 4.7 k pull-up to 5 V, R21 10 k base to GND
 for i, name in enumerate(["R17", "R18", "R19", "R20", "R21"]):
     axial(43.7, 34.2 + i * 2.7, pitch=10.16, label=None)
@@ -139,8 +138,8 @@ for i, name in enumerate(["R22", "R23"]):
     axial(43.7, 47.6 + i * 2.7, pitch=10.16, label=None)
     text(d, X(49.6), Y(47.6 + i * 2.7), name, 8, SILK, True, 'lm')
 
-# 5 V rail measure (GPIO 2), same 10 k / 15 k ratio as the pressure divider: R30 (series) and R31 (to GND), below R23
-for i, name in enumerate(["R30", "R31"]):
+# 5 V rail measure (GPIO 2), same 10 k / 15 k ratio as the pressure divider: R28 (series) and R29 (to GND), below R23
+for i, name in enumerate(["R28", "R29"]):
     axial(43.7, 53.0 + i * 2.7, pitch=10.16, label=None)
     text(d, X(49.6), Y(53.0 + i * 2.7), name, 8, SILK, True, 'lm')
 
@@ -189,7 +188,7 @@ rect(d, X(12.2) - 1.4 * K, Y(ROWS[0]) - 1.4 * K, X(12.2 + 3 * 2.54) + 1.4 * K, Y
 silk(17.3, 55.3, "J2 (A, B) + J8 (C)", 9)
 for c_, lab in enumerate(["+5V", "GND", "P+", "P−"]):
     text(d, X(12.2 + c_ * 2.54), Y(ROWS[0]) - 1.9 * K, lab, 7, SILK, True)
-for c_, lab in enumerate(["5V", "GND", "SDA", "SCL"]):
+for c_, lab in enumerate(["3V3", "GND", "SDA", "SCL"]):
     text(d, X(12.2 + c_ * 2.54), Y(ROWS[2]) + 1.9 * K, lab, 7, SILK, True)
 # J7: 3 x 4 right-angle header. Row A: start button (2) + steam button (2); row B: encoder (GA, GB, VCC, GND); row C: spare I/O (+5 V, IN, OUT, GND). (The pressure sensor is J9, a JST XH under J3.)
 for r_ in range(3):
@@ -215,14 +214,13 @@ text(d, X(6.6), Y(62.6), "D1", 8, SILK, True, 'lm')
 circ(d, X(22.0), Y(-3.5), 3.15 * K, fill=None, outline=SILK + (255,), width=2)
 tpad(20.75, -3.5, ring=1.8, drill=0.8); tpad(23.25, -3.5, ring=1.8, drill=0.8); text(d, X(25.4), Y(-3.5), "C1", 9, SILK, True, 'lm')
 tpad(30.0, -3.5, ring=1.6, drill=0.8); tpad(32.5, -3.5, ring=1.6, drill=0.8); text(d, X(33.8), Y(-3.5), "C2", 8, SILK, True, 'lm')
-# corridor, below JP1: R24, R25 (10 k, GA / GB dividers to GND) and R28 (I2C pull-up to +5 V, SDA side), vertical
-for i, name in enumerate(["R24", "R25", "R28"]):
+# corridor, below JP1: R24, R25 (10 k, GA / GB dividers to GND), vertical
+for i, name in enumerate(["R24", "R25"]):
     axial_v(24.6 + i * 2.4, 44.1, label=name)
-# back tab: I2C level shifter, Q6 / Q7 2N7000 (SDA / SCL) and R26 / R27 (10 k pull-ups to 3V3), left of C1
+# back tab: R26 / R27, 4.7 k I2C pull-ups to 3V3 (dimmer powered from 3.3 V: no level shifter), left of C1
 for i, name in enumerate(["R26", "R27"]):
     axial(13.0, -5.4 + i * 3.8, pitch=7.62, label=None)
     text(d, X(13.0), Y(-5.4 + i * 3.8), name, 7, INK, True)
-to92(39.0, -3.5, "Q6"); to92(44.4, -3.5, "Q7")
 # C5 100 nF (pressure filter, taller than 3 mm so not under the MAX31865): in the corridor, below JP1
 tpad(26.0, 53.5, ring=1.6, drill=0.8); tpad(28.5, 53.5, ring=1.6, drill=0.8); text(d, X(29.8), Y(53.5), "C5", 8, SILK, True, 'lm')
 # JST XH x2: vertical headers, pins along x, the plugs come out upwards: no keep-out towards the front, away from the ribbon path (x 7 to 18)
@@ -304,11 +302,11 @@ comp = [
     "Q1 to Q3  SSR drive ; Q4  backlight (optional)",
     "R1 to R4  1 kΩ  ·  R5 to R8  10 kΩ  ·  R9, R10 4.7 kΩ + R24, R25 10 kΩ: GA, GB dividers  ·  R17, R18: IN",
     "Q5, R19 to R21  spare output stage (3.3 V to 5 V)",
-    "Q6, Q7  2N7000 I2C level shifter  ·  R26, R27  10 kΩ to 3V3  ·  R28, R29  10 kΩ to +5 V",
+    "R26, R27  4.7 kΩ I2C pull-ups to 3V3 (dimmer at 3.3 V, no level shifter)",
     "R11 to R16  flow sensor inputs  ·  C3, C4  1 nF",
     "F1  1.1 A resettable fuse  ·  D1  1N5819",
     "C1  470 µF, C2  100 nF: on the back tab  ·  C5  100 nF  ·  R22 10 kΩ, R23 15 kΩ: pressure (J9)",
-    "R30 10 kΩ, R31 15 kΩ: 5 V rail measure on GPIO 2 (pressure sensor is ratiometric)",
+    "R28 10 kΩ, R29 15 kΩ: 5 V rail measure on GPIO 2 (pressure sensor is ratiometric)",
 ]
 for i, t in enumerate(comp):
     text(d, lx, 438 + i * 24, t, 15, INK, False, 'lm')
