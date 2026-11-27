@@ -50,7 +50,7 @@ T(x0 + 370, 312, "a 2 x 4 housing can be plugged 180 degrees the wrong way:", F(
 T(x0 + 370, 330, "mark it, or key the header", F(13), GRY, 'lm')
 
 head(60, 366, "J7: right-angle 3 x 4 male header")
-j7a = [("button", (90, 90, 96)), ("GND", DK), ("stream", (90, 90, 96)), ("GND", DK)]
+j7a = [("button", (90, 90, 96)), ("GND", DK), ("steam", (90, 90, 96)), ("GND", DK)]
 j7b = [("GA", GRN), ("GB", GRN), ("+5 V", RED), ("GND", DK)]
 j7c = [("+5 V", RED), ("IN 38", VIO), ("OUT 39", VIO), ("GND", DK)]
 for i, (lab, col) in enumerate(j7a):
@@ -59,7 +59,7 @@ for i, (lab, col) in enumerate(j7b):
     pin(60 + i * 88, 442, lab, col, 14)
 for i, (lab, col) in enumerate(j7c):
     pin(60 + i * 88, 488, lab, col, 14)
-T(440, 418, "row A: start button (2) + stream button (2)", F(14), GRY, 'lm')
+T(440, 418, "row A: start button (2) + steam button (2)", F(14), GRY, 'lm')
 T(440, 464, "row B: encoder (module order)", F(14), GRY, 'lm')
 T(440, 510, "row C: spare I/O (5 V, level-adapted in / out)", F(14), GRY, 'lm')
 
@@ -96,7 +96,7 @@ T(gx, 118, "ESP32-S3: pins used", F(22, True), INK, 'lm')
 rows = [("5V", "+5 V via JP1 (after diode and fuse)", RED), ("3V3", "display, I2C pull-ups (3.3 V side)", RED),
         ("GPIO 17", "pump SSR drive", BRN), ("GPIO 18", "boiler SSR drive", ORG), ("GPIO 21", "valve SSR drive", YEL),
         ("GPIO 15", "flow In", BLU), ("GPIO 16", "flow Out", BLU), ("GPIO 1", "pressure sensor (ADC)", BLU),
-        ("GPIO 4 / 5", "encoder A / B", GRN), ("GPIO 6 / 41", "start / stream buttons", (90, 90, 96)),
+        ("GPIO 4 / 5", "encoder A / B", GRN), ("GPIO 6 / 41", "start / steam buttons", (90, 90, 96)),
         ("GPIO 47 / 48", "dimmer I2C: SDA / SCL", VIO),
         ("GPIO 11 / 12 / 13", "SPI: MOSI / SCK / MISO", VIO), ("GPIO 10", "display CS", VIO), ("GPIO 9 / 8", "display DC / RST", VIO),
         ("GPIO 14", "display BLK (direct, Q4 optional)", VIO), ("GPIO 7", "MAX31865 CS", VIO), ("GPIO 38", "spare input on J7 (5 V divider)", (150, 150, 156)), ("GPIO 39", "spare output on J7 (to 5 V, inverting)", (150, 150, 156))]

@@ -159,7 +159,7 @@ cuboid(CX0 + 27.2 - 1.2, CY0 + 33.0 - 1.2, top + 2.5, 2.4, 4.9, 5.5, (40, 40, 44
 cuboid(CX0 + 12.2 - 1.27, CY0 + 57.7, top, 10.16, 7.8, 8.4, BLACK)
 cuboid(CX0 + 12.2 - 1.27 + 0.15, CY0 + 65.6, top + 2.9, 10.0, 8.6, 5.1, WHITE)
 cuboid(CX0 + 12.2 - 1.27 + 0.15, CY0 + 65.6, top + 0.1, 10.0, 8.6, 2.3, (225, 222, 205))   # J8 housing (row C, the lowest)
-# J7: 3 x 4 right-angle header (A: start button + stream button, B: encoder, C: spare I/O)
+# J7: 3 x 4 right-angle header (A: start button + steam button, B: encoder, C: spare I/O)
 cuboid(CX0 + 22.4 - 1.27, CY0 + 57.7, top, 10.16, 7.8, 8.4, BLACK)
 cuboid(CX0 + 22.4 - 1.27 + 0.15, CY0 + 65.6, top + 5.5, 4.9, 8.6, 2.3, WHITE)
 cuboid(CX0 + 22.4 - 1.27 + 5.23, CY0 + 65.6, top + 5.5, 4.9, 8.6, 2.3, (235, 235, 235))
@@ -225,11 +225,11 @@ xj2 = CX0 + 12.2 + 1.5 * 2.54
 cA, cB = (205, 35, 35), (232, 130, 30)
 run_x(xj2, Y0, Y_END, top + 2.9 + 3.82, 4, cA); cable("row A: 5 V, GND, pump", "J2", 4, cA, (xj2, Y_END, top + 2.9 + 3.82))
 run_x(xj2, Y0, Y_END, top + 2.9 + 1.28, 4, cB); cable("row B: boiler, valve", "J2", 4, cB, (xj2, Y_END, top + 2.9 + 1.28))
-# J7: start button (2 wires), stream button (2 wires), encoder (4 wires, middle row), spare I/O (4 wires, lowest row)
+# J7: start button (2 wires), steam button (2 wires), encoder (4 wires, middle row), spare I/O (4 wires, lowest row)
 xb, xb2, xe, xs = CX0 + 22.4 + 1.27, CX0 + 22.4 + 6.35, CX0 + 22.4 + 3.81, CX0 + 22.4 + 3.81
 run_x(xb, Y0, Y_END, top + 6.65, 2, (240, 240, 240)); cable("button", "J7", 2, (240, 240, 240), (xb, Y_END, top + 6.65))
 run_x(xe, Y0, Y_END, top + 4.1, 4, (40, 150, 70)); cable("encoder", "J7", 4, (40, 150, 70), (xe, Y_END, top + 4.1))
-run_x(xb2, Y0, Y_END, top + 6.65, 2, (120, 190, 240)); cable("stream button", "J7", 2, (120, 190, 240), (xb2, Y_END, top + 6.65))
+run_x(xb2, Y0, Y_END, top + 6.65, 2, (120, 190, 240)); cable("steam button", "J7", 2, (120, 190, 240), (xb2, Y_END, top + 6.65))
 run_x(xs, Y0, Y_END, top + 1.27, 4, (150, 90, 200)); cable("spare I/O", "J7", 4, (150, 90, 200), (xs, Y_END, top + 1.27))
 # J8: pump dimmer (I2C), 4 wires, lowest row of the J2 header
 c8 = (225, 60, 150)
