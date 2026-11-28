@@ -163,25 +163,29 @@ rect(d, X(34.8) - 1.27 * K, Y(30.3) - 1.27 * K, X(34.8 + 7 * 2.54) + 1.27 * K, Y
 silk(43.7, 28.5, "U2  MAX31865 (1x8, pin 1 VIN on the right)", 10)
 
 # ---------------------------------------------------------------- J5: socket 2 x 4 for the FPC adapter (board at the left, connector towards the front)
+# measured adapter (photos with a ruler, +/- 0.5 mm): 18.5 x 25.5; seen from above with its connector towards the front,
+# pin 1 is at the front right: front row 7 5 3 1 (left to right), rear row 8 6 4 2
 for r_ in range(2):
     for c_ in range(4):
-        tpad(8.0 + c_ * 2.54, 33.1 + r_ * 2.54, square=(r_ == 0 and c_ == 0), ring=1.7, drill=1.0)
+        tpad(8.0 + c_ * 2.54, 33.1 + r_ * 2.54, square=(r_ == 1 and c_ == 3), ring=1.7, drill=1.0)
 rect(d, X(8.0) - 1.5 * K, Y(33.1) - 1.5 * K, X(8.0 + 3 * 2.54) + 1.5 * K, Y(35.64) + 1.5 * K, outline=SILK + (255,), width=2)
-silk(13.0, 31.2, "J5  FPC board (2 x 4)", 10)
-# two M2 holes for the standoffs of the FPC adapter (positions to be taken from your board)
-for (cx, cy) in [(3.5, 30.6), (21.5, 30.6)]:
-    hole(cx, cy, 2.2, 4.2)
-silk(12.5, 29.0, "2 x M2 (to measure)", 9)
+text(d, X(17.4), Y(35.64), "1", 9, SILK, True)
+# the adapter's two 3 mm holes (measured): non-plated holes for M2.5 nylon standoffs, no part within 3 mm of them
+for (cx, cy) in [(5.26, 46.1), (18.36, 46.1)]:
+    hole(cx, cy, 2.7, 2.7)
+    circ(d, X(cx), Y(cy), 3.0 * K, outline=SILK + (255,), width=2)
+silk(4.4, 50.0, "M2.5", 8)
+silk(19.2, 50.0, "M2.5", 8)
 
-# flow input conditioning under the adapter: R11..R16 (two columns of three, pitch 7.62) + C3, C4
+# flow input conditioning under the adapter: R11..R16 (two columns, pitch 7.62) + C3, C4 between the standoffs
 for i, name in enumerate(["R11", "R12", "R13", "R14", "R15", "R16"]):
     cx_ = 6.8 if i < 3 else 17.4
-    cy_ = 39.3 + (i % 3) * 2.6
+    cy_ = [39.0, 41.6, 52.4][i % 3]
     axial(cx_, cy_, pitch=7.62, label=None)
     text(d, X(cx_), Y(cy_) - 1.6 * K, name, 8, SILK, True)
-for i, (name, xa) in enumerate([("C3", 7.0), ("C4", 14.0)]):
-    tpad(xa, 49.5, ring=1.6, drill=0.8); tpad(xa + 2.0, 49.5, ring=1.6, drill=0.8)
-    text(d, X(xa + 1.0), Y(49.5) - 1.9 * K, name, 8, SILK, True)
+for i, (name, ya) in enumerate([("C3", 44.9), ("C4", 47.3)]):
+    tpad(10.8, ya, ring=1.6, drill=0.8); tpad(12.8, ya, ring=1.6, drill=0.8)
+    text(d, X(14.4), Y(ya), name, 8, SILK, True)
 
 # ---------------------------------------------------------------- front strip: J2 (2x4), J7 (1x6), polyfuse, diode, electrolytic, XH x2
 # Front edge: every right-angle header has its Dupont housings plugged in towards the front (about 9 mm of keep-out in front of the pads).
@@ -264,14 +268,14 @@ rrect(o, px(X(31.0)) / SS, px(Y(27.5)) / SS, px(X(56.4)) / SS, px(Y(55.4)) / SS,
 rect(o, px(X(35.3)) / SS, px(Y(47.9)) / SS, px(X(52.5)) / SS, px(Y(55.0)) / SS, fill=(46, 104, 180, 220), outline=(180, 210, 250, 255), width=2)
 text(o, X(43.7), Y(32.9), "MAX31865   25.4 x 27.9, height 15", 11, (235, 240, 255), True)
 text(o, X(43.9), Y(51.5), "PT100 terminal (wires exit to the front)", 10, (235, 240, 255), True)
-# FPC adapter board ~22 x 26.5 at x 1.5..23.5, y 27.5..54 (connector towards the front: the ribbon goes straight to the front)
-rrect(o, px(X(1.5)) / SS, px(Y(27.5)) / SS, px(X(23.5)) / SS, px(Y(54.0)) / SS, 6, fill=(22, 150, 80, 130), outline=(150, 240, 190, 255), width=3)
-rect(o, px(X(7.5)) / SS, px(Y(48.4)) / SS, px(X(17.5)) / SS, px(Y(53.9)) / SS, fill=(236, 236, 228, 230), outline=(120, 120, 110, 255), width=2)
-text(o, X(12.5), Y(51.1), "FPC connector", 10, (50, 50, 44), True)
-text(o, X(12.5), Y(46.0), "FPC board ~22 x 26 (at 8.5 mm)", 10, (230, 255, 240), True)
-# the ribbon, straight to the front (about 6 mm wide)
-rect(o, px(X(9.5)) / SS, px(Y(54.0)) / SS, px(X(15.5)) / SS, px(Y(75.0)) / SS, fill=(232, 160, 48, 150), outline=(232, 160, 48, 255), width=2)
-text(o, X(12.5), Y(60.0), "ribbon", 9, (120, 70, 10), True)
+# FPC adapter board 18.5 x 25.5 (measured) at x 2.56..21.06, y 29.8..55.3 (connector towards the front: the ribbon goes straight to the front)
+rrect(o, px(X(2.56)) / SS, px(Y(29.8)) / SS, px(X(21.06)) / SS, px(Y(55.3)) / SS, 6, fill=(22, 150, 80, 130), outline=(150, 240, 190, 255), width=3)
+rect(o, px(X(6.3)) / SS, px(Y(48.8)) / SS, px(X(17.3)) / SS, px(Y(54.3)) / SS, fill=(236, 236, 228, 230), outline=(120, 120, 110, 255), width=2)
+text(o, X(11.8), Y(51.6), "FPC connector", 10, (50, 50, 44), True)
+text(o, X(11.8), Y(30.9), "J5: FPC board 18.5 x 25.5 (at 8.5 mm)", 10, (230, 255, 240), True)
+# the ribbon, straight to the front (about 5 mm wide)
+rect(o, px(X(9.3)) / SS, px(Y(54.3)) / SS, px(X(14.3)) / SS, px(Y(75.0)) / SS, fill=(232, 160, 48, 150), outline=(232, 160, 48, 255), width=2)
+text(o, X(11.8), Y(60.0), "ribbon", 9, (120, 70, 10), True)
 base = Image.alpha_composite(base, ov)
 d = ImageDraw.Draw(base)
 
@@ -345,7 +349,7 @@ chk = [
     "USB-C opening in the left wall (y 9 to 19 mm); mounting holes under the antenna: no copper ring;",
     "PT100 wires leave at the front above J7 / J3 / J4, at about 14 mm;",
     "Dupont housings end at the front wall (the board has a 42 x 7 tab there); cable slot in the wall;",
-    "M2 holes and pin-1 orientation of the FPC board; pin order of J5, J6 and J7;",
+    "FPC board measured on photos (18.5 x 25.5, 3 mm holes): confirm with a caliper; pin order of J6, J7;",
     "J9 (JST XH under J3): 1.2 mm to J3, 0.6 mm to the tab edge;",
     "check its plug height against the cable of J3 (about 12 mm).",
 ]

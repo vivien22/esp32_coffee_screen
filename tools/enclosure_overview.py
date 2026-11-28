@@ -143,14 +143,14 @@ cuboid(mx + 3.8, my + 1.4, top, 19.0, 2.5, 3.0, BLACK)
 cuboid(mx, my, top + 3.0, 25.4, 27.9, 1.6, (130, 30, 40))
 cuboid(mx + 4.2, my + 20.5, top + 3.0 + 1.6, 17.0, 7.0, 10.4, (46, 120, 190))          # PT100 terminal block
 cuboid(mx + 9.4, my + 9.9, top + 3.0 + 1.6, 7, 7, 1.6, BLACK)                          # the chip
-# the FPC adapter board (~22 x 26.5) on a 2 x 4 header, at the left, FPC connector towards the front
-ax0, ay0 = CX0 + 1.5, CY0 + 27.5
+# the FPC adapter board (18.5 x 25.5, measured) on a 2 x 4 header, at the left, FPC connector towards the front
+ax0, ay0 = CX0 + 2.56, CY0 + 29.8
 HDR = 8.5
-cuboid(ax0 + 6.5, ay0 + 5.6, top, 10.2, 5.1, HDR, BLACK)
-cuboid(ax0, ay0, top + HDR, 22, 26.5, 1.6, (22, 130, 70))
-cuboid(ax0 + 6, ay0 + 19.0, top + HDR + 1.6, 10, 5.5, 2.6, WHITE)                      # its FPC connector
-cuboid(ax0 + 1.0, ay0 + 3.1, top, 3.5, 3.5, HDR, (110, 110, 118))
-cuboid(ax0 + 17.5, ay0 + 3.1, top, 3.5, 3.5, HDR, (110, 110, 118))
+cuboid(ax0 + 4.17, ay0 + 2.03, top, 10.16, 5.08, HDR, BLACK)
+cuboid(ax0, ay0, top + HDR, 18.5, 25.5, 1.6, (22, 130, 70))
+cuboid(ax0 + 3.74, ay0 + 19.0, top + HDR + 1.6, 11, 5.5, 2.6, WHITE)                    # its FPC connector
+cuboid(ax0 + 0.95, ay0 + 14.55, top, 3.5, 3.5, HDR, (110, 110, 118))                   # M2.5 nylon standoffs under its two holes
+cuboid(ax0 + 14.05, ay0 + 14.55, top, 3.5, 3.5, HDR, (110, 110, 118))
 # D2: 1N5819 standing in the former JP1 pads (corridor): +5 V board to the 5V pin of the ESP32
 cyl(CX0 + 27.2, CY0 + 33.0, 1.35, top, 5.2, (30, 30, 34))
 cuboid(CX0 + 27.2 - 0.3, CY0 + 33.0 - 0.3, top + 5.2, 0.6, 2.54 + 0.6, 0.6, (200, 200, 205))   # lead bent over to the second pad
@@ -181,7 +181,7 @@ cuboid(CX0 + 38.5 - 4.95 + 0.3, CY0 + 68.6 + 0.3, top + 5.8, 9.3, 5.2, 6.0, CREA
 # FPC ribbon: leaves the connector towards the front and runs straight out
 Y_END = CY0 + 97.0
 RZ0 = top + HDR + 1.6 + 1.2
-cuboid(ax0 + 8, ay0 + 24.5, RZ0, 6, Y_END - (ay0 + 24.5), 0.4, (232, 160, 48))
+cuboid(ax0 + 6.74, ay0 + 24.5, RZ0, 5, Y_END - (ay0 + 24.5), 0.4, (232, 160, 48))
 
 # ---------------------------------------------------------------- cables: small flat ribbons, 1.5 mm per wire (4 wires = 6 mm), 1.3 mm thick
 WIRE = 1.5
@@ -306,8 +306,8 @@ def pl(x, y, z, tx, ty, t, color=(20, 20, 26)):
 pl(ex + 30, ey + 11, top + 10.2, 330, 330, "ESP32-S3, rotated 90 deg")
 pl(CX0 + 3, CY0 + 14, top + 12, 330, 250, "USB-C: left wall opening")
 pl(mx + 12, my + 8, top + 15, 1560, 330, "MAX31865 (PT100 to the front)")
-pl(ax0 + 11, ay0 + 10, top + HDR + 1.6, 330, 430, "your FPC adapter board (on sockets)")
-pl(ax0 + 11, ay0 + 22, top + HDR + 4.2, 330, 520, "FPC connector pre-soldered")
+pl(ax0 + 9.25, ay0 + 10, top + HDR + 1.6, 330, 430, "your FPC adapter board (on sockets)")
+pl(ax0 + 9.25, ay0 + 22, top + HDR + 4.2, 330, 520, "FPC connector pre-soldered")
 pl(sx0, sy0 + 50, FLOOR + 3, 330, 640, "3 mm small posts (45 x 50)")
 pl(BX - WALL - 4, BY - WALL - 4, BASE_H, 1560, 520, "8 mm round corner posts")
 pl(CX0 + 30, BY, FW, 1560, 640, "slot to cut in the front wall (cables)")
@@ -317,7 +317,7 @@ pl(CX0 + 27.2, CY0 + 34, top + 5.5, 330, 740, "D2: diode, +5 V to the ESP32")
 ends = []
 for (n, lab, conn, wires, col, end) in CABLES:
     ends.append((n, end, col))
-ends.append((RIBBON_NUMBER, (ax0 + 11, Y_END, RZ0), (232, 160, 48)))
+ends.append((RIBBON_NUMBER, (ax0 + 9.25, Y_END, RZ0), (232, 160, 48)))
 order = sorted(ends, key=lambda e: e[1][0])
 for rank, (n, p, col) in enumerate(order):
     u, v = P2(*p)
@@ -332,7 +332,7 @@ for rank, (n, p, col) in enumerate(order):
 
 # cable legend
 text(560, 955, "Cables: small flat ribbons, 1.5 mm per wire (all leave through the front slot)", 20, (30, 30, 36), True)
-entries = [(n, "%s  %s  (%s)" % (conn, lab, SIZE_LABEL.get(n, "%d wires, %.1f mm" % (wires, wires * WIRE))), col) for (n, lab, conn, wires, col, end) in CABLES] + [(RIBBON_NUMBER, "J5  display FPC ribbon (6 mm)", (232, 160, 48))]
+entries = [(n, "%s  %s  (%s)" % (conn, lab, SIZE_LABEL.get(n, "%d wires, %.1f mm" % (wires, wires * WIRE))), col) for (n, lab, conn, wires, col, end) in CABLES] + [(RIBBON_NUMBER, "J5  display FPC ribbon (5 mm)", (232, 160, 48))]
 per_col = 7
 for i, (n, lab, col) in enumerate(entries):
     cx = 580 + (i // per_col) * 560

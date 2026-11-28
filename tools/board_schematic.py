@@ -75,7 +75,7 @@ for i, (lab, col) in enumerate([("+5 V", RED), ("signal", BLU), ("GND", DK)]):
     pin(60 + i * 88, 562, lab, col, 14)
 
 # ---- J5
-head(60, 790, "J5: 2 x 4 socket for your FPC adapter board (8 pins)", "your board's numbering: top row 1, 3, 5, 7; bottom row 2, 4, 6, 8")
+head(60, 790, "J5: 2 x 4 socket for your FPC adapter board (8 pins)", "odd row 1, 3, 5, 7 on the FPC connector side (pin 1 front right), even row 2, 4, 6, 8 behind")
 fpc_top = [("1", "BLK"), ("3", "DC"), ("5", "SDA"), ("7", "VCC")]
 fpc_bot = [("2", "CS"), ("4", "RES"), ("6", "SCL"), ("8", "GND")]
 for i, (n, sg) in enumerate(fpc_top):

@@ -13,6 +13,7 @@ A record of the choices made while designing the carrier board (conversation wit
 - ESP32-S3 N16R8 board measured: 21 mm wide, 2 x 20 pins, rows 17.78 mm apart. Rotated 90°, USB-C to the left wall, antenna end on the right with a copper keep-out.
 - J3, J4, J9 moved 3.5 mm left (and J3 / J4 back 0.5 mm) to get margin from the board edge and between J3 and J9.
 - Q1 to Q4: two rows of two (in-line they overlapped R10 and each other). All TO-92 use a **triangular footprint** (outer legs 2.54 mm apart, middle leg bent 2.54 mm back): three round pads in line at 1.27 mm overlap and would short the legs (found by an automatic pad-clearance check).
+- FPC adapter measured on photos (18.5 x 25.5 mm, two 3 mm holes near its connector end): it now sits at x 2.6 to 21.1, y 29.8 to 55.3, J5 unchanged (pin 1 at the front right). Its two holes get **M2.5 nylon standoffs** on non-plated holes of the carrier, so that the ribbon cannot lever the adapter off its header; R13 / R16 moved to y 52.4 and C3 / C4 between the standoffs to keep 3 mm around them.
 - Mounting hole at (6.5, 9): copper ring reduced to 4.6 mm (a 5.6 mm ring came within 0.26 mm of a socket pad). Hole under the antenna: non-plated, **nylon screw**.
 
 ## Connectors
