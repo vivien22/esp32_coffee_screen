@@ -12,9 +12,11 @@ Farnell (11.99 EUR excl. VAT delivery below 50 EUR) and Mouser (25 EUR delivery 
 | Z5U-2,5 100N (2.5 mm pitch) | 3 | C2, C5, C6 |
 | FIS BL1 20 Z (1 x 20 female, 2.54 mm, tinned) | 2 | ESP32 sockets: check the height against the ESP32 board |
 
-**Funduino cart: 3.90 EUR + 7.90 EUR delivery**: JST-XH 3-pin header x3, 40-pin male header x1, 3 x 40 angled header x1, 1 nF ceramic x2, 2 x 5 female header (11 mm pins) x1.
+**Funduino cart: 3.90 EUR + 7.90 EUR delivery**: JST-XH 3-pin header x3, 40-pin male header x1, 3 x 40 angled header x1, 1 nF ceramic x2, 2 x 5 female header (11 mm pins) x1, **220 uF 10 V radial capacitor x1 (F23106917, 0.30 EUR) for C1**.
 
-**Still missing**: C1 (330 uF 10 V, 6.3 mm, 2.5 mm pitch: Reichelt only has 8 x 11.5 mm; Funduino has a 220 uF 10 V radial, size not checked), low 1 x 8 socket for the MAX31865, M2.5 nylon screw.
+**Note on C1 (the spec and the schematic still say 330 to 470 uF, deliberately not changed):** the 330 uF 6.3 mm part was not available cheaply (Reichelt only has 8 x 11.5 mm; TME sells the Panasonic by 200 or the Rubycon by 958). The Funduino 220 uF 10 V is a stop-gap: 6.5 mm diameter, 8 mm tall, 10 V (2 x margin on the 5.0 V rail); pitch (probably 2.5 mm) and temperature rating (85 or 105 C?) are not given, so check both on arrival. C1 only smooths the 5 V rail, so a third less capacitance is acceptable; if the enclosure runs hot, prefer the Panasonic ECA1AHG331 (105 C, Farnell 1907187).
+
+**Still missing**: low 1 x 8 socket for the MAX31865, M2.5 nylon screw.
 
 The Farnell section below is kept as the fallback (it is the only source checked for C1, ECA1AHG331).
 
