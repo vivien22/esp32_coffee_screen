@@ -1,3 +1,23 @@
+# Cheapest option found (2026-11-28): Reichelt + Funduino, about 25.8 EUR delivered
+
+Farnell (11.99 EUR excl. VAT delivery below 50 EUR) and Mouser (25 EUR delivery below 75 EUR) were compared: both lose, because delivery dominates a 15 EUR parts list. Reichelt (reichelt.com/fr, delivery 7.90 EUR by DPD, 9.95 DHL) and Funduino (7.90 EUR) are the cheapest pair. Prices include VAT.
+
+**Reichelt cart: 6.08 EUR + 7.90 EUR delivery**
+| Article | Qty | Use |
+|---|---|---|
+| LITT RXEF110 | 1 | F1 resettable fuse |
+| PN 2222A CD | 5 | Q1 to Q5 |
+| 1N 5819 | 1 | D2 |
+| METALL 33,0 / 1,00K / 4,70K / 10,0K / 12,0K / 22,0K | 2 / 7 / 6 / 12 / 2 / 2 | all resistors |
+| Z5U-2,5 100N (2.5 mm pitch) | 3 | C2, C5, C6 |
+| FIS BL1 20 Z (1 x 20 female, 2.54 mm, tinned) | 2 | ESP32 sockets: check the height against the ESP32 board |
+
+**Funduino cart: 3.90 EUR + 7.90 EUR delivery**: JST-XH 3-pin header x3, 40-pin male header x1, 3 x 40 angled header x1, 1 nF ceramic x2, 2 x 5 female header (11 mm pins) x1.
+
+**Still missing**: C1 (330 uF 10 V, 6.3 mm, 2.5 mm pitch: Reichelt only has 8 x 11.5 mm; Funduino has a 220 uF 10 V radial, size not checked), low 1 x 8 socket for the MAX31865, M2.5 nylon screw.
+
+The Farnell section below is kept as the fallback (it is the only source checked for C1, ECA1AHG331).
+
 # Ordering the carrier board parts (Farnell France)
 
 Prepared on 2026-11-28 from `docs/carrier_spec.md` (bill of materials). Order codes were checked on fr.farnell.com that day, except where noted. Prices and stock change: the cart shows the real total.
